@@ -113,30 +113,53 @@
 }
 
 .sidebar-footer {
-  padding: 20px;
-  background-color: #231309; /* Even darker shade */
+  padding: 15px;
+  background-color: #231309;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: auto; /* Push to bottom */
 }
 
-.user-info {
+.sidebar-footer .nav-item {
+  padding: 12px 15px;
+  width: 100%;
   display: flex;
   align-items: center;
-  gap: 10px;
+  color: #fff;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-left: 4px solid transparent;
 }
 
-.user-info i {
-  font-size: 1.5em;
+.sidebar-footer .nav-item:hover {
+  background-color: #8B3A2B;
+  border-left-color: rgba(255, 255, 255, 0.5);
 }
 
-.user-info span {
-  transition: opacity 0.3s ease;
-  white-space: nowrap;
+.sidebar-footer .nav-item i {
+  width: 24px;
+  text-align: center;
+  margin-right: 15px;
+  font-size: 1.1em;
 }
 
-.sidebar.collapsed .user-info span {
-  opacity: 0;
-  width: 0;
-  overflow: hidden;
+.sidebar.collapsed .sidebar-footer .nav-item {
+  padding: 12px;
+  justify-content: center;
+}
+
+.sidebar.collapsed .sidebar-footer .nav-item i {
+  margin-right: 0;
+}
+
+.sidebar.collapsed .sidebar-footer .nav-item span {
+  display: none;
+}
+
+/* Remove the user info styles */
+.user-info {
+  display: none;
 }
 
 /* Tooltip for collapsed state */
@@ -186,10 +209,4 @@
     margin-right: 0;
     font-size: 1.2em;
   }
-}
-
-/* Remove these styles if they exist */
-.sidebar-footer,
-.user-info {
-  display: none;
 } 

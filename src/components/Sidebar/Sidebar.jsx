@@ -1,15 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { auth } from '../../firebase-config';
 import './Sidebar.css';
 
-const Sidebar = () => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+const Sidebar = ({ isCollapsed, onToggle }) => {
   const navigate = useNavigate();
-
-  const toggleSidebar = () => {
-    setIsCollapsed(!isCollapsed);
-  };
 
   const handleLogout = async () => {
     try {
@@ -24,7 +19,7 @@ const Sidebar = () => {
     <div className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
       <div className="sidebar-header">
         <h2>Agreement Manager</h2>
-        <button className="toggle-btn" onClick={toggleSidebar}>
+        <button className="toggle-btn" onClick={onToggle}>
           <i className={`fas fa-chevron-${isCollapsed ? 'right' : 'left'}`}></i>
         </button>
       </div>
@@ -69,10 +64,10 @@ const Sidebar = () => {
       </nav>
 
       <div className="sidebar-footer">
-        <div className="user-info">
-          <i className="fas fa-user-circle"></i>
-          <span>Admin User</span>
-        </div>
+        <button className="nav-item" onClick={handleLogout}>
+          <i className="fas fa-sign-out-alt"></i>
+          {!isCollapsed && <span>Logout</span>}
+        </button>
       </div>
     </div>
   );
