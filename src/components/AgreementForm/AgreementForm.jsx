@@ -24,9 +24,8 @@ const AgreementForm = () => {
     // Agreement Details
     agreementType: 'MOU', // Default value
     
-    // Simplified Partners structure
+    // Partner Type only
     partnerType: '',
-    partnerName: '',
     
     // Dates
     dateSigned: '',
@@ -67,7 +66,7 @@ const AgreementForm = () => {
     }));
   };
 
-  // Add automatic expiry date calculation
+  // Update the handleDateOrValidityChange function
   const handleDateOrValidityChange = (e) => {
     const { name, value } = e.target;
     setFormData(prevState => {
@@ -78,10 +77,19 @@ const AgreementForm = () => {
       
       if ((name === 'dateSigned' && prevState.validity) || 
           (name === 'validity' && prevState.dateSigned)) {
-        newState.dateExpired = calculateExpiryDate(
-          name === 'dateSigned' ? value : prevState.dateSigned,
-          name === 'validity' ? value : prevState.validity
-        );
+        // Convert text validity to number for calculation
+        const validityYears = name === 'validity' ? 
+          parseInt(value) || 0 : 
+          parseInt(prevState.validity) || 0;
+        
+        if (validityYears > 0) {
+          newState.dateExpired = calculateExpiryDate(
+            name === 'dateSigned' ? value : prevState.dateSigned,
+            validityYears
+          );
+        } else {
+          newState.dateExpired = '';
+        }
       }
       
       return newState;
@@ -112,8 +120,12 @@ const AgreementForm = () => {
     }
 
     // Validate partner information
-    if (!formData.partnerType || !formData.partnerName) {
-      alert('Please fill in partner information');
+    if (!formData.partnerType) {
+      setNotification({
+        show: true,
+        type: 'error',
+        message: 'Please select a partner type'
+      });
       return;
     }
 
@@ -139,7 +151,6 @@ const AgreementForm = () => {
         designation: '',
         agreementType: 'MOU',
         partnerType: '',
-        partnerName: '',
         dateSigned: '',
         validity: '',
         dateExpired: '',
@@ -166,7 +177,7 @@ const AgreementForm = () => {
   return (
     <div className="agreement-form-container">
       <div className="form-header">
-        <h2>Partnership Agreement Form</h2>
+        <h2>Linkages Partnership Agreement Form</h2>
         <p className="form-subtitle">Enter agreement details below</p>
       </div>
 
@@ -253,19 +264,6 @@ const AgreementForm = () => {
                 <option value="localGov">Local Government</option>
               </select>
             </div>
-            <div className="form-group">
-              <label htmlFor="partnerName">Partner Name:</label>
-              <input
-                type="text"
-                id="partnerName"
-                name="partnerName"
-                value={formData.partnerName}
-                onChange={handleChange}
-                placeholder="Enter partner name"
-                required
-                className="partner-input"
-              />
-            </div>
           </div>
         </section>
 
@@ -288,13 +286,12 @@ const AgreementForm = () => {
               <span className="validity-helper">Duration of the agreement</span>
             </label>
             <input
-              type="number"
+              type="text"
               id="validity"
               name="validity"
               value={formData.validity}
               onChange={handleDateOrValidityChange}
-              min="1"
-              max="10"
+              placeholder="Enter validity period"
               required
             />
           </div>

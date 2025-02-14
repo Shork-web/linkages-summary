@@ -3,6 +3,7 @@
   background-color: white;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin: 0 -20px;
 }
 
 .agreements-header {
@@ -10,7 +11,13 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 30px;
-  padding: 0 10px;
+  padding: 0 20px;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.header-title {
+  margin-right: auto;
 }
 
 .header-title h2 {
@@ -23,13 +30,15 @@
 .header-controls {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 55px;
+  flex-wrap: wrap;
+  margin-left: auto;
 }
 
 .search-box {
   position: relative;
-  min-width: 200px;
-  margin-right: 40px;
+  min-width: 300px;
+  margin-right: auto;
 }
 
 .search-box input {
@@ -60,6 +69,7 @@
   display: flex;
   gap: 15px;
   align-items: center;
+  margin-left: auto;
 }
 
 .filter-group select {
@@ -88,30 +98,76 @@
 
 .table-container {
   overflow-x: auto;
+  margin: 0 -20px;
+  padding: 0 20px;
+  max-width: calc(100vw - 80px);
   margin-bottom: 20px;
-  max-width: 100%;
 }
 
 .agreements-table {
   width: 100%;
   border-collapse: collapse;
   margin-bottom: 20px;
-  min-width: 1500px;
+  min-width: 1200px;
 }
 
 .agreements-table th,
 .agreements-table td {
-  padding: 12px 15px;
+  padding: 15px 20px;
   text-align: left;
   border-bottom: 1px solid #ddd;
+  white-space: nowrap;
 }
 
 .agreements-table th {
   background-color: #f8f8f8;
   color: #333;
   font-weight: 600;
-  white-space: nowrap;
   padding: 12px 20px;
+}
+
+.agreements-table th:nth-child(1),
+.agreements-table td:nth-child(1) {
+  min-width: 200px;
+}
+
+.agreements-table th:nth-child(2),
+.agreements-table td:nth-child(2) {
+  min-width: 200px;
+}
+
+.agreements-table th:nth-child(3),
+.agreements-table td:nth-child(3) {
+  min-width: 150px;
+}
+
+.agreements-table th:nth-child(4),
+.agreements-table td:nth-child(4) {
+  min-width: 150px;
+}
+
+.agreements-table th:nth-child(5),
+.agreements-table td:nth-child(5) {
+  min-width: 120px;
+}
+
+.agreements-table th:nth-child(6),
+.agreements-table td:nth-child(6),
+.agreements-table th:nth-child(8),
+.agreements-table td:nth-child(8) {
+  min-width: 120px;
+}
+
+.agreements-table th:nth-child(7),
+.agreements-table td:nth-child(7) {
+  min-width: 100px;
+}
+
+.agreements-table th:nth-child(11),
+.agreements-table td:nth-child(11) {
+  min-width: 200px;
+  max-width: 300px;
+  position: relative;
 }
 
 .agreements-table tbody tr:hover {
@@ -165,7 +221,6 @@
   gap: 8px;
   justify-content: center;
   align-items: center;
-  height: 32px;
 }
 
 .action-btn {
@@ -173,43 +228,37 @@
   align-items: center;
   justify-content: center;
   width: 32px;
-  height: 32px;
+  height: 100px;
   padding: 0;
   border: none;
   border-radius: 4px;
   cursor: pointer;
   transition: all 0.2s ease;
-  color: #666;
-  background: transparent;
-}
-
-.action-btn i {
-  font-size: 16px;
-  line-height: 1;
+  background-color: transparent;
 }
 
 .action-btn:hover {
-  background-color: #f0f0f0;
-}
-
-.edit-btn:hover {
-  color: #1565C0;
-}
-
-.delete-btn:hover {
-  color: #C62828;
-}
-
-.view-btn {
-  color: #1565C0;
+  background-color: rgba(0, 0, 0, 0.05);
 }
 
 .edit-btn {
   color: #F57C00;
 }
 
+.edit-btn:hover {
+  color: #E65100;
+}
+
 .delete-btn {
   color: #C62828;
+}
+
+.delete-btn:hover {
+  color: #B71C1C;
+}
+
+.view-btn {
+  color: #1565C0;
 }
 
 .table-footer {
@@ -277,41 +326,93 @@
 }
 
 /* Style for description column to handle long text */
-.agreements-table td:nth-child(11) {
-  max-width: 200px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.description-cell {
   position: relative;
+  max-width: 300px;
+  padding: 0;
 }
 
-/* Optional: Add tooltip on hover */
-.agreements-table td:nth-child(11):hover {
-  overflow: visible;
+.description-content {
+  position: relative;
+  overflow: hidden;
+  line-height: 1.4;
+  padding: 4px 0;
+}
+
+.description-content.collapsed {
+  max-height: 3em;
+  text-overflow: ellipsis;
+  white-space: normal;
+}
+
+.description-content.expanded {
+  max-height: none;
   white-space: normal;
   background-color: #fff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  z-index: 1;
-  position: absolute;
   border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   padding: 8px;
-  min-width: 200px;
-  max-width: 400px;
+  z-index: 10;
+}
+
+.show-more-btn {
+  background: none;
+  border: none;
+  color: #8B3A2B;
+  cursor: pointer;
+  font-size: 0.85em;
+  padding: 2px 0;
+  margin-top: 4px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  z-index: 11;
+}
+
+.show-more-btn:hover {
+  text-decoration: underline;
+}
+
+.show-more-btn i {
+  font-size: 0.8em;
+}
+
+/* Add fade effect for collapsed text */
+.description-content.collapsed::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 20px;
+  background: linear-gradient(transparent, white);
+  pointer-events: none;
 }
 
 /* Style for links column */
 .agreements-table td:nth-child(12) {
   text-align: center;
+  width: 80px;
 }
 
 .agreements-table td:nth-child(12) a {
   color: #8B3A2B;
   text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  height: 32px;
-  min-width: 50px;
+  padding: 6px 12px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.agreements-table td:nth-child(12) a:hover {
+  background-color: rgba(139, 58, 43, 0.1);
+}
+
+/* Style for actions column */
+.agreements-table td:nth-child(13) {
+  text-align: center;
+  width: 100px;
+  padding: 8px 15px;
 }
 
 /* Style for renewal column */
@@ -341,29 +442,38 @@
   }
 }
 
+@media (max-width: 1400px) {
+  .agreements-container {
+    margin: 0 -10px;
+  }
+
+  .table-container {
+    margin: 0 -10px;
+    padding: 0 10px;
+  }
+}
+
 @media (max-width: 1024px) {
   .agreements-header {
     flex-direction: column;
     align-items: stretch;
-    gap: 20px;
   }
 
   .header-controls {
     flex-direction: column;
+    width: 100%;
     gap: 15px;
   }
 
   .search-box {
-    min-width: 100%;
+    width: 100%;
+    min-width: unset;
+    margin-right: 0;
   }
 
   .filter-group {
     width: 100%;
-    justify-content: space-between;
-  }
-
-  .filter-group select {
-    flex: 1;
+    margin-left: 0;
   }
 }
 
@@ -635,4 +745,79 @@
 
 .delete-actions .confirm-btn:hover {
   background-color: #B71C1C;
+}
+
+/* Update main container padding */
+main {
+  padding: 20px 40px;
+  max-width: 100%;
+}
+
+/* Update the description column styles */
+.agreements-table th:nth-child(11),
+.agreements-table td:nth-child(11) {
+  min-width: 200px;
+  max-width: 300px;
+}
+
+.description-cell {
+  position: relative;
+  max-width: 300px;
+}
+
+.description-content {
+  position: relative;
+  overflow: hidden;
+  line-height: 1.4;
+}
+
+.description-content.collapsed {
+  max-height: 3em;
+  text-overflow: ellipsis;
+  white-space: normal;
+}
+
+.description-content.expanded {
+  max-height: none;
+  white-space: normal;
+}
+
+.show-more-btn {
+  background: none;
+  border: none;
+  color: #8B3A2B;
+  cursor: pointer;
+  font-size: 0.85em;
+  padding: 2px 0;
+  margin-top: 4px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.show-more-btn:hover {
+  text-decoration: underline;
+}
+
+.show-more-btn i {
+  font-size: 0.8em;
+}
+
+/* Add fade effect for collapsed text */
+.description-content.collapsed::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 20px;
+  background: linear-gradient(transparent, white);
+  pointer-events: none;
+}
+
+/* Make sure table headers align with content */
+.agreements-table th:nth-child(12),
+.agreements-table th:nth-child(13) {
+  text-align: center;
 } 

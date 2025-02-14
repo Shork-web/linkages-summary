@@ -28,6 +28,9 @@ const AllAgreements = () => {
     type: '',
     message: ''
   });
+  const [expandedDescriptions, setExpandedDescriptions] = useState(new Set());
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
 
   useEffect(() => {
     // Check authentication
@@ -54,6 +57,11 @@ const AllAgreements = () => {
       (filters.status === '' || agreement.status === filters.status)
     );
   });
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredAgreements.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredAgreements.length / itemsPerPage);
 
   const handleEdit = (agreement) => {
     setEditingAgreement(agreement);
@@ -114,6 +122,30 @@ const AllAgreements = () => {
 
   const cancelDelete = () => {
     setDeleteConfirm({ show: false, agreementId: null, agreementName: '' });
+  };
+
+  const toggleDescription = (id) => {
+    setExpandedDescriptions(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(id)) {
+        newSet.delete(id);
+      } else {
+        newSet.add(id);
+      }
+      return newSet;
+    });
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
   };
 
   return (
@@ -177,8 +209,8 @@ const AllAgreements = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredAgreements.length > 0 ? (
-                filteredAgreements.map(agreement => (
+              {currentItems.length > 0 ? (
+                currentItems.map(agreement => (
                   <tr key={agreement.id}>
                     <td>{agreement.name}</td>
                     <td>{agreement.address}</td>
@@ -186,7 +218,10 @@ const AllAgreements = () => {
                     <td>{agreement.designation}</td>
                     <td>{agreement.agreementType}</td>
                     <td>{agreement.dateSigned}</td>
-                    <td>{agreement.validity}</td>
+                    <td>
+                      {agreement.validity}
+                      {agreement.validity && !isNaN(agreement.validity) && ' years'}
+                    </td>
                     <td>{agreement.dateExpired}</td>
                     <td>{agreement.forRenewal ? 'Yes' : 'No'}</td>
                     <td>
@@ -194,7 +229,29 @@ const AllAgreements = () => {
                         {agreement.status}
                       </span>
                     </td>
-                    <td>{agreement.description}</td>
+                    <td className="description-cell">
+                      <div className={`description-content ${expandedDescriptions.has(agreement.id) ? 'expanded' : 'collapsed'}`}>
+                        {agreement.description}
+                      </div>
+                      {agreement.description.length > 100 && (
+                        <button 
+                          className="show-more-btn"
+                          onClick={() => toggleDescription(agreement.id)}
+                        >
+                          {expandedDescriptions.has(agreement.id) ? (
+                            <>
+                              Show Less
+                              <i className="fas fa-chevron-up"></i>
+                            </>
+                          ) : (
+                            <>
+                              Show More
+                              <i className="fas fa-chevron-down"></i>
+                            </>
+                          )}
+                        </button>
+                      )}
+                    </td>
                     <td>
                       <a href={agreement.links} target="_blank" rel="noopener noreferrer">
                         View
@@ -235,9 +292,21 @@ const AllAgreements = () => {
 
         <div className="table-footer">
           <div className="pagination">
-            <button className="page-btn" disabled><i className="fas fa-chevron-left"></i></button>
-            <button className="page-btn active">1</button>
-            <button className="page-btn" disabled><i className="fas fa-chevron-right"></i></button>
+            <button 
+              className="page-btn" 
+              onClick={handlePrevPage}
+              disabled={currentPage === 1}
+            >
+              <i className="fas fa-chevron-left"></i>
+            </button>
+            <button className="page-btn active">{currentPage}</button>
+            <button 
+              className="page-btn" 
+              onClick={handleNextPage}
+              disabled={currentPage === totalPages}
+            >
+              <i className="fas fa-chevron-right"></i>
+            </button>
           </div>
         </div>
       </div>

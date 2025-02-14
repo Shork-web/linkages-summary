@@ -26,7 +26,7 @@ const MainLayout = () => {
       />
       <div className={`main-content ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
         <header className="App-header">
-          <h1>Partnership Agreement Management</h1>
+          <h1>Linkages Partnership Agreement Management</h1>
         </header>
         <main>
           <Outlet />

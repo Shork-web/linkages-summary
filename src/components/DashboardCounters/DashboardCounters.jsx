@@ -9,7 +9,7 @@ const DashboardCounters = ({ agreements }) => {
       MOA: agreements.filter(a => a.agreementType === 'MOA').length
     },
     byPartnerType: {
-      Academic: agreements.filter(a => a.partnerType === 'academic').length,
+      Academe: agreements.filter(a => a.partnerType === 'academe').length,
       Industry: agreements.filter(a => a.partnerType === 'industry').length,
       Government: agreements.filter(a => a.partnerType === 'government').length
     }
@@ -41,10 +41,10 @@ const DashboardCounters = ({ agreements }) => {
         </div>
 
         <div className="counter-section partners">
-          <div className="counter-card academic">
+          <div className="counter-card academe">
             <div className="counter-content">
-              <span className="counter-value">{counters.byPartnerType.Academic}</span>
-              <span className="counter-label">Academic</span>
+              <span className="counter-value">{counters.byPartnerType.Academe}</span>
+              <span className="counter-label">Academe</span>
             </div>
           </div>
           <div className="counter-card industry">

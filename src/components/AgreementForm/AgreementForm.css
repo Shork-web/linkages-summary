@@ -263,7 +263,7 @@ select {
 }
 
 .validity-helper {
-  font-size: 0.8em;
+  font-size: 0.85em;
   color: #666;
   margin-left: 8px;
   font-weight: normal;
@@ -435,4 +435,31 @@ select {
 
 .renewal-checkbox-group .checkbox-label:hover {
   background-color: rgba(139, 58, 43, 0.05);
+}
+
+/* Update validity input styles */
+.form-group input[name="validity"] {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  transition: border-color 0.3s ease;
+  box-sizing: border-box;
+}
+
+.form-group input[name="validity"]:hover {
+  border-color: #8B3A2B;
+}
+
+.form-group input[name="validity"]:focus {
+  outline: none;
+  border-color: #8B3A2B;
+  box-shadow: 0 0 0 2px rgba(139, 58, 43, 0.1);
+}
+
+/* Remove the number input specific styles */
+.form-group input[type="number"]::-webkit-inner-spin-button,
+.form-group input[type="number"]::-webkit-outer-spin-button {
+  display: none;
 } 
