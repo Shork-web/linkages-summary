@@ -6,6 +6,7 @@ import './RenewalAgreements.css';
 
 const RenewalAgreements = () => {
   const [agreements, setAgreements] = useState([]);
+  const [expandedDescriptions, setExpandedDescriptions] = useState(new Set());
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -32,6 +33,18 @@ const RenewalAgreements = () => {
 
     return () => unsubscribe();
   }, [navigate]);
+
+  const toggleDescription = (id) => {
+    setExpandedDescriptions(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(id)) {
+        newSet.delete(id);
+      } else {
+        newSet.add(id);
+      }
+      return newSet;
+    });
+  };
 
   return (
     <div className="agreements-container">
@@ -91,8 +104,28 @@ const RenewalAgreements = () => {
                       {agreement.status}
                     </span>
                   </td>
-                  <td style={{ maxWidth: '200px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    {agreement.description}
+                  <td className="description-cell">
+                    <div className={`description-content ${expandedDescriptions.has(agreement.id) ? 'expanded' : 'collapsed'}`}>
+                      {agreement.description}
+                    </div>
+                    {agreement.description.length > 100 && (
+                      <button 
+                        className="show-more-btn"
+                        onClick={() => toggleDescription(agreement.id)}
+                      >
+                        {expandedDescriptions.has(agreement.id) ? (
+                          <>
+                            Show Less
+                            <i className="fas fa-chevron-up"></i>
+                          </>
+                        ) : (
+                          <>
+                            Show More
+                            <i className="fas fa-chevron-down"></i>
+                          </>
+                        )}
+                      </button>
+                    )}
                   </td>
                   <td>
                     <a href={agreement.links} target="_blank" rel="noopener noreferrer">

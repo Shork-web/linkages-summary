@@ -67,4 +67,131 @@
 .agreements-table th:nth-child(4) { width: 15%; } /* Contact Person */
 .agreements-table th:nth-child(5) { width: 12%; } /* Contact Number */
 .agreements-table th:nth-child(6) { width: 15%; } /* Email */
-.agreements-table th:nth-child(7) { width: 8%; }  /* Active Agreements */ 
+.agreements-table th:nth-child(7) { width: 8%; }  /* Active Agreements */
+
+/* Enhanced Partner Stats Grid */
+.partner-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 25px;
+  margin: 20px;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 16px;
+}
+
+.partner-stat-card {
+  background: white;
+  border-radius: 16px;
+  padding: 25px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  position: relative;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.partner-stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.partner-stat-card.academe {
+  border-left: 5px solid #1565C0;
+}
+
+.partner-stat-card.industry {
+  border-left: 5px solid #2E7D32;
+}
+
+.partner-stat-card.government {
+  border-left: 5px solid #F57C00;
+}
+
+.partner-stat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.partner-stat-header h3 {
+  margin: 0;
+  font-size: 1.5em;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.total-count {
+  background: #f0f2f5;
+  padding: 8px 16px;
+  border-radius: 30px;
+  font-size: 0.95em;
+  color: #444;
+  font-weight: 600;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+.agreement-type-counts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.count-item {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  transition: all 0.2s ease;
+  border: 1px solid rgba(0, 0, 0, 0.03);
+}
+
+.count-item:hover {
+  background: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.count-label {
+  display: block;
+  font-size: 1em;
+  color: #666;
+  margin-bottom: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.count-value {
+  display: block;
+  font-size: 2em;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.partner-stat-card.academe .count-value {
+  color: #1565C0;
+}
+
+.partner-stat-card.industry .count-value {
+  color: #2E7D32;
+}
+
+.partner-stat-card.government .count-value {
+  color: #F57C00;
+}
+
+@media (max-width: 768px) {
+  .partner-stats-grid {
+    grid-template-columns: 1fr;
+    margin: 15px;
+    padding: 15px;
+  }
+  
+  .partner-stat-card {
+    padding: 20px;
+  }
+  
+  .count-value {
+    font-size: 1.8em;
+  }
+} 

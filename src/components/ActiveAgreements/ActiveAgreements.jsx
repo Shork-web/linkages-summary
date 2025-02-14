@@ -4,11 +4,24 @@ import './ActiveAgreements.css';
 
 const ActiveAgreements = () => {
   const [agreements, setAgreements] = useState([]);
+  const [expandedDescriptions, setExpandedDescriptions] = useState(new Set());
 
   useEffect(() => {
     const unsubscribe = subscribeToAgreements(setAgreements, 'active');
     return () => unsubscribe();
   }, []);
+
+  const toggleDescription = (id) => {
+    setExpandedDescriptions(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(id)) {
+        newSet.delete(id);
+      } else {
+        newSet.add(id);
+      }
+      return newSet;
+    });
+  };
 
   return (
     <div className="agreements-container">
@@ -66,7 +79,29 @@ const ActiveAgreements = () => {
                   <td>{agreement.dateExpired}</td>
                   <td>{agreement.forRenewal ? 'Yes' : 'No'}</td>
                   <td>{agreement.status}</td>
-                  <td>{agreement.description}</td>
+                  <td className="description-cell">
+                    <div className={`description-content ${expandedDescriptions.has(agreement.id) ? 'expanded' : 'collapsed'}`}>
+                      {agreement.description}
+                    </div>
+                    {agreement.description.length > 100 && (
+                      <button 
+                        className="show-more-btn"
+                        onClick={() => toggleDescription(agreement.id)}
+                      >
+                        {expandedDescriptions.has(agreement.id) ? (
+                          <>
+                            Show Less
+                            <i className="fas fa-chevron-up"></i>
+                          </>
+                        ) : (
+                          <>
+                            Show More
+                            <i className="fas fa-chevron-down"></i>
+                          </>
+                        )}
+                      </button>
+                    )}
+                  </td>
                   <td>
                     <a href={agreement.links} target="_blank" rel="noopener noreferrer">
                       View
