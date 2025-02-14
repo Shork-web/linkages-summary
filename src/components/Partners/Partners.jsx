@@ -47,12 +47,13 @@ const Partners = () => {
   }, [navigate]);
 
   return (
-    <div className="agreements-container">
+    <div className="partners-container">
+      <h2 className="partners-title">Partner Statistics</h2>
       <div className="partner-stats-grid">
         {Object.entries(partnerStats).map(([partnerType, stats]) => (
           <div key={partnerType} className={`partner-stat-card ${partnerType}`}>
             <div className="partner-stat-header">
-              <h3>{partnerType.charAt(0).toUpperCase() + partnerType.slice(1)}</h3>
+              <h3>{partnerType.charAt(0).toUpperCase() + partnerType.slice(1)} Partners</h3>
               <span className="total-count">{stats.total} Total</span>
             </div>
             <div className="agreement-type-counts">

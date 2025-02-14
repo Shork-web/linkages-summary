@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { subscribeToAgreements } from '../../utils/fetchAgreements';
 import { doc, deleteDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../../firebase-config';
@@ -13,7 +13,9 @@ const AllAgreements = () => {
   const [agreements, setAgreements] = useState([]);
   const [filters, setFilters] = useState({
     type: '',
-    status: ''
+    status: '',
+    search: '',
+    partnerType: ''
   });
   const navigate = useNavigate();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -31,6 +33,7 @@ const AllAgreements = () => {
   const [expandedDescriptions, setExpandedDescriptions] = useState(new Set());
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
+  const [visiblePages, setVisiblePages] = useState([]);
 
   useEffect(() => {
     // Check authentication
@@ -52,10 +55,37 @@ const AllAgreements = () => {
   };
 
   const filteredAgreements = agreements.filter(agreement => {
-    return (
-      (filters.type === '' || agreement.agreementType === filters.type) &&
-      (filters.status === '' || agreement.status === filters.status)
+    const searchTerm = filters.search.toLowerCase().trim();
+    
+    // If no search term, only apply type filters
+    if (!searchTerm) {
+      return (filters.type === '' || agreement.agreementType === filters.type) &&
+             (filters.status === '' || agreement.status === filters.status) &&
+             (filters.partnerType === '' || agreement.partnerType === filters.partnerType);
+    }
+
+    // Check if any field matches the search term
+    const isMatch = [
+      agreement.name,
+      agreement.address,
+      agreement.signedBy,
+      agreement.designation,
+      agreement.description,
+      agreement.agreementType,
+      agreement.partnerType,
+      agreement.status,
+      agreement.validity,
+      agreement.dateSigned,
+      agreement.dateExpired
+    ].some(field => 
+      String(field || '').toLowerCase().includes(searchTerm)
     );
+
+    // Apply both search and type filters
+    return isMatch && 
+           (filters.type === '' || agreement.agreementType === filters.type) &&
+           (filters.status === '' || agreement.status === filters.status) &&
+           (filters.partnerType === '' || agreement.partnerType === filters.partnerType);
   });
 
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -148,6 +178,36 @@ const AllAgreements = () => {
     }
   };
 
+  const calculateVisiblePages = useCallback(() => {
+    const delta = 2;
+    const range = [];
+    for (
+      let i = Math.max(2, currentPage - delta);
+      i <= Math.min(totalPages - 1, currentPage + delta);
+      i++
+    ) {
+      range.push(i);
+    }
+
+    if (currentPage - delta > 2) {
+      range.unshift('...');
+    }
+    if (currentPage + delta < totalPages - 1) {
+      range.push('...');
+    }
+
+    range.unshift(1);
+    if (totalPages > 1) {
+      range.push(totalPages);
+    }
+
+    setVisiblePages(range);
+  }, [currentPage, totalPages]);
+
+  useEffect(() => {
+    calculateVisiblePages();
+  }, [calculateVisiblePages]);
+
   return (
     <div>
       <DashboardCounters agreements={agreements} />
@@ -161,29 +221,31 @@ const AllAgreements = () => {
               <i className="fas fa-search"></i>
               <input 
                 type="text" 
-                placeholder="Search agreements..."
+                name="search"
+                value={filters.search}
+                onChange={handleFilterChange}
+                placeholder="Search by name, type, status..."
               />
             </div>
             <div className="filter-group">
-              <select 
-                name="type" 
-                value={filters.type} 
+              <select
+                name="type"
+                value={filters.type}
                 onChange={handleFilterChange}
               >
                 <option value="">All Types</option>
                 <option value="MOU">MOU</option>
                 <option value="MOA">MOA</option>
               </select>
-              <select 
-                name="status" 
-                value={filters.status} 
+              <select
+                name="partnerType"
+                value={filters.partnerType}
                 onChange={handleFilterChange}
               >
-                <option value="">All Status</option>
-                <option value="active">Active</option>
-                <option value="pending">Pending</option>
-                <option value="expired">Expired</option>
-                <option value="renewed">Renewed</option>
+                <option value="">All Partners</option>
+                <option value="academe">Academe</option>
+                <option value="industry">Industry</option>
+                <option value="government">Government</option>
               </select>
             </div>
           </div>
@@ -296,17 +358,37 @@ const AllAgreements = () => {
               className="page-btn" 
               onClick={handlePrevPage}
               disabled={currentPage === 1}
+              title="Previous Page"
             >
               <i className="fas fa-chevron-left"></i>
             </button>
-            <button className="page-btn active">{currentPage}</button>
+            
+            {visiblePages.map((page, index) => (
+              <React.Fragment key={index}>
+                {page === '...' ? (
+                  <span className="page-ellipsis">...</span>
+                ) : (
+                  <button
+                    className={`page-btn ${currentPage === page ? 'active' : ''}`}
+                    onClick={() => setCurrentPage(page)}
+                  >
+                    {page}
+                  </button>
+                )}
+              </React.Fragment>
+            ))}
+
             <button 
               className="page-btn" 
               onClick={handleNextPage}
               disabled={currentPage === totalPages}
+              title="Next Page"
             >
               <i className="fas fa-chevron-right"></i>
             </button>
+          </div>
+          <div className="page-info">
+            Page {currentPage} of {totalPages}
           </div>
         </div>
       </div>

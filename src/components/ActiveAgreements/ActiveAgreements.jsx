@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { subscribeToAgreements } from '../../utils/fetchAgreements';
+import { useAgreementFilters } from '../../hooks/useAgreementFilters';
 import './ActiveAgreements.css';
 
 const ActiveAgreements = () => {
   const [agreements, setAgreements] = useState([]);
   const [expandedDescriptions, setExpandedDescriptions] = useState(new Set());
+  const { filters, handleFilterChange, filteredAgreements } = useAgreementFilters(agreements);
 
   useEffect(() => {
     const unsubscribe = subscribeToAgreements(setAgreements, 'active');
@@ -34,14 +36,31 @@ const ActiveAgreements = () => {
             <i className="fas fa-search"></i>
             <input 
               type="text" 
-              placeholder="Search active agreements..."
+              name="search"
+              value={filters.search}
+              onChange={handleFilterChange}
+              placeholder="Search agreements..."
             />
           </div>
           <div className="filter-group">
-            <select defaultValue="">
+            <select
+              name="type"
+              value={filters.type}
+              onChange={handleFilterChange}
+            >
               <option value="">All Types</option>
               <option value="MOU">MOU</option>
               <option value="MOA">MOA</option>
+            </select>
+            <select
+              name="partnerType"
+              value={filters.partnerType}
+              onChange={handleFilterChange}
+            >
+              <option value="">All Partners</option>
+              <option value="academe">Academe</option>
+              <option value="industry">Industry</option>
+              <option value="government">Government</option>
             </select>
           </div>
         </div>
@@ -66,8 +85,8 @@ const ActiveAgreements = () => {
             </tr>
           </thead>
           <tbody>
-            {agreements.length > 0 ? (
-              agreements.map(agreement => (
+            {filteredAgreements.length > 0 ? (
+              filteredAgreements.map(agreement => (
                 <tr key={agreement.id}>
                   <td>{agreement.name}</td>
                   <td>{agreement.address}</td>
@@ -114,8 +133,12 @@ const ActiveAgreements = () => {
                 <td colSpan="12">
                   <div className="empty-state">
                     <i className="fas fa-check-circle"></i>
-                    <p>No active agreements</p>
-                    <p className="empty-subtitle">Create a new agreement to get started</p>
+                    <p>No agreements found</p>
+                    <p className="empty-subtitle">
+                      {(filters.search || filters.type || filters.partnerType) 
+                        ? 'Try adjusting your filters'
+                        : 'Create a new agreement to get started'}
+                    </p>
                   </div>
                 </td>
               </tr>

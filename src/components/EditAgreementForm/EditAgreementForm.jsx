@@ -3,7 +3,30 @@ import '../AgreementForm/AgreementForm.css';
 import './EditAgreementForm.css';
 
 const EditAgreementForm = ({ agreement, onSubmit, onCancel }) => {
-  const [formData, setFormData] = useState(agreement);
+  const [formData, setFormData] = useState({
+    // Personal Information
+    name: agreement.name,
+    address: agreement.address,
+    signedBy: agreement.signedBy,
+    designation: agreement.designation,
+    
+    // Agreement Details
+    agreementType: agreement.agreementType,
+    
+    // Partner Type only
+    partnerType: agreement.partnerType,
+    
+    // Dates
+    dateSigned: agreement.dateSigned,
+    validity: agreement.validity,
+    dateExpired: agreement.dateExpired,
+    forRenewal: agreement.forRenewal,
+    
+    // Additional Info
+    status: agreement.status,
+    description: agreement.description,
+    links: agreement.links
+  });
 
   const calculateExpiryDate = (dateSigned, validityYears) => {
     if (!dateSigned || !validityYears) return '';
@@ -127,23 +150,10 @@ const EditAgreementForm = ({ agreement, onSubmit, onCancel }) => {
               className="partner-select"
             >
               <option value="">Select Partner Type</option>
-              <option value="industry">Industry</option>
               <option value="academe">Academe</option>
-              <option value="localGov">Local Government</option>
+              <option value="industry">Industry</option>
+              <option value="government">Government</option>
             </select>
-          </div>
-          <div className="form-group">
-            <label htmlFor="partnerName">Partner Name:</label>
-            <input
-              type="text"
-              id="partnerName"
-              name="partnerName"
-              value={formData.partnerName}
-              onChange={handleChange}
-              placeholder="Enter partner name"
-              required
-              className="partner-input"
-            />
           </div>
         </div>
       </section>
