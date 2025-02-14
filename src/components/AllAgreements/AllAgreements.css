@@ -1,0 +1,333 @@
+.agreements-container {
+  padding: 20px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.agreements-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  padding: 0 10px;
+}
+
+.header-title h2 {
+  color: #8B3A2B;
+  margin: 0;
+  font-size: 1.8em;
+  font-weight: 600;
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.search-box {
+  position: relative;
+  min-width: 200px;
+  margin-right: 40px;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 8px 8px 8px 35px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 13px;
+  transition: all 0.3s ease;
+}
+
+.search-box input:focus {
+  outline: none;
+  border-color: #8B3A2B;
+  box-shadow: 0 0 0 2px rgba(139, 58, 43, 0.1);
+}
+
+.search-box i {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #666;
+  font-size: 14px;
+}
+
+.filter-group {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.filter-group select {
+  padding: 8px 30px 8px 10px;
+  font-size: 13px;
+  min-width: 120px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  color: #333;
+  background-color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238B3A2B' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 1em;
+  padding-right: 35px;
+}
+
+.filter-group select:focus {
+  outline: none;
+  border-color: #8B3A2B;
+  box-shadow: 0 0 0 2px rgba(139, 58, 43, 0.1);
+}
+
+.table-container {
+  overflow-x: auto;
+  margin-bottom: 20px;
+  max-width: 100%;
+}
+
+.agreements-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+  min-width: 1500px;
+}
+
+.agreements-table th,
+.agreements-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.agreements-table th {
+  background-color: #f8f8f8;
+  color: #333;
+  font-weight: 600;
+  white-space: nowrap;
+  padding: 12px 20px;
+}
+
+.agreements-table tbody tr:hover {
+  background-color: #f5f5f5;
+}
+
+.status-badge {
+  padding: 5px 10px;
+  border-radius: 12px;
+  font-size: 0.85em;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.status-active {
+  background-color: #E8F5E9;
+  color: #2E7D32;
+}
+
+.status-pending {
+  background-color: #FFF3E0;
+  color: #F57C00;
+}
+
+.status-expired {
+  background-color: #FFEBEE;
+  color: #C62828;
+}
+
+.status-renewed {
+  background-color: #E3F2FD;
+  color: #1565C0;
+}
+
+.partners-cell {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.partner-chip {
+  background-color: #f0f0f0;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.85em;
+  white-space: nowrap;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 5px;
+}
+
+.action-btn {
+  background: none;
+  border: none;
+  padding: 5px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.view-btn {
+  color: #1565C0;
+}
+
+.edit-btn {
+  color: #F57C00;
+}
+
+.delete-btn {
+  color: #C62828;
+}
+
+.action-btn:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  transform: scale(1.1);
+}
+
+.table-footer {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.pagination {
+  display: flex;
+  gap: 5px;
+}
+
+.page-btn {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  background: white;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.page-btn.active {
+  background-color: #8B3A2B;
+  color: white;
+  border-color: #8B3A2B;
+}
+
+.page-btn:hover:not(.active) {
+  background-color: #f5f5f5;
+}
+
+/* Add these styles for empty state */
+.empty-state {
+  padding: 40px 20px;
+  text-align: center;
+  color: #666;
+}
+
+.empty-state i {
+  font-size: 3em;
+  color: #8B3A2B;
+  margin-bottom: 15px;
+}
+
+.empty-state p {
+  margin: 5px 0;
+  font-size: 1.1em;
+}
+
+.empty-state .empty-subtitle {
+  font-size: 0.9em;
+  color: #888;
+}
+
+/* Update pagination buttons for disabled state */
+.page-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: #f5f5f5;
+}
+
+.page-btn:disabled:hover {
+  background-color: #f5f5f5;
+}
+
+/* Style for description column to handle long text */
+.agreements-table td:nth-child(11) {
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Style for links column */
+.agreements-table td:nth-child(12) a {
+  color: #8B3A2B;
+  text-decoration: none;
+}
+
+/* Style for renewal column */
+.agreements-table td:nth-child(9) {
+  text-align: center;
+}
+
+/* Update empty state colspan */
+.empty-table td {
+  padding: 40px 20px;
+}
+
+/* Add horizontal scroll indicator */
+.table-container::after {
+  content: '← Scroll horizontally →';
+  display: block;
+  text-align: center;
+  padding: 10px;
+  color: #666;
+  font-size: 0.9em;
+  margin-top: 10px;
+}
+
+@media (min-width: 1500px) {
+  .table-container::after {
+    display: none;
+  }
+}
+
+@media (max-width: 1024px) {
+  .agreements-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 20px;
+  }
+
+  .header-controls {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .search-box {
+    min-width: 100%;
+  }
+
+  .filter-group {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .filter-group select {
+    flex: 1;
+  }
+}
+
+@media (max-width: 576px) {
+  .filter-group {
+    flex-direction: column;
+  }
+
+  .filter-group select {
+    width: 100%;
+  }
+} 

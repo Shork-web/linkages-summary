@@ -1,0 +1,16 @@
+/* Import base styles */
+@import '../AllAgreements/AllAgreements.css';
+
+/* Pending-specific styles */
+.empty-state i {
+  color: #F57C00; /* Orange for pending */
+}
+
+.status-badge.status-pending {
+  background-color: #FFF3E0;
+  color: #F57C00;
+}
+
+.header-title h2 {
+  color: #F57C00;
+} 

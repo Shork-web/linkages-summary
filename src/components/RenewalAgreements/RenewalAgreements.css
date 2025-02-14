@@ -1,0 +1,21 @@
+/* Import base styles */
+@import '../AllAgreements/AllAgreements.css';
+
+/* Renewal-specific styles */
+.empty-state i {
+  color: #1565C0; /* Blue for renewal */
+}
+
+.status-badge.status-renewal {
+  background-color: #E3F2FD;
+  color: #1565C0;
+}
+
+.header-title h2 {
+  color: #1565C0;
+}
+
+/* Highlight rows that are close to renewal */
+.agreements-table tr.near-renewal {
+  background-color: rgba(21, 101, 192, 0.05);
+} 

@@ -1,0 +1,355 @@
+.agreement-form-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.form-section {
+  margin-bottom: 30px;
+  padding: 25px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background-color: #ffffff;
+  transition: all 0.3s ease;
+}
+
+.form-section:hover {
+  box-shadow: 0 2px 8px rgba(139, 58, 43, 0.1);
+}
+
+.form-section h3 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #8B3A2B; /* Burnt Umber */
+  font-size: 1.3em;
+  font-weight: 600;
+  border-bottom: 2px solid #8B3A2B;
+  padding-bottom: 8px;
+  text-align: left;
+}
+
+.form-group {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #333;
+  font-size: 0.95em;
+}
+
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group input[type="date"],
+.form-group input[type="url"],
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #8B3A2B;
+  box-shadow: 0 0 0 2px rgba(139, 58, 43, 0.1);
+}
+
+.form-group textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.form-group input[type="checkbox"] {
+  margin-right: 10px;
+  transform: scale(1.2);
+}
+
+.submit-button {
+  background-color: #8B3A2B;
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  width: 100%;
+  transition: all 0.3s ease;
+  margin-top: 20px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.submit-button:hover {
+  background-color: #7A3225;
+  box-shadow: 0 2px 8px rgba(139, 58, 43, 0.2);
+  transform: translateY(-1px);
+}
+
+.submit-button:active {
+  transform: translateY(0);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .agreement-form-container {
+    padding: 15px;
+  }
+  
+  .form-section {
+    padding: 20px;
+  }
+
+  .form-section h3 {
+    font-size: 1.2em;
+  }
+}
+
+/* Custom select styling */
+select {
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238B3A2B' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 1em;
+  padding-right: 40px !important;
+}
+
+/* Status colors */
+.form-group select[name="status"] option[value="active"] {
+  color: #2E7D32;
+}
+
+.form-group select[name="status"] option[value="expired"] {
+  color: #C62828;
+}
+
+.form-group select[name="status"] option[value="pending"] {
+  color: #F57C00;
+}
+
+.form-group select[name="status"] option[value="renewed"] {
+  color: #1565C0;
+}
+
+/* Add these new styles to your existing CSS */
+
+.partner-input-group {
+  background-color: #f8f8f8;
+  padding: 20px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+}
+
+.partner-add-group {
+  display: flex;
+  gap: 10px;
+}
+
+.add-partner-btn {
+  background-color: #8B3A2B;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.add-partner-btn:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.add-partner-btn:hover:not(:disabled) {
+  background-color: #7A3225;
+}
+
+.partners-lists {
+  margin-top: 20px;
+}
+
+.partner-list {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.partner-list h4 {
+  color: #8B3A2B;
+  margin-bottom: 10px;
+  font-size: 1.1em;
+}
+
+.partner-list ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.partner-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background-color: #f8f8f8;
+  border-radius: 4px;
+  margin-bottom: 5px;
+}
+
+.remove-partner-btn {
+  background: none;
+  border: none;
+  color: #C62828;
+  font-size: 1.2em;
+  cursor: pointer;
+  padding: 0 5px;
+  transition: all 0.2s ease;
+}
+
+.remove-partner-btn:hover {
+  color: #B71C1C;
+  transform: scale(1.2);
+}
+
+.form-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.form-subtitle {
+  color: #666;
+  margin-top: 5px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.section-indicator {
+  background-color: #8B3A2B;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.8em;
+  font-weight: 500;
+}
+
+.validity-helper {
+  font-size: 0.8em;
+  color: #666;
+  margin-left: 8px;
+  font-weight: normal;
+}
+
+.partners-summary {
+  background-color: #fff;
+  padding: 15px;
+  border-radius: 6px;
+  margin: 20px 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.partners-count {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 10px;
+}
+
+.partners-count span {
+  background-color: #8B3A2B;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 15px;
+  font-size: 0.9em;
+}
+
+.checkbox-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.checkbox-group label {
+  margin: 0;
+}
+
+.readonly-input {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+
+.form-actions {
+  display: flex;
+  gap: 15px;
+  margin-top: 30px;
+}
+
+.reset-button {
+  background-color: #fff;
+  color: #8B3A2B;
+  border: 2px solid #8B3A2B;
+  padding: 12px 24px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  flex: 1;
+  transition: all 0.3s ease;
+}
+
+.reset-button:hover {
+  background-color: #8B3A2B;
+  color: white;
+}
+
+.submit-button {
+  flex: 2;
+}
+
+/* Improve partner list styling */
+.partner-list li {
+  border-left: 3px solid #8B3A2B;
+  margin-bottom: 8px;
+  transition: all 0.2s ease;
+}
+
+.partner-list li:hover {
+  transform: translateX(5px);
+}
+
+/* Add animation for adding/removing partners */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.partner-list li {
+  animation: fadeIn 0.3s ease;
+}
+
+/* Improve form section transitions */
+.form-section {
+  transition: all 0.3s ease;
+}
+
+.form-section:focus-within {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(139, 58, 43, 0.15);
+} 

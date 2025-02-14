@@ -1,0 +1,70 @@
+/* Import base styles */
+@import '../AllAgreements/AllAgreements.css';
+
+/* Partners-specific styles */
+.empty-state i {
+  color: #8B3A2B; /* Burnt umber for partners */
+}
+
+/* Partner type badges */
+.partner-type {
+  padding: 5px 10px;
+  border-radius: 12px;
+  font-size: 0.85em;
+  font-weight: 500;
+}
+
+.partner-type.academic {
+  background-color: #E3F2FD;
+  color: #1565C0;
+}
+
+.partner-type.industry {
+  background-color: #E8F5E9;
+  color: #2E7D32;
+}
+
+.partner-type.government {
+  background-color: #FFF3E0;
+  color: #F57C00;
+}
+
+/* Active agreements count badge */
+.agreements-count {
+  background-color: #8B3A2B;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.85em;
+  font-weight: 500;
+}
+
+/* Contact info styles */
+.contact-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.contact-info a {
+  color: #8B3A2B;
+  text-decoration: none;
+}
+
+.contact-info a:hover {
+  text-decoration: underline;
+}
+
+/* Custom table width for partners */
+.agreements-table {
+  min-width: 1200px;
+}
+
+/* Adjust column widths */
+.agreements-table th:nth-child(1) { width: 20%; } /* Partner Name */
+.agreements-table th:nth-child(2) { width: 10%; } /* Type */
+.agreements-table th:nth-child(3) { width: 20%; } /* Address */
+.agreements-table th:nth-child(4) { width: 15%; } /* Contact Person */
+.agreements-table th:nth-child(5) { width: 12%; } /* Contact Number */
+.agreements-table th:nth-child(6) { width: 15%; } /* Email */
+.agreements-table th:nth-child(7) { width: 8%; }  /* Active Agreements */ 

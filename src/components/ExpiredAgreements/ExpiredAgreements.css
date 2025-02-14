@@ -1,0 +1,21 @@
+/* Import base styles */
+@import '../AllAgreements/AllAgreements.css';
+
+/* Expired-specific styles */
+.empty-state i {
+  color: #C62828; /* Red for expired */
+}
+
+.status-badge.status-expired {
+  background-color: #FFEBEE;
+  color: #C62828;
+}
+
+.header-title h2 {
+  color: #C62828;
+}
+
+/* Highlight expired rows */
+.agreements-table tr.expired {
+  background-color: rgba(198, 40, 40, 0.05);
+} 
