@@ -1,10 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { db } from '../../firebase-config'; // Import Firestore
+import { collection, addDoc } from 'firebase/firestore'; // Import Firestore functions
 import './AgreementForm.css';
+import { auth } from '../../firebase-config';
+import { useNavigate } from 'react-router-dom';
+import Notification from '../Notification/Notification';
 
-const calculateExpiryDate = (dateString, validityMonths) => {
-  if (!dateString || !validityMonths) return '';
+const calculateExpiryDate = (dateString, validityYears) => {
+  if (!dateString || !validityYears) return '';
   const date = new Date(dateString);
-  date.setMonth(date.getMonth() + parseInt(validityMonths));
+  date.setFullYear(date.getFullYear() + parseInt(validityYears));
   return date.toISOString().split('T')[0];
 };
 
@@ -19,14 +24,9 @@ const AgreementForm = () => {
     // Agreement Details
     agreementType: 'MOU', // Default value
     
-    // Updated Partners structure
-    partnerType: '', // New field for partner type
-    partnerName: '', // New field for partner name
-    partners: {      // Object to store partners by type
-      industry: [],
-      academe: [],
-      localGov: []
-    },
+    // Simplified Partners structure
+    partnerType: '',
+    partnerName: '',
     
     // Dates
     dateSigned: '',
@@ -35,10 +35,29 @@ const AgreementForm = () => {
     forRenewal: false,
     
     // Additional Info
-    status: '',
+    status: 'pending',
     description: '',
     links: ''
   });
+
+  const navigate = useNavigate();
+
+  // Add notification state
+  const [notification, setNotification] = useState({
+    show: false,
+    type: '',
+    message: ''
+  });
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged(user => {
+      if (!user) {
+        navigate('/login');
+      }
+    });
+
+    return () => unsubscribe();
+  }, [navigate]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -69,61 +88,86 @@ const AgreementForm = () => {
     });
   };
 
-  // Add new partner
-  const handleAddPartner = (e) => {
-    e.preventDefault();
-    if (formData.partnerType && formData.partnerName) {
-      setFormData(prevState => ({
-        ...prevState,
-        partners: {
-          ...prevState.partners,
-          [formData.partnerType]: [...prevState.partners[formData.partnerType], formData.partnerName]
-        },
-        partnerType: '', // Reset selection
-        partnerName: ''  // Reset input
-      }));
-    }
-  };
-
-  // Remove partner
-  const handleRemovePartner = (type, index) => {
-    setFormData(prevState => ({
-      ...prevState,
-      partners: {
-        ...prevState.partners,
-        [type]: prevState.partners[type].filter((_, i) => i !== index)
-      }
-    }));
-  };
-
-  // Modify handleSubmit to include form validation
-  const handleSubmit = (e) => {
+  // Modify handleSubmit to handle single partner
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Check if there are any partners added
-    if (Object.values(formData.partners).every(arr => arr.length === 0)) {
-      alert('Please add at least one partner before submitting.');
+    if (!auth.currentUser) {
+      setNotification({
+        show: true,
+        type: 'error',
+        message: 'You must be logged in to submit agreements'
+      });
       return;
     }
 
-    console.log('Form Data:', formData);
-    // Add your form submission logic here
+    // Validate required fields
+    if (!formData.name || !formData.address || !formData.signedBy || !formData.designation) {
+      setNotification({
+        show: true,
+        type: 'error',
+        message: 'Please fill in all required fields'
+      });
+      return;
+    }
+
+    // Validate partner information
+    if (!formData.partnerType || !formData.partnerName) {
+      alert('Please fill in partner information');
+      return;
+    }
+
+    try {
+      const docRef = await addDoc(collection(db, 'agreementform'), {
+        ...formData,
+        createdBy: auth.currentUser.uid,
+        createdAt: new Date().toISOString()
+      });
+
+      console.log('Document written with ID: ', docRef.id);
+      setNotification({
+        show: true,
+        type: 'success',
+        message: 'Agreement successfully submitted!'
+      });
+      
+      // Reset form after successful submission
+      setFormData({
+        name: '',
+        address: '',
+        signedBy: '',
+        designation: '',
+        agreementType: 'MOU',
+        partnerType: '',
+        partnerName: '',
+        dateSigned: '',
+        validity: '',
+        dateExpired: '',
+        forRenewal: false,
+        status: 'pending',
+        description: '',
+        links: ''
+      });
+
+    } catch (error) {
+      console.error('Error adding document: ', error);
+      if (error.code === 'permission-denied') {
+        alert('You do not have permission to create agreements');
+      } else {
+        setNotification({
+          show: true,
+          type: 'error',
+          message: 'Error submitting agreement. Please try again.'
+        });
+      }
+    }
   };
 
   return (
     <div className="agreement-form-container">
-      <div className="form-header">
-        <h2>Partnership Agreement Form</h2>
-        <p className="form-subtitle">Enter agreement details below</p>
-      </div>
-
       <form onSubmit={handleSubmit}>
-        {/* Personal Information Section - Keep existing code but add tooltips */}
         <section className="form-section">
-          <div className="section-header">
-            <h3>Personal Information</h3>
-            <span className="section-indicator">1/5</span>
-          </div>
+          <h3>Personal Information</h3>
           <div className="form-group">
             <label htmlFor="name">Name:</label>
             <input
@@ -169,12 +213,8 @@ const AgreementForm = () => {
           </div>
         </section>
 
-        {/* Agreement Type Section - Add icon */}
         <section className="form-section">
-          <div className="section-header">
-            <h3>Agreement Type</h3>
-            <span className="section-indicator">2/5</span>
-          </div>
+          <h3>Agreement Type</h3>
           <div className="form-group">
             <select
               name="agreementType"
@@ -189,13 +229,9 @@ const AgreementForm = () => {
           </div>
         </section>
 
-        {/* Partners Section - Update with counter */}
         <section className="form-section">
-          <div className="section-header">
-            <h3>Partners</h3>
-            <span className="section-indicator">3/5</span>
-          </div>
-          <div className="partner-input-group">
+          <h3>Partner Information</h3>
+          <div className="partner-info-container">
             <div className="form-group">
               <label htmlFor="partnerType">Partner Type:</label>
               <select
@@ -204,6 +240,7 @@ const AgreementForm = () => {
                 value={formData.partnerType}
                 onChange={handleChange}
                 required
+                className="partner-select"
               >
                 <option value="">Select Partner Type</option>
                 <option value="industry">Industry</option>
@@ -211,70 +248,24 @@ const AgreementForm = () => {
                 <option value="localGov">Local Government</option>
               </select>
             </div>
-            
             <div className="form-group">
               <label htmlFor="partnerName">Partner Name:</label>
-              <div className="partner-add-group">
-                <input
-                  type="text"
-                  id="partnerName"
-                  name="partnerName"
-                  value={formData.partnerName}
-                  onChange={handleChange}
-                  placeholder="Enter partner name"
-                />
-                <button 
-                  type="button" 
-                  onClick={handleAddPartner}
-                  className="add-partner-btn"
-                  disabled={!formData.partnerType || !formData.partnerName}
-                >
-                  Add Partner
-                </button>
-              </div>
+              <input
+                type="text"
+                id="partnerName"
+                name="partnerName"
+                value={formData.partnerName}
+                onChange={handleChange}
+                placeholder="Enter partner name"
+                required
+                className="partner-input"
+              />
             </div>
-          </div>
-
-          <div className="partners-summary">
-            <h4>Partners Summary</h4>
-            <div className="partners-count">
-              <span>Industry: {formData.partners.industry.length}</span>
-              <span>Academe: {formData.partners.academe.length}</span>
-              <span>Local Gov't: {formData.partners.localGov.length}</span>
-            </div>
-          </div>
-
-          <div className="partners-lists">
-            {Object.entries(formData.partners).map(([type, partners]) => (
-              partners.length > 0 && (
-                <div key={type} className="partner-list">
-                  <h4>{type.charAt(0).toUpperCase() + type.slice(1)} Partners</h4>
-                  <ul>
-                    {partners.map((partner, index) => (
-                      <li key={index}>
-                        {partner}
-                        <button
-                          type="button"
-                          onClick={() => handleRemovePartner(type, index)}
-                          className="remove-partner-btn"
-                        >
-                          ×
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )
-            ))}
           </div>
         </section>
 
-        {/* Dates Section - Add automatic expiry calculation */}
         <section className="form-section">
-          <div className="section-header">
-            <h3>Agreement Dates</h3>
-            <span className="section-indicator">4/5</span>
-          </div>
+          <h3>Agreement Dates</h3>
           <div className="form-group">
             <label htmlFor="dateSigned">Date Signed:</label>
             <input
@@ -288,7 +279,7 @@ const AgreementForm = () => {
           </div>
           <div className="form-group">
             <label htmlFor="validity">
-              Validity (in months):
+              Validity (in years):
               <span className="validity-helper">Duration of the agreement</span>
             </label>
             <input
@@ -298,7 +289,7 @@ const AgreementForm = () => {
               value={formData.validity}
               onChange={handleDateOrValidityChange}
               min="1"
-              max="120"
+              max="10"
               required
             />
           </div>
@@ -313,24 +304,22 @@ const AgreementForm = () => {
               className="readonly-input"
             />
           </div>
-          <div className="form-group checkbox-group">
-            <input
-              type="checkbox"
-              id="forRenewal"
-              name="forRenewal"
-              checked={formData.forRenewal}
-              onChange={handleChange}
-            />
-            <label htmlFor="forRenewal">Mark for Renewal</label>
+          <div className="renewal-checkbox-group">
+            <label className="checkbox-label">
+              <input
+                type="checkbox"
+                id="forRenewal"
+                name="forRenewal"
+                checked={formData.forRenewal}
+                onChange={handleChange}
+              />
+              <span>Mark this agreement for renewal</span>
+            </label>
           </div>
         </section>
 
-        {/* Additional Information Section */}
         <section className="form-section">
-          <div className="section-header">
-            <h3>Additional Information</h3>
-            <span className="section-indicator">5/5</span>
-          </div>
+          <h3>Additional Information</h3>
           <div className="form-group">
             <label htmlFor="status">Status:</label>
             <select
@@ -340,7 +329,6 @@ const AgreementForm = () => {
               onChange={handleChange}
               required
             >
-              <option value="">Select Status</option>
               <option value="active">Active</option>
               <option value="expired">Expired</option>
               <option value="pending">Pending</option>
@@ -379,6 +367,14 @@ const AgreementForm = () => {
           </button>
         </div>
       </form>
+      
+      {notification.show && (
+        <Notification
+          type={notification.type}
+          message={notification.message}
+          onClose={() => setNotification({ show: false, type: '', message: '' })}
+        />
+      )}
     </div>
   );
 };

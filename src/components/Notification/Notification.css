@@ -1,0 +1,60 @@
+.notification-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1100;
+}
+
+.notification {
+  background: white;
+  padding: 24px;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.notification-content {
+  margin-bottom: 20px;
+}
+
+.notification-content i {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.notification.success i {
+  color: #2E7D32;
+}
+
+.notification.error i {
+  color: #C62828;
+}
+
+.notification p {
+  color: #333;
+  font-size: 1.1em;
+  margin: 0;
+}
+
+.notification-btn {
+  background-color: #8B3A2B;
+  color: white;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 4px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.notification-btn:hover {
+  background-color: #7A3225;
+} 

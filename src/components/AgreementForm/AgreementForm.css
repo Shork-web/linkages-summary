@@ -41,26 +41,29 @@
   margin-bottom: 8px;
   font-weight: 500;
   color: #333;
-  font-size: 0.95em;
 }
 
-.form-group input[type="text"],
-.form-group input[type="number"],
-.form-group input[type="date"],
-.form-group input[type="url"],
-.form-group select,
-.form-group textarea {
+.form-group input,
+.form-group textarea,
+.form-group select {
   width: 100%;
-  padding: 10px 12px;
+  padding: 10px;
   border: 1px solid #ddd;
-  border-radius: 6px;
-  font-size: 16px;
-  transition: all 0.3s ease;
+  border-radius: 4px;
+  font-size: 14px;
+  transition: border-color 0.3s ease;
+  box-sizing: border-box;
+}
+
+.form-group input:hover,
+.form-group textarea:hover,
+.form-group select:hover {
+  border-color: #8B3A2B;
 }
 
 .form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
+.form-group textarea:focus,
+.form-group select:focus {
   outline: none;
   border-color: #8B3A2B;
   box-shadow: 0 0 0 2px rgba(139, 58, 43, 0.1);
@@ -69,6 +72,14 @@
 .form-group textarea {
   min-height: 100px;
   resize: vertical;
+}
+
+.form-group textarea#description {
+  min-height: 120px;
+}
+
+.form-group textarea#address {
+  min-height: 80px;
 }
 
 .form-group input[type="checkbox"] {
@@ -281,13 +292,52 @@ select {
 }
 
 .checkbox-group {
+  margin-top: 1.5rem;
   display: flex;
-  align-items: center;
-  gap: 8px;
+  align-items: flex-start;
 }
 
-.checkbox-group label {
-  margin: 0;
+.checkbox-label {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border: 1px solid #8B3A2B;
+  border-radius: 2px;
+  margin: 3px 0 0 0;
+  cursor: pointer;
+  position: relative;
+  background-color: white;
+}
+
+.checkbox-label input[type="checkbox"]:checked {
+  background-color: white;
+  border-color: #8B3A2B;
+}
+
+.checkbox-label input[type="checkbox"]:checked::after {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 2px;
+  width: 10px;
+  height: 10px;
+  background-color: #8B3A2B;
+  border-radius: 1px;
+}
+
+.checkbox-label span {
+  font-size: 1rem;
+  color: #4A4A4A;
+  line-height: 1.5;
+  font-weight: normal;
 }
 
 .readonly-input {
@@ -352,4 +402,37 @@ select {
 .form-section:focus-within {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(139, 58, 43, 0.15);
+}
+
+.partner-info-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.partner-select,
+.partner-input {
+  height: 42px;
+}
+
+/* Add this new style for the renewal checkbox group */
+.renewal-checkbox-group {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background-color: #f8f8f8;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+}
+
+.renewal-checkbox-group .checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.5rem;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.renewal-checkbox-group .checkbox-label:hover {
+  background-color: rgba(139, 58, 43, 0.05);
 } 

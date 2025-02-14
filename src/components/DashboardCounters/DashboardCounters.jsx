@@ -1,7 +1,20 @@
 import React from 'react';
 import './DashboardCounters.css';
 
-const DashboardCounters = ({ counters }) => {
+const DashboardCounters = ({ agreements }) => {
+  const counters = {
+    totalAgreements: agreements.length,
+    byType: {
+      MOU: agreements.filter(a => a.agreementType === 'MOU').length,
+      MOA: agreements.filter(a => a.agreementType === 'MOA').length
+    },
+    byPartnerType: {
+      Academic: agreements.filter(a => a.partnerType === 'academic').length,
+      Industry: agreements.filter(a => a.partnerType === 'industry').length,
+      Government: agreements.filter(a => a.partnerType === 'government').length
+    }
+  };
+
   return (
     <div className="dashboard-counters">
       <div className="counter-grid">

@@ -2,7 +2,6 @@
   text-align: center;
   background-color: #f5f5f5;
   min-height: 100vh;
-  display: flex;
 }
 
 .App-logo {
@@ -47,17 +46,5 @@ main {
   }
   to {
     transform: rotate(360deg);
-  }
-}
-
-.main-content {
-  flex: 1;
-  margin-left: 250px; /* Same as sidebar width */
-}
-
-/* Add responsive behavior */
-@media (max-width: 768px) {
-  .main-content {
-    margin-left: 60px; /* Same as collapsed sidebar width */
   }
 }

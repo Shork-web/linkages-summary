@@ -121,30 +121,45 @@
 }
 
 .sidebar-footer {
-  padding: 20px;
-  background-color: #231309; /* Even darker shade */
+  padding: 15px;
+  background-color: #231309;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  justify-content: center;
 }
 
-.user-info {
+/* Style just the logout button */
+.logout-btn {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 8px 16px;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+  width: 100%;
+  transition: all 0.3s ease;
+  font-size: 1em;
 }
 
-.user-info i {
-  font-size: 1.5em;
+.logout-btn:hover {
+  background-color: #8B3A2B;
 }
 
+.logout-btn i {
+  font-size: 1.2em;
+}
+
+.sidebar.collapsed .logout-btn span {
+  display: none;
+}
+
+/* Remove user-info related styles */
+.user-info,
+.user-info i,
 .user-info span {
-  transition: opacity 0.3s ease;
-  white-space: nowrap;
-}
-
-.sidebar.collapsed .user-info span {
-  opacity: 0;
-  width: 0;
-  overflow: hidden;
+  display: none;
 }
 
 /* Tooltip for collapsed state */

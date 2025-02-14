@@ -119,29 +119,29 @@
 }
 
 .status-badge {
-  padding: 5px 10px;
+  padding: 4px 8px;
   border-radius: 12px;
   font-size: 0.85em;
   font-weight: 500;
   text-transform: capitalize;
 }
 
-.status-active {
+.status-badge.status-active {
   background-color: #E8F5E9;
   color: #2E7D32;
 }
 
-.status-pending {
+.status-badge.status-pending {
   background-color: #FFF3E0;
   color: #F57C00;
 }
 
-.status-expired {
+.status-badge.status-expired {
   background-color: #FFEBEE;
   color: #C62828;
 }
 
-.status-renewed {
+.status-badge.status-renewed {
   background-color: #E3F2FD;
   color: #1565C0;
 }
@@ -162,16 +162,42 @@
 
 .action-buttons {
   display: flex;
-  gap: 5px;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+  height: 32px;
 }
 
 .action-btn {
-  background: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
   border: none;
-  padding: 5px;
-  cursor: pointer;
   border-radius: 4px;
+  cursor: pointer;
   transition: all 0.2s ease;
+  color: #666;
+  background: transparent;
+}
+
+.action-btn i {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.action-btn:hover {
+  background-color: #f0f0f0;
+}
+
+.edit-btn:hover {
+  color: #1565C0;
+}
+
+.delete-btn:hover {
+  color: #C62828;
 }
 
 .view-btn {
@@ -184,11 +210,6 @@
 
 .delete-btn {
   color: #C62828;
-}
-
-.action-btn:hover {
-  background-color: rgba(0, 0, 0, 0.05);
-  transform: scale(1.1);
 }
 
 .table-footer {
@@ -261,12 +282,36 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  position: relative;
+}
+
+/* Optional: Add tooltip on hover */
+.agreements-table td:nth-child(11):hover {
+  overflow: visible;
+  white-space: normal;
+  background-color: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1;
+  position: absolute;
+  border-radius: 4px;
+  padding: 8px;
+  min-width: 200px;
+  max-width: 400px;
 }
 
 /* Style for links column */
+.agreements-table td:nth-child(12) {
+  text-align: center;
+}
+
 .agreements-table td:nth-child(12) a {
   color: #8B3A2B;
   text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  min-width: 50px;
 }
 
 /* Style for renewal column */
@@ -437,4 +482,157 @@
   .counter-card {
     min-width: 100%;
   }
+}
+
+/* Add confirmation dialog styling */
+.delete-confirm {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.delete-confirm .buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.delete-confirm button {
+  padding: 8px 16px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+}
+
+.delete-confirm .cancel {
+  background-color: #f0f0f0;
+}
+
+.delete-confirm .confirm {
+  background-color: #C62828;
+  color: white;
+}
+
+/* Modal styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 1.5em;
+  cursor: pointer;
+  color: #666;
+  padding: 5px;
+}
+
+.close-btn:hover {
+  color: #C62828;
+}
+
+/* Delete confirmation modal styles */
+.delete-confirm {
+  background: white;
+  padding: 24px;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.delete-confirm h3 {
+  color: #C62828;
+  margin: 0 0 16px 0;
+  font-size: 1.5em;
+}
+
+.delete-confirm p {
+  margin: 8px 0;
+  color: #333;
+}
+
+.agreement-name {
+  font-weight: 600;
+  color: #000;
+  padding: 12px;
+  background: #f5f5f5;
+  border-radius: 4px;
+  margin: 12px 0 !important;
+}
+
+.warning-text {
+  color: #C62828 !important;
+  font-size: 0.9em;
+  margin-top: 16px !important;
+}
+
+.delete-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+  justify-content: flex-end;
+}
+
+.delete-actions button {
+  padding: 8px 16px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.delete-actions .cancel-btn {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.delete-actions .confirm-btn {
+  background-color: #C62828;
+  color: white;
+}
+
+.delete-actions .cancel-btn:hover {
+  background-color: #e0e0e0;
+}
+
+.delete-actions .confirm-btn:hover {
+  background-color: #B71C1C;
 } 

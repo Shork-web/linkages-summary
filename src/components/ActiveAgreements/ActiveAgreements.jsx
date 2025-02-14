@@ -1,7 +1,15 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { subscribeToAgreements } from '../../utils/fetchAgreements';
 import './ActiveAgreements.css';
 
 const ActiveAgreements = () => {
+  const [agreements, setAgreements] = useState([]);
+
+  useEffect(() => {
+    const unsubscribe = subscribeToAgreements(setAgreements, 'active');
+    return () => unsubscribe();
+  }, []);
+
   return (
     <div className="agreements-container">
       <div className="agreements-header">
@@ -42,19 +50,41 @@ const ActiveAgreements = () => {
               <th>Status</th>
               <th>Description</th>
               <th>Links</th>
-              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            <tr className="empty-table">
-              <td colSpan="13">
-                <div className="empty-state">
-                  <i className="fas fa-check-circle"></i>
-                  <p>No active agreements</p>
-                  <p className="empty-subtitle">Create a new agreement to get started</p>
-                </div>
-              </td>
-            </tr>
+            {agreements.length > 0 ? (
+              agreements.map(agreement => (
+                <tr key={agreement.id}>
+                  <td>{agreement.name}</td>
+                  <td>{agreement.address}</td>
+                  <td>{agreement.signedBy}</td>
+                  <td>{agreement.designation}</td>
+                  <td>{agreement.agreementType}</td>
+                  <td>{agreement.dateSigned}</td>
+                  <td>{agreement.validity}</td>
+                  <td>{agreement.dateExpired}</td>
+                  <td>{agreement.forRenewal ? 'Yes' : 'No'}</td>
+                  <td>{agreement.status}</td>
+                  <td>{agreement.description}</td>
+                  <td>
+                    <a href={agreement.links} target="_blank" rel="noopener noreferrer">
+                      View
+                    </a>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr className="empty-table">
+                <td colSpan="12">
+                  <div className="empty-state">
+                    <i className="fas fa-check-circle"></i>
+                    <p>No active agreements</p>
+                    <p className="empty-subtitle">Create a new agreement to get started</p>
+                  </div>
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>

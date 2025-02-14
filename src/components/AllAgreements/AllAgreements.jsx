@@ -1,25 +1,124 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { subscribeToAgreements } from '../../utils/fetchAgreements';
+import { doc, deleteDoc, updateDoc } from 'firebase/firestore';
+import { db } from '../../firebase-config';
 import DashboardCounters from '../DashboardCounters/DashboardCounters';
 import './AllAgreements.css';
+import { useNavigate } from 'react-router-dom';
+import { auth } from '../../firebase-config';
+import EditAgreementForm from '../EditAgreementForm/EditAgreementForm';
+import Notification from '../Notification/Notification';
 
 const AllAgreements = () => {
-  // Sample data for counters - replace with actual data later
-  const counters = {
-    totalAgreements: 0,
-    byType: {
-      MOU: 0,
-      MOA: 0
-    },
-    byPartnerType: {
-      Academic: 0,
-      Industry: 0,
-      Government: 0
+  const [agreements, setAgreements] = useState([]);
+  const [filters, setFilters] = useState({
+    type: '',
+    status: ''
+  });
+  const navigate = useNavigate();
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingAgreement, setEditingAgreement] = useState(null);
+  const [deleteConfirm, setDeleteConfirm] = useState({
+    show: false,
+    agreementId: null,
+    agreementName: ''
+  });
+  const [notification, setNotification] = useState({
+    show: false,
+    type: '',
+    message: ''
+  });
+
+  useEffect(() => {
+    // Check authentication
+    if (!auth.currentUser) {
+      navigate('/login');
+      return;
     }
+
+    const unsubscribe = subscribeToAgreements(setAgreements);
+    return () => unsubscribe();
+  }, [navigate]);
+
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    setFilters(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const filteredAgreements = agreements.filter(agreement => {
+    return (
+      (filters.type === '' || agreement.agreementType === filters.type) &&
+      (filters.status === '' || agreement.status === filters.status)
+    );
+  });
+
+  const handleEdit = (agreement) => {
+    setEditingAgreement(agreement);
+    setIsEditModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsEditModalOpen(false);
+    setEditingAgreement(null);
+  };
+
+  const handleUpdateAgreement = async (updatedData) => {
+    try {
+      const agreementRef = doc(db, 'agreementform', editingAgreement.id);
+      await updateDoc(agreementRef, updatedData);
+      handleCloseModal();
+      setNotification({
+        show: true,
+        type: 'success',
+        message: 'Agreement updated successfully!'
+      });
+    } catch (error) {
+      console.error('Error updating agreement:', error);
+      setNotification({
+        show: true,
+        type: 'error',
+        message: 'Error updating agreement. Please try again.'
+      });
+    }
+  };
+
+  const handleDelete = (agreement) => {
+    setDeleteConfirm({
+      show: true,
+      agreementId: agreement.id,
+      agreementName: agreement.name
+    });
+  };
+
+  const confirmDelete = async () => {
+    try {
+      await deleteDoc(doc(db, 'agreementform', deleteConfirm.agreementId));
+      setDeleteConfirm({ show: false, agreementId: null, agreementName: '' });
+      setNotification({
+        show: true,
+        type: 'success',
+        message: 'Agreement deleted successfully!'
+      });
+    } catch (error) {
+      console.error('Error deleting agreement:', error);
+      setNotification({
+        show: true,
+        type: 'error',
+        message: 'Error deleting agreement. Please try again.'
+      });
+    }
+  };
+
+  const cancelDelete = () => {
+    setDeleteConfirm({ show: false, agreementId: null, agreementName: '' });
   };
 
   return (
     <div>
-      <DashboardCounters counters={counters} />
+      <DashboardCounters agreements={agreements} />
       <div className="agreements-container">
         <div className="agreements-header">
           <div className="header-title">
@@ -34,12 +133,20 @@ const AllAgreements = () => {
               />
             </div>
             <div className="filter-group">
-              <select defaultValue="">
+              <select 
+                name="type" 
+                value={filters.type} 
+                onChange={handleFilterChange}
+              >
                 <option value="">All Types</option>
                 <option value="MOU">MOU</option>
                 <option value="MOA">MOA</option>
               </select>
-              <select defaultValue="">
+              <select 
+                name="status" 
+                value={filters.status} 
+                onChange={handleFilterChange}
+              >
                 <option value="">All Status</option>
                 <option value="active">Active</option>
                 <option value="pending">Pending</option>
@@ -70,15 +177,58 @@ const AllAgreements = () => {
               </tr>
             </thead>
             <tbody>
-              <tr className="empty-table">
-                <td colSpan="13">
-                  <div className="empty-state">
-                    <i className="fas fa-file-contract"></i>
-                    <p>No agreements found</p>
-                    <p className="empty-subtitle">Add a new agreement to get started</p>
-                  </div>
-                </td>
-              </tr>
+              {filteredAgreements.length > 0 ? (
+                filteredAgreements.map(agreement => (
+                  <tr key={agreement.id}>
+                    <td>{agreement.name}</td>
+                    <td>{agreement.address}</td>
+                    <td>{agreement.signedBy}</td>
+                    <td>{agreement.designation}</td>
+                    <td>{agreement.agreementType}</td>
+                    <td>{agreement.dateSigned}</td>
+                    <td>{agreement.validity}</td>
+                    <td>{agreement.dateExpired}</td>
+                    <td>{agreement.forRenewal ? 'Yes' : 'No'}</td>
+                    <td>
+                      <span className={`status-badge status-${agreement.status}`}>
+                        {agreement.status}
+                      </span>
+                    </td>
+                    <td>{agreement.description}</td>
+                    <td>
+                      <a href={agreement.links} target="_blank" rel="noopener noreferrer">
+                        View
+                      </a>
+                    </td>
+                    <td className="action-buttons">
+                      <button 
+                        className="action-btn edit-btn"
+                        onClick={() => handleEdit(agreement)}
+                        title="Edit Agreement"
+                      >
+                        <i className="fas fa-edit"></i>
+                      </button>
+                      <button 
+                        className="action-btn delete-btn"
+                        onClick={() => handleDelete(agreement)}
+                        title="Delete Agreement"
+                      >
+                        <i className="fas fa-trash-alt"></i>
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr className="empty-table">
+                  <td colSpan="13">
+                    <div className="empty-state">
+                      <i className="fas fa-file-contract"></i>
+                      <p>No agreements found</p>
+                      <p className="empty-subtitle">Add a new agreement to get started</p>
+                    </div>
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
@@ -91,6 +241,59 @@ const AllAgreements = () => {
           </div>
         </div>
       </div>
+
+      {/* Add Modal */}
+      {isEditModalOpen && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h2>Edit Agreement</h2>
+              <button className="close-btn" onClick={handleCloseModal}>
+                <i className="fas fa-times"></i>
+              </button>
+            </div>
+            <EditAgreementForm 
+              agreement={editingAgreement}
+              onSubmit={handleUpdateAgreement}
+              onCancel={handleCloseModal}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Add Delete Confirmation Modal */}
+      {deleteConfirm.show && (
+        <div className="modal-overlay">
+          <div className="delete-confirm">
+            <h3>Delete Agreement</h3>
+            <p>Are you sure you want to delete the agreement with:</p>
+            <p className="agreement-name">{deleteConfirm.agreementName}</p>
+            <p className="warning-text">This action cannot be undone.</p>
+            <div className="delete-actions">
+              <button 
+                className="cancel-btn" 
+                onClick={cancelDelete}
+              >
+                Cancel
+              </button>
+              <button 
+                className="confirm-btn" 
+                onClick={confirmDelete}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {notification.show && (
+        <Notification
+          type={notification.type}
+          message={notification.message}
+          onClose={() => setNotification({ show: false, type: '', message: '' })}
+        />
+      )}
     </div>
   );
 };

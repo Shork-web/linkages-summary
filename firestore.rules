@@ -1,0 +1,31 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Specific rules for the agreementform collection
+    match /agreementform/{agreementId} {
+      // Only allow access if user is authenticated
+      allow read, create: if request.auth != null;
+      allow update, delete: if request.auth != null;
+      
+      // Allow create access to authenticated users with proper data validation
+      allow create: if request.auth != null &&
+        request.resource.data.name is string &&
+        request.resource.data.address is string &&
+        request.resource.data.signedBy is string &&
+        request.resource.data.designation is string &&
+        request.resource.data.agreementType in ['MOU', 'MOA'] &&
+        request.resource.data.partners is map &&
+        request.resource.data.dateSigned is string &&
+        request.resource.data.validity is number &&
+        request.resource.data.dateExpired is string &&
+        request.resource.data.forRenewal is bool &&
+        request.resource.data.status in ['active', 'expired', 'pending', 'renewed'] &&
+        request.resource.data.description is string &&
+        request.resource.data.links is string &&
+        request.resource.data.createdAt is string;
+    }
+    match /accessKeys/{keyId} {
+      allow read: if true; // Allow anyone to read (since this is just an access key)
+    }
+  }
+} 

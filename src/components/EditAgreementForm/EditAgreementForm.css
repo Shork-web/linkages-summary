@@ -1,0 +1,74 @@
+/* Import AgreementForm styles */
+@import '../AgreementForm/AgreementForm.css';
+
+/* Additional styles specific to edit form */
+.edit-form {
+  padding: 0;
+}
+
+.form-actions {
+  margin-top: 30px;
+  display: flex;
+  gap: 15px;
+}
+
+.cancel-btn {
+  background-color: #fff;
+  color: #8B3A2B;
+  border: 2px solid #8B3A2B;
+  padding: 12px 24px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  flex: 1;
+  transition: all 0.3s ease;
+}
+
+.cancel-btn:hover {
+  background-color: #f0f0f0;
+}
+
+.save-btn {
+  background-color: #8B3A2B;
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  flex: 2;
+  transition: all 0.3s ease;
+}
+
+.save-btn:hover {
+  background-color: #7A3225;
+  box-shadow: 0 2px 8px rgba(139, 58, 43, 0.2);
+  transform: translateY(-1px);
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-weight: 500;
+  color: #333;
+}
+
+.form-group input[type="text"],
+.form-group textarea,
+.form-group select {
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.form-group textarea {
+  min-height: 100px;
+  resize: vertical;
+} 
