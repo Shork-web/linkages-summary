@@ -31,21 +31,25 @@ function App() {
 
   return (
     <Router>
-      <Routes>
-        <Route
-          path="/login"
-          element={user ? <Navigate to="/" /> : <Login />}
-        />
-        <Route path="/" element={user ? <MainLayout /> : <Navigate to="/login" />}>
-          <Route index element={<AgreementForm />} />
-          <Route path="agreements" element={<AllAgreements />} />
-          <Route path="pending" element={<PendingAgreements />} />
-          <Route path="active" element={<ActiveAgreements />} />
-          <Route path="renewal" element={<RenewalAgreements />} />
-          <Route path="expired" element={<ExpiredAgreements />} />
-          <Route path="partners" element={<Partners />} />
-        </Route>
-      </Routes>
+      <div className="App">
+        <Sidebar isCollapsed={isSidebarCollapsed} onToggle={() => setIsSidebarCollapsed(!isSidebarCollapsed)} />
+        <div className={`main-content ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
+          <header className="App-header">
+            <h1>Partnership Agreement Management</h1>
+          </header>
+          <main>
+            <Routes>
+              <Route path="/" element={<AgreementForm />} />
+              <Route path="/agreements" element={<AllAgreements />} />
+              <Route path="/pending" element={<PendingAgreements />} />
+              <Route path="/active" element={<ActiveAgreements />} />
+              <Route path="/renewal" element={<RenewalAgreements />} />
+              <Route path="/expired" element={<ExpiredAgreements />} />
+              <Route path="/partners" element={<Partners />} />
+            </Routes>
+          </main>
+        </div>
+      </div>
     </Router>
   );
 }

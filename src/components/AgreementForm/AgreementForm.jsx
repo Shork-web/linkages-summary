@@ -165,6 +165,11 @@ const AgreementForm = () => {
 
   return (
     <div className="agreement-form-container">
+      <div className="form-header">
+        <h2>Partnership Agreement Form</h2>
+        <p className="form-subtitle">Enter agreement details below</p>
+      </div>
+
       <form onSubmit={handleSubmit}>
         <section className="form-section">
           <h3>Personal Information</h3>
