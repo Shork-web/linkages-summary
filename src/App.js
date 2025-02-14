@@ -19,7 +19,7 @@ function App() {
         <Sidebar isCollapsed={isSidebarCollapsed} onToggle={() => setIsSidebarCollapsed(!isSidebarCollapsed)} />
         <div className={`main-content ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
           <header className="App-header">
-            <h1>Partnership Agreement Management</h1>
+            <h1>LinkagesPartnership Agreement Management</h1>
           </header>
           <main>
             <Routes>

@@ -56,13 +56,6 @@ const Sidebar = () => {
           </NavLink>
         </ul>
       </nav>
-
-      <div className="sidebar-footer">
-        <div className="user-info">
-          <i className="fas fa-user-circle"></i>
-          <span>Admin User</span>
-        </div>
-      </div>
     </div>
   );
 };

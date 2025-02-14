@@ -113,7 +113,7 @@ const AgreementForm = () => {
   return (
     <div className="agreement-form-container">
       <div className="form-header">
-        <h2>Partnership Agreement Form</h2>
+        <h2>Linkages Partnership Agreement Form</h2>
         <p className="form-subtitle">Enter agreement details below</p>
       </div>
 
