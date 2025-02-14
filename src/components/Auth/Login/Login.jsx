@@ -1,6 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { auth } from '../../../firebase-config';
-import { signInWithEmailAndPassword, setPersistence, browserLocalPersistence } from 'firebase/auth';
+import { 
+  signInWithEmailAndPassword, 
+  setPersistence, 
+  browserLocalPersistence,
+  onAuthStateChanged
+} from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 import './Login.css';
 
@@ -10,6 +15,18 @@ const Login = () => {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+
+  // Check authentication state on component mount
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // User is signed in, redirect to home
+        navigate('/');
+      }
+    });
+
+    return () => unsubscribe();
+  }, [navigate]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -21,7 +38,7 @@ const Login = () => {
       await setPersistence(auth, browserLocalPersistence);
       // Then sign in
       await signInWithEmailAndPassword(auth, email, password);
-      navigate('/');
+      // No need to navigate here as onAuthStateChanged will handle it
     } catch (err) {
       console.error('Login error:', err);
       setError('Invalid access key');
