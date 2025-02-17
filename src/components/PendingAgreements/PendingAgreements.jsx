@@ -74,9 +74,17 @@ const PendingAgreements = () => {
                   <td>{agreement.signedBy}</td>
                   <td>{agreement.designation}</td>
                   <td>{agreement.agreementType}</td>
-                  <td>{agreement.dateSigned}</td>
-                  <td>{agreement.validity}</td>
-                  <td>{agreement.dateExpired}</td>
+                  <td>{new Date(agreement.dateSigned).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  })}</td>
+                  <td>{agreement.validity} years</td>
+                  <td>{new Date(agreement.dateExpired).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  })}</td>
                   <td>{agreement.forRenewal ? 'Yes' : 'No'}</td>
                   <td>{agreement.status}</td>
                   <td className="description-cell">

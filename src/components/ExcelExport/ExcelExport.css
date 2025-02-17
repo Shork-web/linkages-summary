@@ -1,0 +1,35 @@
+.excel-export-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background-color: #217346; /* Excel green color */
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.excel-export-btn:hover {
+  background-color: #1a5c38;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.excel-export-btn:active {
+  transform: translateY(0);
+}
+
+.excel-export-btn i {
+  font-size: 1.1rem;
+}
+
+/* Add this to your existing header-controls class in AllAgreements.css */
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+} 

@@ -1,7 +1,7 @@
 .sidebar {
   width: 250px;
   height: 100vh;
-  background-color: #2C1810; /* Darker shade of burnt umber */
+  background-color: #8B3A2B; /* Example background color */
   color: white;
   position: fixed;
   left: 0;
@@ -52,8 +52,9 @@
 }
 
 .sidebar-header h2 {
+  color: white;
   margin: 0;
-  font-size: 1.5em;
+  font-size: 1.8em;
   font-weight: 600;
   transition: opacity 0.3s ease;
 }

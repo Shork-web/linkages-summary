@@ -169,6 +169,22 @@ const EditAgreementForm = ({ agreement, onSubmit, onCancel }) => {
             value={formData.dateSigned}
             onChange={handleDateOrValidityChange}
             required
+            onFocus={(e) => e.target.type = 'date'}
+            onBlur={(e) => {
+              if (!e.target.value) {
+                e.target.type = 'text';
+              } else {
+                const date = new Date(e.target.value);
+                const formattedDate = date.toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric'
+                });
+                e.target.type = 'text';
+                e.target.value = formattedDate;
+              }
+            }}
+            placeholder="Select date"
           />
         </div>
         <div className="form-group">
@@ -190,10 +206,14 @@ const EditAgreementForm = ({ agreement, onSubmit, onCancel }) => {
         <div className="form-group">
           <label htmlFor="dateExpired">Expiry Date:</label>
           <input
-            type="date"
+            type="text"
             id="dateExpired"
             name="dateExpired"
-            value={formData.dateExpired}
+            value={formData.dateExpired ? new Date(formData.dateExpired).toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric'
+            }) : ''}
             readOnly
             className="readonly-input"
           />

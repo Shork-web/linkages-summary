@@ -71,4 +71,34 @@
 .form-group textarea {
   min-height: 100px;
   resize: vertical;
+}
+
+/* Add these styles for the date inputs */
+.form-group input[type="date"],
+.form-group input[type="text"] {
+  font-family: inherit;
+  font-size: 1rem;
+  padding: 0.8rem 1rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  width: 100%;
+  transition: all 0.3s ease;
+  color: #333;
+}
+
+.form-group input[type="date"]::-webkit-calendar-picker-indicator {
+  background-color: transparent;
+  padding: 8px;
+  cursor: pointer;
+  opacity: 0.6;
+}
+
+.form-group input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+}
+
+/* Style for readonly input */
+.readonly-input {
+  background-color: #f8f9fa;
+  cursor: not-allowed;
 } 

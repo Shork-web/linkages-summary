@@ -3,6 +3,7 @@ import { Outlet, useNavigate } from 'react-router-dom';
 import { signOut } from 'firebase/auth';
 import { auth } from '../../firebase-config';
 import Sidebar from '../Sidebar/Sidebar';
+import LoadingScreen from '../LoadingScreen/LoadingScreen';
 import './MainLayout.css';
 
 const MainLayout = () => {
@@ -15,7 +16,10 @@ const MainLayout = () => {
       if (!user) {
         navigate('/login');
       }
-      setIsLoading(false);
+      // Add a small delay to prevent flash of loading screen
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 800);
     });
 
     return () => unsubscribe();
@@ -31,7 +35,7 @@ const MainLayout = () => {
   };
 
   if (isLoading) {
-    return <div>Loading...</div>; // Or your custom loading component
+    return <LoadingScreen />;
   }
 
   return (

@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { auth } from '../../firebase-config';
+import LogoutConfirmation from '../LogoutConfirmation/LogoutConfirmation';
 import './Sidebar.css';
 
 const Sidebar = ({ isCollapsed, onToggle }) => {
   const navigate = useNavigate();
+  const [showLogoutConfirmation, setShowLogoutConfirmation] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -64,11 +66,21 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
       </nav>
 
       <div className="sidebar-footer">
-        <button className="nav-item" onClick={handleLogout}>
+        <button className="nav-item" onClick={() => setShowLogoutConfirmation(true)}>
           <i className="fas fa-sign-out-alt"></i>
           {!isCollapsed && <span>Logout</span>}
         </button>
       </div>
+
+      {showLogoutConfirmation && (
+        <LogoutConfirmation
+          onConfirm={() => {
+            handleLogout();
+            setShowLogoutConfirmation(false);
+          }}
+          onCancel={() => setShowLogoutConfirmation(false)}
+        />
+      )}
     </div>
   );
 };

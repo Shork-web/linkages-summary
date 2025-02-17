@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { auth } from '../../firebase-config';
 import EditAgreementForm from '../EditAgreementForm/EditAgreementForm';
 import Notification from '../Notification/Notification';
+import ExcelExport from '../ExcelExport/ExcelExport';
 
 const AllAgreements = () => {
   const [agreements, setAgreements] = useState([]);
@@ -248,6 +249,7 @@ const AllAgreements = () => {
                 <option value="government">Government</option>
               </select>
             </div>
+            <ExcelExport agreements={filteredAgreements} />
           </div>
         </div>
 
@@ -279,12 +281,17 @@ const AllAgreements = () => {
                     <td>{agreement.signedBy}</td>
                     <td>{agreement.designation}</td>
                     <td>{agreement.agreementType}</td>
-                    <td>{agreement.dateSigned}</td>
-                    <td>
-                      {agreement.validity}
-                      {agreement.validity && !isNaN(agreement.validity) && ' years'}
-                    </td>
-                    <td>{agreement.dateExpired}</td>
+                    <td>{new Date(agreement.dateSigned).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
+                    })}</td>
+                    <td>{agreement.validity} years</td>
+                    <td>{new Date(agreement.dateExpired).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
+                    })}</td>
                     <td>{agreement.forRenewal ? 'Yes' : 'No'}</td>
                     <td>
                       <span className={`status-badge status-${agreement.status}`}>
