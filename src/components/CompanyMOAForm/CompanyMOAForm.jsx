@@ -236,19 +236,18 @@ const CompanyMOAForm = () => {
 
         <div className="form-group">
           <label htmlFor="companyType">Company Type: <span className="required">*</span></label>
-          <input
-            list="companyTypes"
+          <select
             id="companyType"
             name="companyType"
             value={formData.companyType}
             onChange={handleChange}
             required
-          />
-          <datalist id="companyTypes">
+          >
+            <option value="">Select Company Type</option>
             {companyTypes.map(type => (
-              <option key={type} value={type} />
+              <option key={type} value={type}>{type}</option>
             ))}
-          </datalist>
+          </select>
         </div>
 
         <div className="expiration-checkbox-group">
