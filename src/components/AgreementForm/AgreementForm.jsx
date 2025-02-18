@@ -256,12 +256,11 @@ const AgreementForm = () => {
                 value={formData.partnerType}
                 onChange={handleChange}
                 required
-                className="partner-select"
               >
                 <option value="">Select Partner Type</option>
-                <option value="industry">Industry</option>
-                <option value="academe">Academe</option>
-                <option value="localGov">Local Government</option>
+                <option value="Industry">Industry</option>
+                <option value="Academe">Academe</option>
+                <option value="Local Government">Local Government</option>
               </select>
             </div>
           </div>

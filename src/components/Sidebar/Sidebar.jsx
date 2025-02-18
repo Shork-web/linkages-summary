@@ -4,7 +4,7 @@ import { auth } from '../../firebase-config';
 import LogoutConfirmation from '../LogoutConfirmation/LogoutConfirmation';
 import './Sidebar.css';
 
-const Sidebar = ({ isCollapsed, onToggle }) => {
+const Sidebar = ({ isCollapsed, toggleSidebar }) => {
   const navigate = useNavigate();
   const [showLogoutConfirmation, setShowLogoutConfirmation] = useState(false);
 
@@ -20,9 +20,9 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
   return (
     <div className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
       <div className="sidebar-header">
-        <h2>Agreement Manager</h2>
-        <button className="toggle-btn" onClick={onToggle}>
-          <i className={`fas fa-chevron-${isCollapsed ? 'right' : 'left'}`}></i>
+        {!isCollapsed && <h2>Agreement Manager</h2>}
+        <button className="sidebar-toggle" onClick={toggleSidebar}>
+          <i className={`fas fa-${isCollapsed ? 'chevron-right' : 'chevron-left'}`}></i>
         </button>
       </div>
       

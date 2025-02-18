@@ -1,12 +1,12 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { subscribeToAgreements } from '../../utils/fetchAgreements';
-import { doc, deleteDoc, updateDoc } from 'firebase/firestore';
+import { doc, deleteDoc } from 'firebase/firestore';
 import { db } from '../../firebase-config';
 import DashboardCounters from '../DashboardCounters/DashboardCounters';
 import './AllAgreements.css';
 import { useNavigate } from 'react-router-dom';
 import { auth } from '../../firebase-config';
-import EditAgreementForm from '../EditAgreementForm/EditAgreementForm';
+import EditAgreementForm from './EditAgreementForm';
 import Notification from '../Notification/Notification';
 import ExcelExport from '../ExcelExport/ExcelExport';
 
@@ -99,29 +99,24 @@ const AllAgreements = () => {
     setIsEditModalOpen(true);
   };
 
-  const handleCloseModal = () => {
-    setIsEditModalOpen(false);
-    setEditingAgreement(null);
+  const handleUpdate = (message, type = 'success') => {
+    setNotification({
+      show: true,
+      type: type,
+      message: message
+    });
+    setTimeout(() => {
+      setNotification({
+        show: false,
+        type: '',
+        message: ''
+      });
+    }, 3000);
   };
 
-  const handleUpdateAgreement = async (updatedData) => {
-    try {
-      const agreementRef = doc(db, 'agreementform', editingAgreement.id);
-      await updateDoc(agreementRef, updatedData);
-      handleCloseModal();
-      setNotification({
-        show: true,
-        type: 'success',
-        message: 'Agreement updated successfully!'
-      });
-    } catch (error) {
-      console.error('Error updating agreement:', error);
-      setNotification({
-        show: true,
-        type: 'error',
-        message: 'Error updating agreement. Please try again.'
-      });
-    }
+  const handleCloseEdit = () => {
+    setIsEditModalOpen(false);
+    setEditingAgreement(null);
   };
 
   const handleDelete = (agreement) => {
@@ -136,18 +131,10 @@ const AllAgreements = () => {
     try {
       await deleteDoc(doc(db, 'agreementform', deleteConfirm.agreementId));
       setDeleteConfirm({ show: false, agreementId: null, agreementName: '' });
-      setNotification({
-        show: true,
-        type: 'success',
-        message: 'Agreement deleted successfully!'
-      });
+      handleUpdate('Agreement deleted successfully!');
     } catch (error) {
       console.error('Error deleting agreement:', error);
-      setNotification({
-        show: true,
-        type: 'error',
-        message: 'Error deleting agreement. Please try again.'
-      });
+      handleUpdate('Error deleting agreement. Please try again.', 'error');
     }
   };
 
@@ -244,9 +231,9 @@ const AllAgreements = () => {
                 onChange={handleFilterChange}
               >
                 <option value="">All Partners</option>
-                <option value="academe">Academe</option>
-                <option value="industry">Industry</option>
-                <option value="government">Government</option>
+                <option value="Industry">Industry</option>
+                <option value="Academe">Academe</option>
+                <option value="Local Government">Local Government</option>
               </select>
             </div>
             <ExcelExport agreements={filteredAgreements} />
@@ -257,18 +244,17 @@ const AllAgreements = () => {
           <table className="agreements-table">
             <thead>
               <tr>
-                <th>Name</th>
+                <th>Partner Name</th>
                 <th>Address</th>
                 <th>Signed By</th>
                 <th>Designation</th>
                 <th>Agreement Type</th>
-                <th>Date Signed</th>
-                <th>Validity</th>
-                <th>Date Expired</th>
-                <th>For Renewal</th>
+                <th>Partner Type</th>
                 <th>Status</th>
+                <th>Validity</th>
+                <th>Date Signed</th>
+                <th>Date Expired</th>
                 <th>Description</th>
-                <th>Links</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -281,23 +267,23 @@ const AllAgreements = () => {
                     <td>{agreement.signedBy}</td>
                     <td>{agreement.designation}</td>
                     <td>{agreement.agreementType}</td>
+                    <td>{agreement.partnerType}</td>
+                    <td>
+                      <span className={`status-badge status-${agreement.status.toLowerCase().replace(/\s+/g, '-')}`}>
+                        {agreement.status}
+                      </span>
+                    </td>
+                    <td>{agreement.validity} years</td>
                     <td>{new Date(agreement.dateSigned).toLocaleDateString('en-US', {
                       year: 'numeric',
                       month: 'long',
                       day: 'numeric'
                     })}</td>
-                    <td>{agreement.validity} years</td>
                     <td>{new Date(agreement.dateExpired).toLocaleDateString('en-US', {
                       year: 'numeric',
                       month: 'long',
                       day: 'numeric'
                     })}</td>
-                    <td>{agreement.forRenewal ? 'Yes' : 'No'}</td>
-                    <td>
-                      <span className={`status-badge status-${agreement.status}`}>
-                        {agreement.status}
-                      </span>
-                    </td>
                     <td className="description-cell">
                       <div className={`description-content ${expandedDescriptions.has(agreement.id) ? 'expanded' : 'collapsed'}`}>
                         {agreement.description}
@@ -321,11 +307,6 @@ const AllAgreements = () => {
                         </button>
                       )}
                     </td>
-                    <td>
-                      <a href={agreement.links} target="_blank" rel="noopener noreferrer">
-                        View
-                      </a>
-                    </td>
                     <td className="action-buttons">
                       <button 
                         className="action-btn edit-btn"
@@ -346,7 +327,7 @@ const AllAgreements = () => {
                 ))
               ) : (
                 <tr className="empty-table">
-                  <td colSpan="13">
+                  <td colSpan="12">
                     <div className="empty-state">
                       <i className="fas fa-file-contract"></i>
                       <p>No agreements found</p>
@@ -400,26 +381,14 @@ const AllAgreements = () => {
         </div>
       </div>
 
-      {/* Add Modal */}
-      {isEditModalOpen && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h2>Edit Agreement</h2>
-              <button className="close-btn" onClick={handleCloseModal}>
-                <i className="fas fa-times"></i>
-              </button>
-            </div>
-            <EditAgreementForm 
-              agreement={editingAgreement}
-              onSubmit={handleUpdateAgreement}
-              onCancel={handleCloseModal}
-            />
-          </div>
-        </div>
+      {isEditModalOpen && editingAgreement && (
+        <EditAgreementForm
+          agreement={editingAgreement}
+          onClose={handleCloseEdit}
+          onUpdate={handleUpdate}
+        />
       )}
 
-      {/* Add Delete Confirmation Modal */}
       {deleteConfirm.show && (
         <div className="modal-overlay">
           <div className="delete-confirm">

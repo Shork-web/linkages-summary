@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../../firebase-config';
 import { collection, addDoc } from 'firebase/firestore';
+import Notification from '../Notification/Notification';
 import './CompanyMOAForm.css';
 
 const CompanyMOAForm = () => {
@@ -27,6 +28,7 @@ const CompanyMOAForm = () => {
   const [withExpiration, setWithExpiration] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [notification, setNotification] = useState(null);
 
   const companyTypes = [
     'BPO',
@@ -123,10 +125,22 @@ const CompanyMOAForm = () => {
       });
       setWithExpiration(false);
 
-      alert('Company MOA successfully added!');
+      setNotification({
+        message: 'Company MOA successfully added!',
+        type: 'success'
+      });
+
+      // Auto-dismiss notification after 3 seconds
+      setTimeout(() => {
+        setNotification(null);
+      }, 3000);
+
     } catch (err) {
       console.error('Error adding company MOA:', err);
-      setError(err.message);
+      setNotification({
+        message: err.message,
+        type: 'error'
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -134,6 +148,13 @@ const CompanyMOAForm = () => {
 
   return (
     <div className="company-moa-form-container">
+      {notification && (
+        <Notification
+          message={notification.message}
+          type={notification.type}
+          onClose={() => setNotification(null)}
+        />
+      )}
       <h2>Company MOA Form</h2>
       {error && <div className="error-message">{error}</div>}
       <form onSubmit={handleSubmit} className="company-moa-form">

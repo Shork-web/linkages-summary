@@ -4,40 +4,112 @@
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   margin: 0 -20px;
+  max-width: 95vw;
 }
 
-.company-list-container h2 {
+.company-list-title {
   color: #8B3A2B;
   margin-bottom: 30px;
   font-size: 1.8em;
   font-weight: 600;
 }
 
-.table-container {
-  max-height: 600px;
+.company-table-container {
+  max-height: 70vh;
   overflow: auto;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   background: white;
   position: relative;
+  margin: 0 auto;
 }
 
-.companies-table {
+.company-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.company-header-controls {
+  display: flex;
+  align-items: center;
+  gap: 60px;
+  flex-wrap: wrap;
+}
+
+.company-search-box {
+  position: relative;
+  min-width: 300px;
+}
+
+.company-search-box input {
+  width: 100%;
+  padding: 8px 8px 8px 35px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 13px;
+  transition: all 0.3s ease;
+}
+
+.company-search-box input:focus {
+  border-color: #8B3A2B;
+  box-shadow: 0 0 0 2px rgba(139, 58, 43, 0.1);
+}
+
+.company-search-box i {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #666;
+  font-size: 14px;
+}
+
+.company-filter-group {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.company-filter-group select {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 13px;
+  min-width: 150px;
+  cursor: pointer;
+  background-color: white;
+}
+
+.company-filter-group select:hover {
+  border-color: #8B3A2B;
+}
+
+.company-filter-group select:focus {
+  border-color: #8B3A2B;
+  box-shadow: 0 0 0 2px rgba(139, 58, 43, 0.1);
+  outline: none;
+}
+
+.company-table {
   width: 100%;
   border-collapse: collapse;
   margin-bottom: 20px;
-  min-width: 1200px;
+  min-width: 1500px;
 }
 
-.companies-table th,
-.companies-table td {
+.company-table th,
+.company-table td {
   padding: 12px 15px;
   text-align: left;
   border-bottom: 1px solid #ddd;
   white-space: nowrap;
 }
 
-.companies-table th {
+.company-table th {
   background-color: #f8f8f8;
   color: #333;
   font-weight: 600;
@@ -49,57 +121,58 @@
   border-bottom: 2px solid #8B3A2B;
 }
 
-.companies-table th:nth-child(1) { width: 15%; } /* Company */
-.companies-table th:nth-child(2) { width: 20%; } /* Address */
-.companies-table th:nth-child(3) { width: 8%; }  /* Longitude */
-.companies-table th:nth-child(4) { width: 8%; }  /* Latitude */
-.companies-table th:nth-child(5) { width: 6%; }  /* Year */
-.companies-table th:nth-child(6) { width: 8%; }  /* Status */
-.companies-table th:nth-child(7) { width: 12%; } /* Type */
-.companies-table th:nth-child(8) { width: 8%; }  /* With Expiration */
-.companies-table th:nth-child(9) { width: 6%; }  /* Validity */
-.companies-table th:nth-child(10) { width: 15%; } /* Remarks */
-.companies-table th:nth-child(11) { width: 8%; } /* Actions */
+/* Column widths */
+.company-table th:nth-child(1) { width: 15%; }
+.company-table th:nth-child(2) { width: 22%; }
+.company-table th:nth-child(3) { width: 8%; }
+.company-table th:nth-child(4) { width: 8%; }
+.company-table th:nth-child(5) { width: 6%; }
+.company-table th:nth-child(6) { width: 8%; }
+.company-table th:nth-child(7) { width: 12%; }
+.company-table th:nth-child(8) { width: 8%; }
+.company-table th:nth-child(9) { width: 6%; }
+.company-table th:nth-child(10) { width: 18%; }
+.company-table th:nth-child(11) { width: 6%; }
 
-.companies-table tbody tr:hover {
+.company-table tbody tr:hover {
   background-color: rgba(139, 58, 43, 0.05);
 }
 
-.status-badge {
+.company-status-badge {
   padding: 4px 8px;
   border-radius: 12px;
   font-size: 0.85em;
   font-weight: 500;
 }
 
-.status-badge.status-active {
+.company-status-badge.status-active {
   background-color: #E8F5E9;
   color: #2E7D32;
 }
 
-.status-badge.status-for-update {
+.company-status-badge.status-for-update {
   background-color: #FFF3E0;
   color: #F57C00;
 }
 
-.status-badge.status-blacklisted {
+.company-status-badge.status-blacklisted {
   background-color: #FFEBEE;
   color: #C62828;
 }
 
-.action-buttons {
+.company-action-buttons {
   display: flex;
-  gap: 8px;
+  gap: 2px;
   justify-content: center;
   align-items: center;
 }
 
-.action-btn {
+.company-action-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 32px;
-  height: 32px;
+  height: 100px;
   padding: 0;
   border: none;
   border-radius: 4px;
@@ -109,96 +182,99 @@
   margin: 0 4px;
 }
 
-.action-btn:hover {
+.company-action-btn:hover {
   background-color: rgba(0, 0, 0, 0.05);
 }
 
-.view-btn {
-  color: #1565C0;
-}
-
-.view-btn:hover {
-  color: #0D47A1;
-}
-
-.edit-btn {
+.company-edit-btn {
   color: #F57C00;
 }
 
-.edit-btn:hover {
+.company-edit-btn:hover {
   color: #E65100;
 }
 
-.delete-btn {
+.company-delete-btn {
   color: #C62828;
 }
 
-.delete-btn:hover {
+.company-delete-btn:hover {
   color: #B71C1C;
 }
 
-/* Responsive styles */
-@media (max-width: 1400px) {
-  .company-list-container {
-    margin: 0 -10px;
-  }
-
-  .table-container {
-    margin: 0 -10px;
-    padding: 0 10px;
-  }
-}
-
-/* Loading state */
-.loading-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 200px;
+.company-loading {
+  padding: 2rem;
+  text-align: center;
   color: #8B3A2B;
-  font-size: 1.2em;
+  font-size: 1.2rem;
 }
 
-/* Empty state */
-.empty-state {
+.company-empty-state {
   text-align: center;
   padding: 40px 20px;
   color: #666;
 }
 
-.empty-state i {
+.company-empty-state i {
   font-size: 3em;
   color: #8B3A2B;
   margin-bottom: 15px;
 }
 
-.empty-state p {
+.company-empty-state p {
   margin: 5px 0;
   font-size: 1.1em;
 }
 
-.empty-state .empty-subtitle {
+.company-empty-subtitle {
   font-size: 0.9em;
   color: #888;
 }
 
+/* Responsive styles */
+@media (max-width: 768px) {
+  .company-list-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .company-header-controls {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .company-search-box {
+    width: 100%;
+    min-width: unset;
+  }
+
+  .company-filter-group {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .company-filter-group select {
+    width: 100%;
+  }
+}
+
 /* Scrollbar styling */
-.table-container::-webkit-scrollbar {
+.company-table-container::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
-.table-container::-webkit-scrollbar-track {
+.company-table-container::-webkit-scrollbar-track {
   background: #f1f1f1;
   border-radius: 4px;
 }
 
-.table-container::-webkit-scrollbar-thumb {
+.company-table-container::-webkit-scrollbar-thumb {
   background: #8B3A2B;
   border-radius: 4px;
 }
 
-.table-container::-webkit-scrollbar-thumb:hover {
+.company-table-container::-webkit-scrollbar-thumb:hover {
   background: #7A3225;
 }
 
@@ -342,33 +418,113 @@
   background-color: #C62828;
 }
 
-/* Add loading state styles */
-.loading {
-  padding: 2rem;
-  text-align: center;
-  color: #8B3A2B;
-  font-size: 1.2rem;
-}
-
-/* Update status badge colors */
-.status-badge {
-  padding: 4px 8px;
-  border-radius: 12px;
-  font-size: 0.85em;
+/* Add this to your existing CSS */
+.company-table td:nth-child(9) {
+  color: #2E7D32;  /* Green color for 'Active' text */
   font-weight: 500;
 }
 
-.status-badge.status-active {
-  background-color: #E8F5E9;
-  color: #2E7D32;
+/* If you want to style specifically the 'Active' text for non-expiring MOAs */
+.company-table td:nth-child(9):not(:contains('years')) {
+  font-style: italic;
 }
 
-.status-badge.status-for-update {
-  background-color: #FFF3E0;
-  color: #F57C00;
+/* Delete Confirmation Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
 }
 
-.status-badge.status-blacklisted {
-  background-color: #FFEBEE;
+.delete-confirm {
+  background: white;
+  padding: 24px;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.delete-confirm h3 {
   color: #C62828;
+  margin-bottom: 16px;
+  font-size: 1.5em;
+}
+
+.warning-text {
+  color: #333;
+  font-weight: 600;
+  margin: 16px 0;
+}
+
+.delete-actions {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.cancel-btn {
+  padding: 8px 24px;
+  border: 2px solid #8B3A2B;
+  background: white;
+  color: #8B3A2B;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.cancel-btn:hover {
+  background: #8B3A2B;
+  color: white;
+}
+
+.confirm-btn {
+  padding: 8px 24px;
+  border: none;
+  background: #C62828;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.confirm-btn:hover {
+  background: #B71C1C;
+}
+
+.company-list-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.company-list-table th,
+.company-list-table td {
+  border: 1px solid #ddd; /* Add border to create dividers */
+  padding: 8px;
+  text-align: left;
+}
+
+.company-list-table th {
+  background-color: #f2f2f2;
+  color: #333;
+  font-weight: 600;
+}
+
+.company-list-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.company-list-table tr:hover {
+  background-color: #f1f1f1;
 } 

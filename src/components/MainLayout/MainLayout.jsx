@@ -9,7 +9,7 @@ import './MainLayout.css';
 const MainLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   console.log('Current route:', location.pathname);
@@ -37,18 +37,18 @@ const MainLayout = () => {
     }
   };
 
+  const toggleSidebar = () => {
+    setIsCollapsed(!isCollapsed);
+  };
+
   if (isLoading) {
     return <LoadingScreen />;
   }
 
   return (
     <div className="main-layout">
-      <Sidebar 
-        isCollapsed={isSidebarCollapsed} 
-        onToggle={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-        onLogout={handleLogout}
-      />
-      <div className={`main-content ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
+      <Sidebar isCollapsed={isCollapsed} toggleSidebar={toggleSidebar} onLogout={handleLogout} />
+      <div className={`main-content ${isCollapsed ? 'sidebar-collapsed' : ''}`}>
         <header className="App-header">
           <h1>Linkages Partnership Agreement Management</h1>
         </header>

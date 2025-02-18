@@ -12,49 +12,77 @@
 }
 
 .notification {
-  background: white;
-  padding: 24px;
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 16px 24px;
   border-radius: 8px;
-  width: 90%;
-  max-width: 400px;
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 300px;
+  max-width: 450px;
+  animation: slideIn 0.3s ease-out;
+  z-index: 1000;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.notification-content {
-  margin-bottom: 20px;
-}
-
-.notification-content i {
-  font-size: 48px;
-  margin-bottom: 16px;
-}
-
-.notification.success i {
+.notification.success {
+  background-color: #E8F5E9;
+  border: 1px solid #2E7D32;
   color: #2E7D32;
 }
 
-.notification.error i {
+.notification.error {
+  background-color: #FFEBEE;
+  border: 1px solid #C62828;
   color: #C62828;
 }
 
-.notification p {
-  color: #333;
-  font-size: 1.1em;
-  margin: 0;
+.notification-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
 }
 
-.notification-btn {
-  background-color: #8B3A2B;
-  color: white;
+.notification-content i {
+  font-size: 1.2em;
+}
+
+.notification-close {
+  background: none;
   border: none;
-  padding: 10px 24px;
-  border-radius: 4px;
-  font-size: 1em;
+  color: inherit;
   cursor: pointer;
-  transition: all 0.2s ease;
+  padding: 4px;
+  opacity: 0.7;
+  transition: opacity 0.2s;
 }
 
-.notification-btn:hover {
-  background-color: #7A3225;
+.notification-close:hover {
+  opacity: 1;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOut {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
 } 

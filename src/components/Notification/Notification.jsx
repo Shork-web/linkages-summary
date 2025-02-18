@@ -1,16 +1,16 @@
 import React from 'react';
 import './Notification.css';
 
-const Notification = ({ type, message, onClose }) => {
+const Notification = ({ message, type, onClose }) => {
   return (
-    <div className={`notification-overlay`}>
-      <div className={`notification ${type}`}>
-        <div className="notification-content">
-          <i className={`fas ${type === 'success' ? 'fa-check-circle' : 'fa-times-circle'}`}></i>
-          <p>{message}</p>
-        </div>
-        <button className="notification-btn" onClick={onClose}>OK</button>
+    <div className={`notification ${type}`}>
+      <div className="notification-content">
+        <i className={`fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}`}></i>
+        <span>{message}</span>
       </div>
+      <button className="notification-close" onClick={onClose}>
+        <i className="fas fa-times"></i>
+      </button>
     </div>
   );
 };
