@@ -144,6 +144,21 @@
   cursor: not-allowed;
 }
 
+.delete-button {
+  padding: 10px 24px;
+  border: none;
+  background: #C62828;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.delete-button:hover {
+  background: #B71C1C;
+}
+
 /* Scrollbar styling */
 .edit-company-modal::-webkit-scrollbar {
   width: 8px;

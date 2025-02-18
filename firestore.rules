@@ -5,7 +5,7 @@ service cloud.firestore {
       allow read, write: if request.auth != null;
       
       // Validation rules for company MOA documents
-      allow create: if request.auth != null &&
+      allow create, update: if request.auth != null &&
         request.resource.data.companyName is string &&
         request.resource.data.companyAddress is string &&
         request.resource.data.companyLongitude is string &&
@@ -19,6 +19,8 @@ service cloud.firestore {
         request.resource.data.withExpiration is bool &&
         request.resource.data.createdAt is string &&
         request.resource.data.updatedAt is string;
+        
+      allow delete: if request.auth != null;
     }
     // Specific rules for the agreementform collection
     match /agreementform/{agreementId} {
