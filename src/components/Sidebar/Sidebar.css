@@ -224,4 +224,26 @@
   .sidebar-footer .nav-item i {
     margin-right: 0;
   }
+}
+
+.nav-section {
+  margin-bottom: 20px;
+}
+
+.section-title {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0 20px;
+  margin: 20px 0 10px;
+  letter-spacing: 0.1em;
+}
+
+.sidebar.collapsed .section-title {
+  display: none;
+}
+
+/* Optional: Add hover effect for better visibility */
+.nav-section:hover .section-title {
+  color: rgba(255, 255, 255, 0.9);
 } 

@@ -1,0 +1,290 @@
+.company-list-container {
+  padding: 20px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin: 0 -20px;
+}
+
+.company-list-container h2 {
+  color: #8B3A2B;
+  margin-bottom: 30px;
+  font-size: 1.8em;
+  font-weight: 600;
+}
+
+.table-container {
+  max-height: 600px;
+  overflow: auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: white;
+  position: relative;
+}
+
+.companies-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+  min-width: 1200px;
+}
+
+.companies-table th,
+.companies-table td {
+  padding: 15px 20px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+  white-space: nowrap;
+}
+
+.companies-table th {
+  background-color: #f8f8f8;
+  color: #333;
+  font-weight: 600;
+  padding: 12px 20px;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: white;
+  border-bottom: 2px solid #8B3A2B;
+}
+
+.companies-table tbody tr:hover {
+  background-color: rgba(139, 58, 43, 0.05);
+}
+
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.85em;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.status-badge.status-active {
+  background-color: #E8F5E9;
+  color: #2E7D32;
+}
+
+.status-badge.status-for-update {
+  background-color: #FFF3E0;
+  color: #F57C00;
+}
+
+.status-badge.status-blacklisted {
+  background-color: #FFEBEE;
+  color: #C62828;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+}
+
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background-color: transparent;
+  margin: 0 4px;
+}
+
+.action-btn:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.view-btn {
+  color: #1565C0;
+}
+
+.view-btn:hover {
+  color: #0D47A1;
+}
+
+.edit-btn {
+  color: #F57C00;
+}
+
+.edit-btn:hover {
+  color: #E65100;
+}
+
+.delete-btn {
+  color: #C62828;
+}
+
+.delete-btn:hover {
+  color: #B71C1C;
+}
+
+/* Responsive styles */
+@media (max-width: 1400px) {
+  .company-list-container {
+    margin: 0 -10px;
+  }
+
+  .table-container {
+    margin: 0 -10px;
+    padding: 0 10px;
+  }
+}
+
+/* Loading state */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  color: #8B3A2B;
+  font-size: 1.2em;
+}
+
+/* Empty state */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: #666;
+}
+
+.empty-state i {
+  font-size: 3em;
+  color: #8B3A2B;
+  margin-bottom: 15px;
+}
+
+.empty-state p {
+  margin: 5px 0;
+  font-size: 1.1em;
+}
+
+.empty-state .empty-subtitle {
+  font-size: 0.9em;
+  color: #888;
+}
+
+/* Scrollbar styling */
+.table-container::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.table-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+  background: #8B3A2B;
+  border-radius: 4px;
+}
+
+.table-container::-webkit-scrollbar-thumb:hover {
+  background: #7A3225;
+}
+
+/* Add these new styles to your existing CSS */
+
+.list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 60px;
+  flex-wrap: wrap;
+}
+
+.search-box {
+  position: relative;
+  min-width: 300px;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 8px 8px 8px 35px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 13px;
+  transition: all 0.3s ease;
+}
+
+.search-box input:focus {
+  border-color: #8B3A2B;
+  box-shadow: 0 0 0 2px rgba(139, 58, 43, 0.1);
+}
+
+.search-box i {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #666;
+  font-size: 14px;
+}
+
+.filter-group {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.filter-group select {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 13px;
+  min-width: 150px;
+  cursor: pointer;
+  background-color: white;
+}
+
+.filter-group select:hover {
+  border-color: #8B3A2B;
+}
+
+.filter-group select:focus {
+  border-color: #8B3A2B;
+  box-shadow: 0 0 0 2px rgba(139, 58, 43, 0.1);
+  outline: none;
+}
+
+@media (max-width: 768px) {
+  .list-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .header-controls {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .search-box {
+    width: 100%;
+    min-width: unset;
+  }
+
+  .filter-group {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .filter-group select {
+    width: 100%;
+  }
+} 

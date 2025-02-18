@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { signOut } from 'firebase/auth';
 import { auth } from '../../firebase-config';
 import Sidebar from '../Sidebar/Sidebar';
@@ -8,8 +8,11 @@ import './MainLayout.css';
 
 const MainLayout = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+
+  console.log('Current route:', location.pathname);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {

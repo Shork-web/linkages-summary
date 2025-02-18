@@ -28,40 +28,62 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
       
       <nav className="sidebar-nav">
         <ul>
-          <NavLink to="/" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
-            <i className="fas fa-file-contract"></i>
-            <span>New Agreement</span>
-          </NavLink>
+          {/* Agreements Section */}
+          <div className="nav-section">
+            <div className="section-title">AGREEMENTS</div>
+            <NavLink to="/new-agreement" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+              <i className="fas fa-file-contract"></i>
+              <span>New Agreement</span>
+            </NavLink>
+            
+            <NavLink to="/agreements" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+              <i className="fas fa-list"></i>
+              <span>All Agreements</span>
+            </NavLink>
+            
+            <NavLink to="/pending" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+              <i className="fas fa-clock"></i>
+              <span>Pending</span>
+            </NavLink>
+            
+            <NavLink to="/active" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+              <i className="fas fa-check-circle"></i>
+              <span>Active</span>
+            </NavLink>
+            
+            <NavLink to="/renewal" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+              <i className="fas fa-history"></i>
+              <span>For Renewal</span>
+            </NavLink>
+            
+            <NavLink to="/expired" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+              <i className="fas fa-times-circle"></i>
+              <span>Expired</span>
+            </NavLink>
+          </div>
+
+          {/* Updated MOA List Section */}
+          <div className="nav-section">
+            <div className="section-title">MOA LIST</div>
+            <NavLink to="/company-moa" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+              <i className="fas fa-file-signature"></i>
+              <span>New Company MOA</span>
+            </NavLink>
+            
+            <NavLink to="/company-list" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+              <i className="fas fa-building"></i>
+              <span>Company List</span>
+            </NavLink>
+          </div>
           
-          <NavLink to="/agreements" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
-            <i className="fas fa-list"></i>
-            <span>All Agreements</span>
-          </NavLink>
-          
-          <NavLink to="/pending" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
-            <i className="fas fa-clock"></i>
-            <span>Pending</span>
-          </NavLink>
-          
-          <NavLink to="/active" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
-            <i className="fas fa-check-circle"></i>
-            <span>Active</span>
-          </NavLink>
-          
-          <NavLink to="/renewal" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
-            <i className="fas fa-history"></i>
-            <span>For Renewal</span>
-          </NavLink>
-          
-          <NavLink to="/expired" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
-            <i className="fas fa-times-circle"></i>
-            <span>Expired</span>
-          </NavLink>
-          
-          <NavLink to="/partners" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
-            <i className="fas fa-handshake"></i>
-            <span>Partners</span>
-          </NavLink>
+          {/* Others Section */}
+          <div className="nav-section">
+            <div className="section-title">OTHERS</div>
+            <NavLink to="/partners" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+              <i className="fas fa-handshake"></i>
+              <span>Partners</span>
+            </NavLink>
+          </div>
         </ul>
       </nav>
 
