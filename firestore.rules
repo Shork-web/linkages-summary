@@ -1,6 +1,25 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    match /companyMOA/{document=**} {
+      allow read, write: if request.auth != null;
+      
+      // Validation rules for company MOA documents
+      allow create: if request.auth != null &&
+        request.resource.data.companyName is string &&
+        request.resource.data.companyAddress is string &&
+        request.resource.data.companyLongitude is string &&
+        request.resource.data.companyLatitude is string &&
+        request.resource.data.moaYear is number &&
+        request.resource.data.moaStatus in ['Active', 'For-Update', 'Blacklisted'] &&
+        request.resource.data.companyType is string &&
+        request.resource.data.moaValidity is number &&
+        request.resource.data.moaExpirationDate is string &&
+        request.resource.data.moaRemarks is string &&
+        request.resource.data.withExpiration is bool &&
+        request.resource.data.createdAt is string &&
+        request.resource.data.updatedAt is string;
+    }
     // Specific rules for the agreementform collection
     match /agreementform/{agreementId} {
       // Only allow access if user is authenticated

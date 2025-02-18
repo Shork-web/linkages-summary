@@ -12,17 +12,21 @@ const CompanyMOAForm = () => {
   }, []);
 
   const [formData, setFormData] = useState({
-    company: '',
-    address: '',
-    longitude: '',
-    latitude: '',
-    year: new Date().getFullYear(),
-    status: 'Active',
-    type: '',
-    validity: '',
-    expirationDate: '',
-    remarks: ''
+    companyName: '',
+    companyAddress: '',
+    companyLongitude: '',
+    companyLatitude: '',
+    moaYear: new Date().getFullYear(),
+    moaStatus: 'Active',
+    companyType: '',
+    moaValidity: '',
+    moaExpirationDate: '',
+    moaRemarks: ''
   });
+
+  const [withExpiration, setWithExpiration] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState('');
 
   const companyTypes = [
     'BPO',
@@ -47,74 +51,110 @@ const CompanyMOAForm = () => {
   ];
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
+    
+    // Handle checkbox inputs
+    if (type === 'checkbox') {
+      if (name === 'withExpiration') {
+        setWithExpiration(checked);
+        if (!checked) {
+          setFormData(prev => ({
+            ...prev,
+            moaValidity: '',
+            moaExpirationDate: ''
+          }));
+        }
+      }
+      return;
+    }
+
+    // Handle other input types
     setFormData(prev => ({
       ...prev,
       [name]: value
     }));
 
     // Calculate expiration date when validity changes
-    if (name === 'validity' && value) {
+    if (name === 'moaValidity' && value && withExpiration) {
       const today = new Date();
       const expirationDate = new Date(today.setFullYear(today.getFullYear() + parseInt(value)));
       setFormData(prev => ({
         ...prev,
-        expirationDate: expirationDate.toISOString().split('T')[0]
+        moaExpirationDate: expirationDate.toISOString().split('T')[0]
       }));
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
+    setError('');
+
     try {
+      // Validate required fields
+      if (!formData.companyName || !formData.companyAddress || !formData.companyType) {
+        throw new Error('Please fill in all required fields');
+      }
+
+      if (withExpiration && (!formData.moaValidity || !formData.moaExpirationDate)) {
+        throw new Error('Please fill in validity and expiration date');
+      }
+
+      // Add document to Firestore
       await addDoc(collection(db, 'companyMOA'), {
         ...formData,
-        createdAt: new Date().toISOString()
-      });
-      
-      // Reset form after successful submission
-      setFormData({
-        company: '',
-        address: '',
-        longitude: '',
-        latitude: '',
-        year: new Date().getFullYear(),
-        status: 'Active',
-        type: '',
-        validity: '',
-        expirationDate: '',
-        remarks: ''
+        withExpiration,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
       });
 
+      // Reset form after successful submission
+      setFormData({
+        companyName: '',
+        companyAddress: '',
+        companyLongitude: '',
+        companyLatitude: '',
+        moaYear: new Date().getFullYear(),
+        moaStatus: 'Active',
+        companyType: '',
+        moaValidity: '',
+        moaExpirationDate: '',
+        moaRemarks: ''
+      });
+      setWithExpiration(false);
+
       alert('Company MOA successfully added!');
-    } catch (error) {
-      console.error('Error adding company MOA:', error);
-      alert('Error adding company MOA. Please try again.');
+    } catch (err) {
+      console.error('Error adding company MOA:', err);
+      setError(err.message);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
     <div className="company-moa-form-container">
       <h2>Company MOA Form</h2>
+      {error && <div className="error-message">{error}</div>}
       <form onSubmit={handleSubmit} className="company-moa-form">
         <div className="form-group">
-          <label htmlFor="company">Company Name:</label>
+          <label htmlFor="companyName">Company Name: <span className="required">*</span></label>
           <input
             type="text"
-            id="company"
-            name="company"
-            value={formData.company}
+            id="companyName"
+            name="companyName"
+            value={formData.companyName}
             onChange={handleChange}
             required
           />
         </div>
 
         <div className="form-group">
-          <label htmlFor="address">Address:</label>
+          <label htmlFor="companyAddress">Company Address: <span className="required">*</span></label>
           <textarea
-            id="address"
-            name="address"
-            value={formData.address}
+            id="companyAddress"
+            name="companyAddress"
+            value={formData.companyAddress}
             onChange={handleChange}
             required
           />
@@ -122,51 +162,47 @@ const CompanyMOAForm = () => {
 
         <div className="form-row">
           <div className="form-group">
-            <label htmlFor="longitude">Longitude:</label>
+            <label htmlFor="companyLongitude">Longitude:</label>
             <input
-              type="number"
-              id="longitude"
-              name="longitude"
-              value={formData.longitude}
+              type="text"
+              id="companyLongitude"
+              name="companyLongitude"
+              value={formData.companyLongitude}
               onChange={handleChange}
-              step="any"
-              required
             />
           </div>
 
           <div className="form-group">
-            <label htmlFor="latitude">Latitude:</label>
+            <label htmlFor="companyLatitude">Latitude:</label>
             <input
-              type="number"
-              id="latitude"
-              name="latitude"
-              value={formData.latitude}
+              type="text"
+              id="companyLatitude"
+              name="companyLatitude"
+              value={formData.companyLatitude}
               onChange={handleChange}
-              step="any"
-              required
             />
           </div>
         </div>
 
         <div className="form-row">
           <div className="form-group">
-            <label htmlFor="year">Year:</label>
+            <label htmlFor="moaYear">Year:</label>
             <input
               type="number"
-              id="year"
-              name="year"
-              value={formData.year}
+              id="moaYear"
+              name="moaYear"
+              value={formData.moaYear}
               onChange={handleChange}
               required
             />
           </div>
 
           <div className="form-group">
-            <label htmlFor="status">Status:</label>
+            <label htmlFor="moaStatus">Status:</label>
             <select
-              id="status"
-              name="status"
-              value={formData.status}
+              id="moaStatus"
+              name="moaStatus"
+              value={formData.moaStatus}
               onChange={handleChange}
               required
             >
@@ -178,11 +214,11 @@ const CompanyMOAForm = () => {
         </div>
 
         <div className="form-group">
-          <label htmlFor="type">Company Type:</label>
+          <label htmlFor="companyType">Company Type: <span className="required">*</span></label>
           <select
-            id="type"
-            name="type"
-            value={formData.type}
+            id="companyType"
+            name="companyType"
+            value={formData.companyType}
             onChange={handleChange}
             required
           >
@@ -193,42 +229,56 @@ const CompanyMOAForm = () => {
           </select>
         </div>
 
+        <div className="expiration-checkbox-group">
+          <label className="checkbox-label">
+            <input
+              type="checkbox"
+              name="withExpiration"
+              checked={withExpiration}
+              onChange={handleChange}
+            />
+            <span>With Expiration</span>
+          </label>
+        </div>
+
         <div className="form-row">
           <div className="form-group">
-            <label htmlFor="validity">
+            <label htmlFor="moaValidity">
               Validity (years):
               <span className="helper-text">Duration of the MOA</span>
             </label>
             <input
               type="number"
-              id="validity"
-              name="validity"
-              value={formData.validity}
+              id="moaValidity"
+              name="moaValidity"
+              value={formData.moaValidity}
               onChange={handleChange}
               min="1"
-              required
+              required={withExpiration}
+              disabled={!withExpiration}
             />
           </div>
 
           <div className="form-group">
-            <label htmlFor="expirationDate">Expiration Date:</label>
+            <label htmlFor="moaExpirationDate">Expiration Date:</label>
             <input
               type="date"
-              id="expirationDate"
-              name="expirationDate"
-              value={formData.expirationDate}
+              id="moaExpirationDate"
+              name="moaExpirationDate"
+              value={formData.moaExpirationDate}
               readOnly
               className="readonly-input"
+              disabled={!withExpiration}
             />
           </div>
         </div>
 
         <div className="form-group">
-          <label htmlFor="remarks">Remarks:</label>
+          <label htmlFor="moaRemarks">Remarks:</label>
           <textarea
-            id="remarks"
-            name="remarks"
-            value={formData.remarks}
+            id="moaRemarks"
+            name="moaRemarks"
+            value={formData.moaRemarks}
             onChange={handleChange}
             rows="4"
           />
@@ -238,8 +288,12 @@ const CompanyMOAForm = () => {
           <button type="button" onClick={() => window.location.reload()} className="reset-button">
             Reset Form
           </button>
-          <button type="submit" className="submit-button">
-            Submit MOA
+          <button 
+            type="submit" 
+            className="submit-button"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? 'Submitting...' : 'Submit MOA'}
           </button>
         </div>
       </form>

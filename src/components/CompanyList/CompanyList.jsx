@@ -35,21 +35,16 @@ const CompanyList = () => {
   ];
 
   useEffect(() => {
-    const unsubscribe = onSnapshot(
-      collection(db, 'companyMOA'),
-      (snapshot) => {
-        const companiesData = [];
-        snapshot.forEach((doc) => {
-          companiesData.push({ id: doc.id, ...doc.data() });
-        });
-        setCompanies(companiesData);
-        setLoading(false);
-      },
-      (error) => {
-        console.error("Error fetching companies:", error);
-        setLoading(false);
-      }
-    );
+    const companiesRef = collection(db, 'companyMOA');
+    
+    const unsubscribe = onSnapshot(companiesRef, (snapshot) => {
+      const companiesData = [];
+      snapshot.forEach((doc) => {
+        companiesData.push({ id: doc.id, ...doc.data() });
+      });
+      setCompanies(companiesData);
+      setLoading(false);
+    });
 
     return () => unsubscribe();
   }, []);
@@ -63,44 +58,21 @@ const CompanyList = () => {
   };
 
   const filteredCompanies = companies.filter(company => {
-    const searchTerm = filters.search.toLowerCase().trim();
+    const matchesSearch = company.companyName.toLowerCase().includes(filters.search.toLowerCase());
+    const matchesType = filters.type ? company.companyType === filters.type : true;
+    const matchesStatus = filters.status ? company.moaStatus === filters.status : true;
     
-    // If no filters are applied, return all companies
-    if (!searchTerm && !filters.type && !filters.status) {
-      return true;
-    }
-
-    // Check if company matches search term
-    const matchesSearch = !searchTerm || [
-      company.company,
-      company.address,
-      company.type,
-      company.status,
-      company.year?.toString()
-    ].some(field => field?.toLowerCase().includes(searchTerm));
-
-    // Check if company matches type filter
-    const matchesType = !filters.type || company.type === filters.type;
-
-    // Check if company matches status filter
-    const matchesStatus = !filters.status || company.status === filters.status;
-
     return matchesSearch && matchesType && matchesStatus;
   });
 
   if (loading) {
-    return (
-      <div className="loading-container">
-        <i className="fas fa-spinner fa-spin"></i>
-        <span>Loading companies...</span>
-      </div>
-    );
+    return <div className="loading">Loading companies...</div>;
   }
 
   return (
     <div className="company-list-container">
+      <h2>Company List</h2>
       <div className="list-header">
-        <h2>Company List</h2>
         <div className="header-controls">
           <div className="search-box">
             <i className="fas fa-search"></i>
@@ -141,13 +113,16 @@ const CompanyList = () => {
         <table className="companies-table">
           <thead>
             <tr>
-              <th>Company Name</th>
-              <th>Type</th>
-              <th>Status</th>
+              <th>Company</th>
               <th>Address</th>
+              <th>Longitude</th>
+              <th>Latitude</th>
               <th>Year</th>
+              <th>Status</th>
+              <th>Type</th>
+              <th>With Expiration</th>
               <th>Validity</th>
-              <th>Expiration Date</th>
+              <th>Remarks</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -155,17 +130,20 @@ const CompanyList = () => {
             {filteredCompanies.length > 0 ? (
               filteredCompanies.map(company => (
                 <tr key={company.id}>
-                  <td>{company.company}</td>
-                  <td>{company.type}</td>
+                  <td>{company.companyName}</td>
+                  <td>{company.companyAddress}</td>
+                  <td>{company.companyLongitude}</td>
+                  <td>{company.companyLatitude}</td>
+                  <td>{company.moaYear}</td>
                   <td>
-                    <span className={`status-badge status-${company.status.toLowerCase()}`}>
-                      {company.status}
+                    <span className={`status-badge status-${company.moaStatus.toLowerCase()}`}>
+                      {company.moaStatus}
                     </span>
                   </td>
-                  <td>{company.address}</td>
-                  <td>{company.year}</td>
-                  <td>{company.validity} years</td>
-                  <td>{new Date(company.expirationDate).toLocaleDateString()}</td>
+                  <td>{company.companyType}</td>
+                  <td>{company.withExpiration ? 'Yes' : 'No'}</td>
+                  <td>{company.moaValidity} years</td>
+                  <td>{company.moaRemarks}</td>
                   <td className="action-buttons">
                     <button className="action-btn view-btn" title="View Details">
                       <i className="fas fa-eye"></i>
@@ -181,7 +159,7 @@ const CompanyList = () => {
               ))
             ) : (
               <tr>
-                <td colSpan="8">
+                <td colSpan="11">
                   <div className="empty-state">
                     <i className="fas fa-building"></i>
                     <p>No companies found</p>

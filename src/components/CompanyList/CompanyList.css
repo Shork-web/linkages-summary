@@ -31,7 +31,7 @@
 
 .companies-table th,
 .companies-table td {
-  padding: 15px 20px;
+  padding: 12px 15px;
   text-align: left;
   border-bottom: 1px solid #ddd;
   white-space: nowrap;
@@ -49,6 +49,18 @@
   border-bottom: 2px solid #8B3A2B;
 }
 
+.companies-table th:nth-child(1) { width: 15%; } /* Company */
+.companies-table th:nth-child(2) { width: 20%; } /* Address */
+.companies-table th:nth-child(3) { width: 8%; }  /* Longitude */
+.companies-table th:nth-child(4) { width: 8%; }  /* Latitude */
+.companies-table th:nth-child(5) { width: 6%; }  /* Year */
+.companies-table th:nth-child(6) { width: 8%; }  /* Status */
+.companies-table th:nth-child(7) { width: 12%; } /* Type */
+.companies-table th:nth-child(8) { width: 8%; }  /* With Expiration */
+.companies-table th:nth-child(9) { width: 6%; }  /* Validity */
+.companies-table th:nth-child(10) { width: 15%; } /* Remarks */
+.companies-table th:nth-child(11) { width: 8%; } /* Actions */
+
 .companies-table tbody tr:hover {
   background-color: rgba(139, 58, 43, 0.05);
 }
@@ -58,7 +70,6 @@
   border-radius: 12px;
   font-size: 0.85em;
   font-weight: 500;
-  text-transform: capitalize;
 }
 
 .status-badge.status-active {
@@ -287,4 +298,77 @@
   .filter-group select {
     width: 100%;
   }
+}
+
+/* Adjust table cell padding for better readability */
+.companies-table td {
+  padding: 12px 15px;
+}
+
+/* Add word-wrap for remarks column */
+.companies-table td:nth-child(10) {
+  white-space: normal;
+  word-wrap: break-word;
+}
+
+/* Add styling for coordinates */
+.companies-table td:nth-child(3),
+.companies-table td:nth-child(4) {
+  font-family: monospace;
+  font-size: 0.9em;
+  color: #666;
+}
+
+/* Add styling for expiration status */
+.companies-table td:nth-child(8) {
+  text-align: center;
+  font-weight: 500;
+}
+
+.companies-table td:nth-child(8)::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 6px;
+}
+
+.companies-table td:nth-child(8):contains('Yes')::before {
+  background-color: #2E7D32;
+}
+
+.companies-table td:nth-child(8):contains('No')::before {
+  background-color: #C62828;
+}
+
+/* Add loading state styles */
+.loading {
+  padding: 2rem;
+  text-align: center;
+  color: #8B3A2B;
+  font-size: 1.2rem;
+}
+
+/* Update status badge colors */
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.85em;
+  font-weight: 500;
+}
+
+.status-badge.status-active {
+  background-color: #E8F5E9;
+  color: #2E7D32;
+}
+
+.status-badge.status-for-update {
+  background-color: #FFF3E0;
+  color: #F57C00;
+}
+
+.status-badge.status-blacklisted {
+  background-color: #FFEBEE;
+  color: #C62828;
 } 
