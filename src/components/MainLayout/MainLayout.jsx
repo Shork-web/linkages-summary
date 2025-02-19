@@ -50,7 +50,7 @@ const MainLayout = () => {
       <Sidebar isCollapsed={isCollapsed} toggleSidebar={toggleSidebar} onLogout={handleLogout} />
       <div className={`main-content ${isCollapsed ? 'sidebar-collapsed' : ''}`}>
         <header className="App-header">
-          <h1>Linkages Partnership Agreement Management</h1>
+          <h1>LINKAGES SUMMARY SYSTEM</h1>
         </header>
         <main>
           <Outlet />
