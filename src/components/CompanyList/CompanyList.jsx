@@ -20,6 +20,9 @@ const CompanyList = () => {
     companyName: ''
   });
   const [editingCompany, setEditingCompany] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(5);
+  const [visiblePages, setVisiblePages] = useState([]);
 
   const companyTypes = [
     'BPO',
@@ -73,6 +76,47 @@ const CompanyList = () => {
     
     return matchesSearch && matchesType && matchesStatus;
   });
+
+  // Calculate pagination
+  const calculateVisiblePages = (totalPages, currentPage) => {
+    let pages = [];
+    const maxVisiblePages = 5;
+
+    if (totalPages <= maxVisiblePages) {
+      pages = Array.from({ length: totalPages }, (_, i) => i + 1);
+    } else {
+      if (currentPage <= 3) {
+        pages = [1, 2, 3, 4, '...', totalPages];
+      } else if (currentPage >= totalPages - 2) {
+        pages = [1, '...', totalPages - 3, totalPages - 2, totalPages - 1, totalPages];
+      } else {
+        pages = [1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages];
+      }
+    }
+    setVisiblePages(pages);
+  };
+
+  // Get current companies
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentCompanies = filteredCompanies.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredCompanies.length / itemsPerPage);
+
+  useEffect(() => {
+    calculateVisiblePages(totalPages, currentPage);
+  }, [currentPage, totalPages]);
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(prev => prev + 1);
+    }
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(prev => prev - 1);
+    }
+  };
 
   const handleDelete = async () => {
     try {
@@ -205,7 +249,7 @@ const CompanyList = () => {
         </div>
       </div>
 
-      <div className="table-container">
+      <div className="company-table-container">
         <table className="company-list-table">
           <thead>
             <tr>
@@ -223,8 +267,8 @@ const CompanyList = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredCompanies.length > 0 ? (
-              filteredCompanies.map(company => (
+            {currentCompanies.length > 0 ? (
+              currentCompanies.map(company => (
                 <tr key={company.id}>
                   <td>{company.companyName}</td>
                   <td>{company.companyAddress}</td>
@@ -276,6 +320,48 @@ const CompanyList = () => {
           </tbody>
         </table>
       </div>
+
+      {filteredCompanies.length > 0 && (
+        <div className="company-pagination-container">
+          <div className="company-pagination">
+            <button 
+              className="company-page-btn" 
+              onClick={handlePrevPage}
+              disabled={currentPage === 1}
+              title="Previous Page"
+            >
+              <i className="fas fa-chevron-left"></i>
+            </button>
+            
+            {visiblePages.map((page, index) => (
+              <React.Fragment key={index}>
+                {page === '...' ? (
+                  <span className="company-page-ellipsis">...</span>
+                ) : (
+                  <button
+                    className={`company-page-btn ${currentPage === page ? 'active' : ''}`}
+                    onClick={() => setCurrentPage(page)}
+                  >
+                    {page}
+                  </button>
+                )}
+              </React.Fragment>
+            ))}
+
+            <button 
+              className="company-page-btn" 
+              onClick={handleNextPage}
+              disabled={currentPage === totalPages}
+              title="Next Page"
+            >
+              <i className="fas fa-chevron-right"></i>
+            </button>
+          </div>
+          <div className="company-page-info">
+            Page {currentPage} of {totalPages}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
