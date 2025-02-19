@@ -84,13 +84,28 @@
 }
 
 .table-container {
-  max-height: 600px; /* Height for 10 rows + header */
-  overflow: auto;
+  max-height: 70vh;
+  overflow-y: scroll;
+  margin-top: 20px;
+  padding-right: 5px;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   background: white;
   position: relative;
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;     /* Firefox */
 }
+
+.table-container::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari and Opera */
+}
+
+/* Remove all the old scrollbar styles */
+/* .table-container::-webkit-scrollbar-track,
+.table-container::-webkit-scrollbar-thumb,
+.table-container::-webkit-scrollbar-thumb:hover {
+  display: none;
+} */
 
 .agreements-table {
   width: 100%;
@@ -854,24 +869,29 @@ main {
   white-space: nowrap;
 }
 
-/* Style the scrollbar */
+/* Custom scrollbar for the table container */
 .table-container::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 12px;
 }
 
 .table-container::-webkit-scrollbar-track {
   background: #f1f1f1;
-  border-radius: 4px;
+  border-radius: 10px;
 }
 
 .table-container::-webkit-scrollbar-thumb {
   background: #8B3A2B;
-  border-radius: 4px;
+  border-radius: 10px;
 }
 
 .table-container::-webkit-scrollbar-thumb:hover {
   background: #7A3225;
+}
+
+/* For Firefox */
+.table-container {
+  scrollbar-width: auto;
+  scrollbar-color: #8B3A2B #f1f1f1;
 }
 
 /* Ensure consistent row height */
@@ -888,4 +908,27 @@ main {
 /* Add hover effect on rows */
 .agreements-table tbody tr:hover {
   background-color: rgba(139, 58, 43, 0.05);
+}
+
+/* Partner type badges in table */
+.partner-type-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.85em;
+  font-weight: 500;
+}
+
+.partner-type-badge.Academe {
+  background-color: #E3F2FD;
+  color: #1565C0;
+}
+
+.partner-type-badge.Industry {
+  background-color: #E8F5E9;
+  color: #2E7D32;
+}
+
+.partner-type-badge.Government {
+  background-color: #FFF3E0;
+  color: #F57C00;
 } 

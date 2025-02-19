@@ -6,11 +6,26 @@ import './Partners.css';
 
 const Partners = () => {
   const [partnerStats, setPartnerStats] = useState({
-    academe: { MOU: 0, MOA: 0, total: 0 },
-    industry: { MOU: 0, MOA: 0, total: 0 },
-    government: { MOU: 0, MOA: 0, total: 0 }
+    Academe: { MOU: 0, MOA: 0, total: 0 },
+    Industry: { MOU: 0, MOA: 0, total: 0 },
+    Government: { MOU: 0, MOA: 0, total: 0 }
   });
   const navigate = useNavigate();
+
+  // Helper function to normalize partner type
+  const normalizePartnerType = (type) => {
+    if (!type) return '';
+    
+    // Convert to lowercase for comparison
+    const lowerType = type.toLowerCase();
+    
+    if (lowerType.includes('academe')) return 'Academe';
+    if (lowerType.includes('industry')) return 'Industry';
+    if (lowerType.includes('government') || lowerType.includes('local')) return 'Government';
+    
+    // If no match, capitalize first letter
+    return type.charAt(0).toUpperCase() + type.slice(1).toLowerCase();
+  };
 
   useEffect(() => {
     if (!auth.currentUser) {
@@ -24,18 +39,22 @@ const Partners = () => {
       agreementsRef,
       (querySnapshot) => {
         const stats = {
-          academe: { MOU: 0, MOA: 0, total: 0 },
-          industry: { MOU: 0, MOA: 0, total: 0 },
-          government: { MOU: 0, MOA: 0, total: 0 }
+          Academe: { MOU: 0, MOA: 0, total: 0 },
+          Industry: { MOU: 0, MOA: 0, total: 0 },
+          Government: { MOU: 0, MOA: 0, total: 0 }
         };
         
         querySnapshot.forEach((doc) => {
           const agreement = doc.data();
-          const partnerKey = agreement.partnerType;
+          const normalizedType = normalizePartnerType(agreement.partnerType);
           
-          if (stats[partnerKey]) {
-            stats[partnerKey][agreement.agreementType]++;
-            stats[partnerKey].total++;
+          // Only count if it matches one of our main categories
+          if (stats[normalizedType]) {
+            const agreementType = agreement.agreementType?.toUpperCase() || '';
+            if (agreementType === 'MOA' || agreementType === 'MOU') {
+              stats[normalizedType][agreementType]++;
+              stats[normalizedType].total++;
+            }
           }
         });
 
@@ -53,7 +72,7 @@ const Partners = () => {
         {Object.entries(partnerStats).map(([partnerType, stats]) => (
           <div key={partnerType} className={`partner-stat-card ${partnerType}`}>
             <div className="partner-stat-header">
-              <h3>{partnerType.charAt(0).toUpperCase() + partnerType.slice(1)} Partners</h3>
+              <h3>{partnerType} Partners</h3>
               <span className="total-count">{stats.total} Total</span>
             </div>
             <div className="agreement-type-counts">

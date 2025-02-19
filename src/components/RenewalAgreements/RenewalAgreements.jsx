@@ -1,38 +1,66 @@
 import React, { useEffect, useState } from 'react';
-import { collection, onSnapshot, query, where } from 'firebase/firestore';
-import { db, auth } from '../../firebase-config';
-import { useNavigate } from 'react-router-dom';
+import { subscribeToAgreements } from '../../utils/fetchAgreements';
 import './RenewalAgreements.css';
 
 const RenewalAgreements = () => {
   const [agreements, setAgreements] = useState([]);
+  const [filters, setFilters] = useState({
+    type: '',
+    search: '',
+    partnerType: ''
+  });
   const [expandedDescriptions, setExpandedDescriptions] = useState(new Set());
-  const navigate = useNavigate();
 
   useEffect(() => {
-    if (!auth.currentUser) {
-      navigate('/login');
-      return;
-    }
-
-    const agreementsRef = collection(db, 'agreementform');
-    // Query for agreements where forRenewal is true AND status is not 'expired'
-    const q = query(
-      agreementsRef, 
-      where('forRenewal', '==', true),
-      where('status', 'in', ['active', 'pending'])
-    );
-    
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const agreementsData = [];
-      querySnapshot.forEach((doc) => {
-        agreementsData.push({ id: doc.id, ...doc.data() });
-      });
-      setAgreements(agreementsData);
+    const unsubscribe = subscribeToAgreements((fetchedAgreements) => {
+      const renewalAgreements = fetchedAgreements.filter(agreement => agreement.forRenewal);
+      setAgreements(renewalAgreements);
     });
-
     return () => unsubscribe();
-  }, [navigate]);
+  }, []);
+
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    setFilters(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const normalizePartnerType = (type) => {
+    const typeMap = {
+      'academe': 'Academe',
+      'ACADEME': 'Academe',
+      'industry': 'Industry',
+      'INDUSTRY': 'Industry',
+      'government': 'Government',
+      'GOVERNMENT': 'Government',
+      'Local Government': 'Government'
+    };
+    return typeMap[type] || type;
+  };
+
+  const filteredAgreements = agreements.filter(agreement => {
+    const searchTerm = filters.search.toLowerCase().trim();
+    const normalizedPartnerType = normalizePartnerType(agreement.partnerType);
+    
+    const matchesSearch = [
+      agreement.name,
+      agreement.address,
+      agreement.signedBy,
+      agreement.designation,
+      agreement.description,
+      agreement.agreementType,
+      normalizedPartnerType
+    ].some(field => 
+      String(field || '').toLowerCase().includes(searchTerm)
+    );
+
+    const matchesType = filters.type === '' || agreement.agreementType === filters.type;
+    const matchesPartnerType = filters.partnerType === '' || normalizedPartnerType === filters.partnerType;
+
+    return matchesSearch && matchesType && matchesPartnerType;
+  });
 
   const toggleDescription = (id) => {
     setExpandedDescriptions(prev => {
@@ -50,21 +78,38 @@ const RenewalAgreements = () => {
     <div className="agreements-container">
       <div className="agreements-header">
         <div className="header-title">
-          <h2>Agreements For Renewal</h2>
+          <h2>Agreements for Renewal</h2>
         </div>
         <div className="header-controls">
           <div className="search-box">
             <i className="fas fa-search"></i>
             <input 
               type="text" 
-              placeholder="Search agreements for renewal..."
+              name="search"
+              value={filters.search}
+              onChange={handleFilterChange}
+              placeholder="Search agreements..."
             />
           </div>
           <div className="filter-group">
-            <select defaultValue="">
+            <select
+              name="type"
+              value={filters.type}
+              onChange={handleFilterChange}
+            >
               <option value="">All Types</option>
               <option value="MOU">MOU</option>
               <option value="MOA">MOA</option>
+            </select>
+            <select
+              name="partnerType"
+              value={filters.partnerType}
+              onChange={handleFilterChange}
+            >
+              <option value="">All Partners</option>
+              <option value="Industry">Industry</option>
+              <option value="Academe">Academe</option>
+              <option value="Government">Government</option>
             </select>
           </div>
         </div>
@@ -88,8 +133,8 @@ const RenewalAgreements = () => {
             </tr>
           </thead>
           <tbody>
-            {agreements.length > 0 ? (
-              agreements.map(agreement => (
+            {filteredAgreements.length > 0 ? (
+              filteredAgreements.map(agreement => (
                 <tr key={agreement.id} className="near-renewal">
                   <td>{agreement.name}</td>
                   <td>{agreement.address}</td>
@@ -107,11 +152,7 @@ const RenewalAgreements = () => {
                     month: 'long',
                     day: 'numeric'
                   })}</td>
-                  <td>
-                    <span className={`status-badge status-${agreement.status}`}>
-                      {agreement.status}
-                    </span>
-                  </td>
+                  <td>{agreement.status}</td>
                   <td className="description-cell">
                     <div className={`description-content ${expandedDescriptions.has(agreement.id) ? 'expanded' : 'collapsed'}`}>
                       {agreement.description}

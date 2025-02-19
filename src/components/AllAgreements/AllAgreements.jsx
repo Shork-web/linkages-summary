@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { subscribeToAgreements } from '../../utils/fetchAgreements';
-import { doc, deleteDoc } from 'firebase/firestore';
+import { doc, deleteDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../../firebase-config';
 import DashboardCounters from '../DashboardCounters/DashboardCounters';
 import './AllAgreements.css';
@@ -43,7 +43,19 @@ const AllAgreements = () => {
       return;
     }
 
-    const unsubscribe = subscribeToAgreements(setAgreements);
+    const unsubscribe = subscribeToAgreements((fetchedAgreements) => {
+      // Convert 'renewed' status to 'active'
+      const processedAgreements = fetchedAgreements.map(agreement => {
+        if (agreement.status.toLowerCase() === 'renewed') {
+          return {
+            ...agreement,
+            status: 'active'
+          };
+        }
+        return agreement;
+      });
+      setAgreements(processedAgreements);
+    });
     return () => unsubscribe();
   }, [navigate]);
 
@@ -55,38 +67,50 @@ const AllAgreements = () => {
     }));
   };
 
+  const normalizePartnerType = (type) => {
+    const typeMap = {
+      'academe': 'Academe',
+      'ACADEME': 'Academe',
+      'industry': 'Industry',
+      'INDUSTRY': 'Industry',
+      'government': 'Government',
+      'GOVERNMENT': 'Government',
+      'Local Government': 'Government'
+    };
+    return typeMap[type] || type;
+  };
+
+  const partnerTypeOptions = [
+    { value: '', label: 'All Partners' },
+    { value: 'Industry', label: 'Industry' },
+    { value: 'Academe', label: 'Academe' },
+    { value: 'Government', label: 'Government' }
+  ];
+
   const filteredAgreements = agreements.filter(agreement => {
     const searchTerm = filters.search.toLowerCase().trim();
+    const normalizedPartnerType = normalizePartnerType(agreement.partnerType);
     
-    // If no search term, only apply type filters
-    if (!searchTerm) {
-      return (filters.type === '' || agreement.agreementType === filters.type) &&
-             (filters.status === '' || agreement.status === filters.status) &&
-             (filters.partnerType === '' || agreement.partnerType === filters.partnerType);
-    }
-
-    // Check if any field matches the search term
-    const isMatch = [
+    const matchesSearch = [
       agreement.name,
       agreement.address,
       agreement.signedBy,
       agreement.designation,
       agreement.description,
       agreement.agreementType,
-      agreement.partnerType,
-      agreement.status,
-      agreement.validity,
-      agreement.dateSigned,
-      agreement.dateExpired
+      normalizedPartnerType,
+      agreement.status
     ].some(field => 
       String(field || '').toLowerCase().includes(searchTerm)
     );
 
-    // Apply both search and type filters
-    return isMatch && 
-           (filters.type === '' || agreement.agreementType === filters.type) &&
-           (filters.status === '' || agreement.status === filters.status) &&
-           (filters.partnerType === '' || agreement.partnerType === filters.partnerType);
+    const matchesType = filters.type === '' || agreement.agreementType === filters.type;
+    const matchesPartnerType = filters.partnerType === '' || normalizedPartnerType === filters.partnerType;
+    const matchesStatus = filters.status ? 
+      agreement.status.toLowerCase() === filters.status.toLowerCase() : 
+      true;
+
+    return matchesSearch && matchesType && matchesPartnerType && matchesStatus;
   });
 
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -99,19 +123,51 @@ const AllAgreements = () => {
     setIsEditModalOpen(true);
   };
 
-  const handleUpdate = (message, type = 'success') => {
-    setNotification({
-      show: true,
-      type: type,
-      message: message
-    });
-    setTimeout(() => {
+  const handleUpdate = async (updatedAgreement) => {
+    try {
+      const agreementRef = doc(db, 'agreementform', updatedAgreement.id);
+      
+      // Ensure status is properly formatted
+      const updateData = {
+        ...updatedAgreement,
+        status: updatedAgreement.status.toLowerCase(),
+        updatedAt: new Date().toISOString()
+      };
+
+      await updateDoc(agreementRef, updateData);
+      
+      // Update local state
+      setAgreements(prevAgreements => 
+        prevAgreements.map(agreement => 
+          agreement.id === updatedAgreement.id ? updateData : agreement
+        )
+      );
+
       setNotification({
-        show: false,
-        type: '',
-        message: ''
+        show: true,
+        type: 'success',
+        message: 'Agreement updated successfully!'
       });
-    }, 3000);
+      
+      setIsEditModalOpen(false);
+      setEditingAgreement(null);
+
+      // Clear notification after 3 seconds
+      setTimeout(() => {
+        setNotification({
+          show: false,
+          type: '',
+          message: ''
+        });
+      }, 3000);
+    } catch (error) {
+      console.error('Error updating agreement:', error);
+      setNotification({
+        show: true,
+        type: 'error',
+        message: 'Error updating agreement. Please try again.'
+      });
+    }
   };
 
   const handleCloseEdit = () => {
@@ -131,10 +187,18 @@ const AllAgreements = () => {
     try {
       await deleteDoc(doc(db, 'agreementform', deleteConfirm.agreementId));
       setDeleteConfirm({ show: false, agreementId: null, agreementName: '' });
-      handleUpdate('Agreement deleted successfully!');
+      setNotification({
+        show: true,
+        type: 'success',
+        message: 'Agreement deleted successfully!'
+      });
     } catch (error) {
       console.error('Error deleting agreement:', error);
-      handleUpdate('Error deleting agreement. Please try again.', 'error');
+      setNotification({
+        show: true,
+        type: 'error',
+        message: 'Error deleting agreement. Please try again.'
+      });
     }
   };
 
@@ -230,10 +294,11 @@ const AllAgreements = () => {
                 value={filters.partnerType}
                 onChange={handleFilterChange}
               >
-                <option value="">All Partners</option>
-                <option value="Industry">Industry</option>
-                <option value="Academe">Academe</option>
-                <option value="Local Government">Local Government</option>
+                {partnerTypeOptions.map(option => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
               </select>
             </div>
             <ExcelExport agreements={filteredAgreements} />

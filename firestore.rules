@@ -23,27 +23,29 @@ service cloud.firestore {
       allow delete: if request.auth != null;
     }
     // Specific rules for the agreementform collection
-    match /agreementform/{agreementId} {
-      // Only allow access if user is authenticated
-      allow read, create: if request.auth != null;
-      allow update, delete: if request.auth != null;
+    match /agreementform/{document=**} {
+      allow read, write: if request.auth != null;
       
-      // Allow create access to authenticated users with proper data validation
-      allow create: if request.auth != null &&
+      // Allow updates with specific valid values
+      allow update: if request.auth != null &&
+        request.resource.data.status in ['active', 'pending', 'expired', 'inactive', 'renewed'] &&
+        request.resource.data.keys().hasAll(['status', 'updatedAt']);
+      
+      // Validation rules for updates
+      allow update: if request.auth != null &&
         request.resource.data.name is string &&
         request.resource.data.address is string &&
         request.resource.data.signedBy is string &&
         request.resource.data.designation is string &&
         request.resource.data.agreementType in ['MOU', 'MOA'] &&
-        request.resource.data.partners is map &&
+        request.resource.data.partnerType in ['Industry', 'Academe', 'Government'] &&
         request.resource.data.dateSigned is string &&
         request.resource.data.validity is number &&
         request.resource.data.dateExpired is string &&
-        request.resource.data.forRenewal is bool &&
         request.resource.data.status in ['active', 'expired', 'pending', 'renewed'] &&
         request.resource.data.description is string &&
-        request.resource.data.links is string &&
-        request.resource.data.createdAt is string;
+        request.resource.data.remarks is string &&
+        request.resource.data.updatedAt is string;
     }
     match /accessKeys/{keyId} {
       allow read: if true; // Allow anyone to read (since this is just an access key)

@@ -7,7 +7,10 @@ const PendingAgreements = () => {
   const [expandedDescriptions, setExpandedDescriptions] = useState(new Set());
 
   useEffect(() => {
-    const unsubscribe = subscribeToAgreements(setAgreements, 'pending');
+    const unsubscribe = subscribeToAgreements((fetchedAgreements) => {
+      const pendingAgreements = fetchedAgreements.filter(agreement => agreement.status.toLowerCase() === 'pending' && !agreement.forRenewal);
+      setAgreements(pendingAgreements);
+    });
     return () => unsubscribe();
   }, []);
 

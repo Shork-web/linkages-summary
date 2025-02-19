@@ -5,64 +5,74 @@ import './EditAgreementForm.css';
 
 const EditAgreementForm = ({ agreement, onClose, onUpdate }) => {
   const [formData, setFormData] = useState({
-    name: '',
-    address: '',
-    signedBy: '',
-    designation: '',
-    description: '',
-    agreementType: '',
-    partnerType: '',
-    status: '',
-    validity: '',
-    dateSigned: '',
-    dateExpired: '',
-    remarks: ''
+    ...agreement,
+    status: agreement.status || 'pending'
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     if (agreement) {
       setFormData({
-        name: agreement.name || '',
-        address: agreement.address || '',
-        signedBy: agreement.signedBy || '',
-        designation: agreement.designation || '',
-        description: agreement.description || '',
-        agreementType: agreement.agreementType || '',
-        partnerType: agreement.partnerType || '',
-        status: agreement.status || '',
-        validity: agreement.validity || '',
-        dateSigned: agreement.dateSigned || '',
-        dateExpired: agreement.dateExpired || '',
-        remarks: agreement.remarks || ''
+        ...agreement,
+        dateSigned: agreement.dateSigned?.split('T')[0] || '',
+        dateExpired: agreement.dateExpired?.split('T')[0] || '',
+        status: agreement.status || 'pending'
       });
     }
   }, [agreement]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: type === 'checkbox' ? checked : value
     }));
+  };
+
+  const calculateExpiryDate = (dateSigned, validity) => {
+    if (!dateSigned || !validity) return '';
+    const date = new Date(dateSigned);
+    date.setFullYear(date.getFullYear() + parseInt(validity));
+    return date.toISOString().split('T')[0];
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setError('');
 
     try {
-      const agreementRef = doc(db, 'agreements', agreement.id);
-      await updateDoc(agreementRef, {
-        ...formData,
-        updatedAt: new Date().toISOString()
-      });
+      const agreementRef = doc(db, 'agreementform', agreement.id);
+      
+      // Calculate new expiry date if date signed or validity changes
+      const newExpiryDate = calculateExpiryDate(formData.dateSigned, formData.validity);
+      
+      // Prepare update data
+      let status = formData.status.toLowerCase();
+      // If the agreement is marked as renewed, set it to active
+      if (status === 'renewed') {
+        status = 'active';
+      }
 
-      onUpdate('Agreement updated successfully');
-      onClose();
+      const updateData = {
+        ...formData,
+        dateExpired: newExpiryDate,
+        updatedAt: new Date().toISOString(),
+        validity: parseInt(formData.validity),
+        status: status,
+        forRenewal: formData.forRenewal
+      };
+
+      // Update in Firestore
+      await updateDoc(agreementRef, updateData);
+      
+      // Call the onUpdate callback with the updated data
+      onUpdate(updateData);
     } catch (error) {
-      onUpdate('Error updating agreement: ' + error.message, 'error');
+      console.error('Error updating agreement:', error);
+      setError(error.message);
     } finally {
       setIsSubmitting(false);
     }
@@ -77,6 +87,8 @@ const EditAgreementForm = ({ agreement, onClose, onUpdate }) => {
             <i className="fas fa-times"></i>
           </button>
         </div>
+
+        {error && <div className="error-message">{error}</div>}
 
         <form onSubmit={handleSubmit} className="edit-agreement-form">
           <div className="form-group">
@@ -182,9 +194,10 @@ const EditAgreementForm = ({ agreement, onClose, onUpdate }) => {
                 onChange={handleChange}
                 required
               >
-                <option value="Active">Active</option>
-                <option value="Inactive">Inactive</option>
-                <option value="For Renewal">For Renewal</option>
+                <option value="active">Active</option>
+                <option value="pending">Pending</option>
+                <option value="expired">Expired</option>
+                <option value="inactive">Inactive</option>
               </select>
             </div>
           </div>
@@ -238,6 +251,25 @@ const EditAgreementForm = ({ agreement, onClose, onUpdate }) => {
               value={formData.remarks}
               onChange={handleChange}
             />
+          </div>
+
+          <div className="renewal-section">
+            <div className="renewal-checkbox">
+              <input
+                type="checkbox"
+                id="forRenewal"
+                name="forRenewal"
+                checked={formData.forRenewal}
+                onChange={handleChange}
+              />
+              <label htmlFor="forRenewal">
+                <i className="fas fa-sync-alt"></i>
+                Mark for Renewal
+              </label>
+            </div>
+            <div className="renewal-description">
+              Marking this agreement for renewal will flag it for follow-up before expiration
+            </div>
           </div>
 
           <div className="modal-actions">

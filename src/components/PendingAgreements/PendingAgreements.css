@@ -13,4 +13,38 @@
 
 .header-title h2 {
   color: #F57C00;
+}
+
+/* Add to existing styles */
+.table-container {
+  max-height: 70vh;
+  overflow-y: scroll;
+  margin-top: 20px;
+  padding-right: 5px;
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;     /* Firefox */
+}
+
+.table-container::-webkit-scrollbar {
+  display: none;
+}
+
+/* Keep horizontal scrollbar visible */
+.table-container::-webkit-scrollbar:horizontal {
+  height: 12px;
+  display: block;
+}
+
+.table-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+  background: #8B3A2B;
+  border-radius: 10px;
+}
+
+.table-container::-webkit-scrollbar-thumb:hover {
+  background: #7A3225;
 } 

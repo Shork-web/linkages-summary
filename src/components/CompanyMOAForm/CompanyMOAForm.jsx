@@ -17,15 +17,15 @@ const CompanyMOAForm = () => {
     companyAddress: '',
     companyLongitude: '',
     companyLatitude: '',
-    moaYear: new Date().getFullYear(),
+    moaYear: new Date().getFullYear().toString(),
     moaStatus: 'Active',
     companyType: '',
+    withExpiration: false,
     moaValidity: '',
     moaExpirationDate: '',
     moaRemarks: ''
   });
 
-  const [withExpiration, setWithExpiration] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [notification, setNotification] = useState(null);
@@ -55,35 +55,44 @@ const CompanyMOAForm = () => {
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     
-    // Handle checkbox inputs
     if (type === 'checkbox') {
       if (name === 'withExpiration') {
-        setWithExpiration(checked);
-        if (!checked) {
-          setFormData(prev => ({
-            ...prev,
-            moaValidity: '',
-            moaExpirationDate: ''
-          }));
-        }
+        setFormData(prev => ({
+          ...prev,
+          withExpiration: checked,
+          moaValidity: checked ? prev.moaValidity : '',
+          moaExpirationDate: checked ? prev.moaExpirationDate : ''
+        }));
       }
       return;
     }
 
-    // Handle other input types
     setFormData(prev => ({
       ...prev,
       [name]: value
     }));
 
     // Calculate expiration date when validity changes
-    if (name === 'moaValidity' && value && withExpiration) {
-      const today = new Date();
-      const expirationDate = new Date(today.setFullYear(today.getFullYear() + parseInt(value)));
-      setFormData(prev => ({
-        ...prev,
-        moaExpirationDate: expirationDate.toISOString().split('T')[0]
-      }));
+    if (name === 'moaValidity' && value && formData.withExpiration) {
+      try {
+        const validityYears = parseInt(value);
+        if (!isNaN(validityYears)) {
+          const today = new Date();
+          const expirationDate = new Date(today);
+          expirationDate.setFullYear(today.getFullYear() + validityYears);
+          
+          // Format date to YYYY-MM-DD
+          const formattedDate = expirationDate.toISOString().split('T')[0];
+          
+          setFormData(prev => ({
+            ...prev,
+            [name]: value,
+            moaExpirationDate: formattedDate
+          }));
+        }
+      } catch (error) {
+        console.error('Error calculating expiration date:', error);
+      }
     }
   };
 
@@ -98,14 +107,13 @@ const CompanyMOAForm = () => {
         throw new Error('Please fill in all required fields');
       }
 
-      if (withExpiration && (!formData.moaValidity || !formData.moaExpirationDate)) {
+      if (formData.withExpiration && (!formData.moaValidity || !formData.moaExpirationDate)) {
         throw new Error('Please fill in validity and expiration date');
       }
 
       // Add document to Firestore
       await addDoc(collection(db, 'companyMOA'), {
         ...formData,
-        withExpiration,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       });
@@ -116,14 +124,14 @@ const CompanyMOAForm = () => {
         companyAddress: '',
         companyLongitude: '',
         companyLatitude: '',
-        moaYear: new Date().getFullYear(),
+        moaYear: new Date().getFullYear().toString(),
         moaStatus: 'Active',
         companyType: '',
+        withExpiration: false,
         moaValidity: '',
         moaExpirationDate: '',
         moaRemarks: ''
       });
-      setWithExpiration(false);
 
       setNotification({
         message: 'Company MOA successfully added!',
@@ -255,7 +263,7 @@ const CompanyMOAForm = () => {
             <input
               type="checkbox"
               name="withExpiration"
-              checked={withExpiration}
+              checked={formData.withExpiration}
               onChange={handleChange}
             />
             <span>With Expiration</span>
@@ -275,8 +283,8 @@ const CompanyMOAForm = () => {
               value={formData.moaValidity}
               onChange={handleChange}
               min="1"
-              required={withExpiration}
-              disabled={!withExpiration}
+              required={formData.withExpiration}
+              disabled={!formData.withExpiration}
             />
           </div>
 
@@ -287,9 +295,9 @@ const CompanyMOAForm = () => {
               id="moaExpirationDate"
               name="moaExpirationDate"
               value={formData.moaExpirationDate}
-              readOnly
               className="readonly-input"
-              disabled={!withExpiration}
+              readOnly
+              disabled={!formData.withExpiration}
             />
           </div>
         </div>

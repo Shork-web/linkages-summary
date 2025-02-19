@@ -1,34 +1,21 @@
 import React, { useEffect, useState } from 'react';
-import { collection, onSnapshot, query, where } from 'firebase/firestore';
-import { db, auth } from '../../firebase-config';
-import { useNavigate } from 'react-router-dom';
+import { subscribeToAgreements } from '../../utils/fetchAgreements';
 import './ExpiredAgreements.css';
 
 const ExpiredAgreements = () => {
   const [agreements, setAgreements] = useState([]);
   const [expandedDescriptions, setExpandedDescriptions] = useState(new Set());
-  const navigate = useNavigate();
 
   useEffect(() => {
-    if (!auth.currentUser) {
-      navigate('/login');
-      return;
-    }
-
-    const agreementsRef = collection(db, 'agreementform');
-    // Query for agreements where status is 'expired'
-    const q = query(agreementsRef, where('status', '==', 'expired'));
-    
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const agreementsData = [];
-      querySnapshot.forEach((doc) => {
-        agreementsData.push({ id: doc.id, ...doc.data() });
+    const unsubscribe = subscribeToAgreements((fetchedAgreements) => {
+      const expiredAgreements = fetchedAgreements.filter(agreement => {
+        const isExpired = new Date(agreement.dateExpired) < new Date();
+        return (agreement.status.toLowerCase() === 'expired' || isExpired) && !agreement.forRenewal;
       });
-      setAgreements(agreementsData);
+      setAgreements(expiredAgreements);
     });
-
     return () => unsubscribe();
-  }, [navigate]);
+  }, []);
 
   const toggleDescription = (id) => {
     setExpandedDescriptions(prev => {
@@ -105,11 +92,7 @@ const ExpiredAgreements = () => {
                     day: 'numeric'
                   })}</td>
                   <td>{agreement.forRenewal ? 'Yes' : 'No'}</td>
-                  <td>
-                    <span className="status-badge status-expired">
-                      {agreement.status}
-                    </span>
-                  </td>
+                  <td>{agreement.status}</td>
                   <td className="description-cell">
                     <div className={`description-content ${expandedDescriptions.has(agreement.id) ? 'expanded' : 'collapsed'}`}>
                       {agreement.description}

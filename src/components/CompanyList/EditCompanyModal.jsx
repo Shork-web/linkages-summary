@@ -19,6 +19,7 @@ const EditCompanyModal = ({ company, onClose, onUpdate }) => {
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [dateError, setDateError] = useState('');
 
   const companyTypes = [
     'BPO',
@@ -50,7 +51,7 @@ const EditCompanyModal = ({ company, onClose, onUpdate }) => {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    
+
     if (type === 'checkbox') {
       if (name === 'withExpiration') {
         setFormData(prev => ({
@@ -63,18 +64,44 @@ const EditCompanyModal = ({ company, onClose, onUpdate }) => {
       return;
     }
 
+    if (name === 'moaExpirationDate') {
+      try {
+        const dateValue = new Date(value);
+        if (isNaN(dateValue.getTime())) {
+          setDateError('Please enter a valid date');
+          return;
+        }
+        setDateError('');
+      } catch (error) {
+        setDateError('Invalid date format');
+        return;
+      }
+    }
+
     setFormData(prev => ({
       ...prev,
       [name]: value
     }));
 
     if (name === 'moaValidity' && value && formData.withExpiration) {
-      const today = new Date();
-      const expirationDate = new Date(today.setFullYear(today.getFullYear() + parseInt(value)));
-      setFormData(prev => ({
-        ...prev,
-        moaExpirationDate: expirationDate.toISOString().split('T')[0]
-      }));
+      try {
+        const today = new Date();
+        if (!isNaN(parseInt(value))) {
+          const expirationDate = new Date(today);
+          expirationDate.setFullYear(today.getFullYear() + parseInt(value));
+          
+          const formattedDate = expirationDate.toISOString().split('T')[0];
+          
+          setFormData(prev => ({
+            ...prev,
+            [name]: value,
+            moaExpirationDate: formattedDate
+          }));
+        }
+      } catch (error) {
+        console.error('Error calculating expiration date:', error);
+        setDateError('Error calculating expiration date');
+      }
     }
   };
 
@@ -109,20 +136,36 @@ const EditCompanyModal = ({ company, onClose, onUpdate }) => {
         </div>
 
         <form onSubmit={handleSubmit} className="edit-company-form">
-          <div className="form-group">
-            <label htmlFor="companyName">Company Name: <span className="required">*</span></label>
-            <input
-              type="text"
-              id="companyName"
-              name="companyName"
-              value={formData.companyName}
-              onChange={handleChange}
-              required
-            />
+          <div className="form-row">
+            <div className="form-group required">
+              <label htmlFor="companyName">Company Name</label>
+              <input
+                id="companyName"
+                name="companyName"
+                value={formData.companyName}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div className="form-group required">
+              <label htmlFor="companyType">Company Type</label>
+              <select
+                id="companyType"
+                name="companyType"
+                value={formData.companyType}
+                onChange={handleChange}
+                required
+              >
+                <option value="">Select Company Type</option>
+                {companyTypes.map(type => (
+                  <option key={type} value={type}>{type}</option>
+                ))}
+              </select>
+            </div>
           </div>
 
-          <div className="form-group">
-            <label htmlFor="companyAddress">Company Address: <span className="required">*</span></label>
+          <div className="form-group full-width address-field required">
+            <label htmlFor="companyAddress">Company Address</label>
             <textarea
               id="companyAddress"
               name="companyAddress"
@@ -132,22 +175,19 @@ const EditCompanyModal = ({ company, onClose, onUpdate }) => {
             />
           </div>
 
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="companyLongitude">Longitude:</label>
+          <div className="form-group coordinates-field">
+            <div>
+              <label htmlFor="companyLongitude">Longitude</label>
               <input
-                type="text"
                 id="companyLongitude"
                 name="companyLongitude"
                 value={formData.companyLongitude}
                 onChange={handleChange}
               />
             </div>
-
-            <div className="form-group">
-              <label htmlFor="companyLatitude">Latitude:</label>
+            <div>
+              <label htmlFor="companyLatitude">Latitude</label>
               <input
-                type="text"
                 id="companyLatitude"
                 name="companyLatitude"
                 value={formData.companyLatitude}
@@ -157,8 +197,8 @@ const EditCompanyModal = ({ company, onClose, onUpdate }) => {
           </div>
 
           <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="moaYear">Year:</label>
+            <div className="form-group required">
+              <label htmlFor="moaYear">MOA Year</label>
               <input
                 type="number"
                 id="moaYear"
@@ -169,8 +209,8 @@ const EditCompanyModal = ({ company, onClose, onUpdate }) => {
               />
             </div>
 
-            <div className="form-group">
-              <label htmlFor="moaStatus">Status:</label>
+            <div className="form-group required status-field">
+              <label htmlFor="moaStatus">Status</label>
               <select
                 id="moaStatus"
                 name="moaStatus"
@@ -185,39 +225,11 @@ const EditCompanyModal = ({ company, onClose, onUpdate }) => {
             </div>
           </div>
 
-          <div className="form-group">
-            <label htmlFor="companyType">Company Type: <span className="required">*</span></label>
-            <select
-              id="companyType"
-              name="companyType"
-              value={formData.companyType}
-              onChange={handleChange}
-              required
-            >
-              <option value="">Select Company Type</option>
-              {companyTypes.map(type => (
-                <option key={type} value={type}>{type}</option>
-              ))}
-            </select>
-          </div>
-
-          <div className="expiration-checkbox-group">
-            <label className="checkbox-label">
-              <input
-                type="checkbox"
-                name="withExpiration"
-                checked={formData.withExpiration}
-                onChange={handleChange}
-              />
-              <span>With Expiration</span>
-            </label>
-          </div>
-
           <div className="form-row">
             <div className="form-group">
               <label htmlFor="moaValidity">
-                Validity (years):
-                <span className="helper-text">Duration of the MOA</span>
+                Validity (years)
+                <span className="helper-text"> Duration of the MOA</span>
               </label>
               <input
                 type="number"
@@ -232,28 +244,49 @@ const EditCompanyModal = ({ company, onClose, onUpdate }) => {
             </div>
 
             <div className="form-group">
-              <label htmlFor="moaExpirationDate">Expiration Date:</label>
-              <input
-                type="date"
-                id="moaExpirationDate"
-                name="moaExpirationDate"
-                value={formData.moaExpirationDate}
-                readOnly
-                className="readonly-input"
-                disabled={!formData.withExpiration}
-              />
+              <label htmlFor="moaExpirationDate">Expiration Date</label>
+              <div className="date-input-container">
+                <input
+                  type="date"
+                  id="moaExpirationDate"
+                  name="moaExpirationDate"
+                  value={formData.moaExpirationDate}
+                  className={`readonly-input ${dateError ? 'error' : ''}`}
+                  readOnly
+                  disabled={!formData.withExpiration}
+                />
+                {dateError && <div className="date-error-tooltip">{dateError}</div>}
+              </div>
             </div>
           </div>
 
-          <div className="form-group">
-            <label htmlFor="moaRemarks">Remarks:</label>
+          <div className="form-group full-width remarks-field">
+            <label htmlFor="moaRemarks">Remarks</label>
             <textarea
               id="moaRemarks"
               name="moaRemarks"
               value={formData.moaRemarks}
               onChange={handleChange}
-              rows="4"
             />
+          </div>
+
+          <div className="expiration-section">
+            <div className="expiration-checkbox">
+              <input
+                type="checkbox"
+                id="withExpiration"
+                name="withExpiration"
+                checked={formData.withExpiration}
+                onChange={handleChange}
+              />
+              <label htmlFor="withExpiration">
+                <i className="fas fa-clock"></i>
+                With Expiration
+              </label>
+            </div>
+            <div className="expiration-description">
+              Check this if the MOA has an expiration date
+            </div>
           </div>
 
           <div className="modal-actions">

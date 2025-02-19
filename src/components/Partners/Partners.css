@@ -14,17 +14,17 @@
   font-weight: 500;
 }
 
-.partner-type.academe {
+.partner-type.Academe {
   background-color: #E3F2FD;
   color: #1565C0;
 }
 
-.partner-type.industry {
+.partner-type.Industry {
   background-color: #E8F5E9;
   color: #2E7D32;
 }
 
-.partner-type.government {
+.partner-type.Government {
   background-color: #FFF3E0;
   color: #F57C00;
 }
@@ -105,6 +105,7 @@
   max-width: 1300px;
 }
 
+/* Partner stat cards with consistent styling regardless of case */
 .partner-stat-card {
   background: white;
   border-radius: 20px;
@@ -125,17 +126,21 @@
   background: linear-gradient(to right, var(--start-color), var(--end-color));
 }
 
-.partner-stat-card.academe {
+/* Standardized class names for partner types */
+.partner-stat-card.Academe,
+.partner-stat-card[class*="academe"] {
   --start-color: #1565C0;
   --end-color: #42a5f5;
 }
 
-.partner-stat-card.industry {
+.partner-stat-card.Industry,
+.partner-stat-card[class*="industry"] {
   --start-color: #2E7D32;
   --end-color: #66bb6a;
 }
 
-.partner-stat-card.government {
+.partner-stat-card.Government,
+.partner-stat-card[class*="government"] {
   --start-color: #F57C00;
   --end-color: #ffb74d;
 }
@@ -205,6 +210,28 @@
   font-weight: 800;
   line-height: 1;
   background: linear-gradient(45deg, var(--start-color), var(--end-color));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Add attribute selectors for flexibility */
+[class*="academe"] .count-value {
+  background: linear-gradient(45deg, #1565C0, #42a5f5);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+[class*="industry"] .count-value {
+  background: linear-gradient(45deg, #2E7D32, #66bb6a);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+[class*="government"] .count-value {
+  background: linear-gradient(45deg, #F57C00, #ffb74d);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;

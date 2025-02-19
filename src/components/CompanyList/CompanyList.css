@@ -527,4 +527,46 @@
 
 .company-list-table tr:hover {
   background-color: #f1f1f1;
+}
+
+.table-container {
+  max-height: 70vh;
+  overflow-y: auto;
+  margin-top: 20px;
+  padding-right: 5px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: white;
+  position: relative;
+}
+
+/* Custom scrollbar styles */
+.table-container::-webkit-scrollbar {
+  width: 12px;
+}
+
+.table-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+  background: #8B3A2B;
+  border-radius: 10px;
+}
+
+.table-container::-webkit-scrollbar-thumb:hover {
+  background: #7A3225;
+}
+
+/* For Firefox */
+.table-container {
+  scrollbar-width: auto;
+  scrollbar-color: #8B3A2B #f1f1f1;
+}
+
+/* Keep horizontal scrollbar visible */
+.table-container::-webkit-scrollbar:horizontal {
+  height: 12px;
+  display: block;
 } 

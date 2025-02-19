@@ -109,23 +109,26 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.6);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  backdrop-filter: blur(4px);
+  animation: fadeIn 0.2s ease-out;
 }
 
 .edit-agreement-modal {
   background: white;
-  border-radius: 8px;
+  border-radius: 12px;
   width: 90%;
   max-width: 800px;
   max-height: 90vh;
   overflow-y: auto;
   position: relative;
-  padding: 24px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 28px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  animation: slideIn 0.3s ease-out;
 }
 
 .modal-header {
@@ -140,54 +143,107 @@
 .modal-header h2 {
   color: #8B3A2B;
   margin: 0;
-  font-size: 1.5em;
+  font-size: 1.8em;
+  font-weight: 600;
 }
 
 .close-button {
   background: none;
   border: none;
   color: #666;
-  font-size: 1.2em;
+  font-size: 1.4em;
   cursor: pointer;
-  padding: 4px;
+  padding: 8px;
+  border-radius: 50%;
   transition: all 0.2s ease;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .close-button:hover {
+  background-color: #f0f0f0;
   color: #C62828;
+  transform: rotate(90deg);
 }
 
 .edit-agreement-form {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 24px;
 }
 
 .form-row {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  align-items: start;
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  min-width: 0;
 }
 
 .form-group label {
-  font-weight: 500;
+  font-weight: 600;
   color: #333;
+  font-size: 0.9rem;
+  margin-bottom: 4px;
 }
 
 .form-group input,
 .form-group select,
 .form-group textarea {
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  font-size: 14px;
-  transition: all 0.3s ease;
+  width: 100%;
+  padding: 12px 16px;
+  border: 1.5px solid #ddd;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  transition: all 0.2s ease;
+  background-color: #fff;
+}
+
+/* Full width fields */
+.form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+/* Specific field types */
+.form-group.description-field textarea {
+  min-height: 120px;
+}
+
+.form-group.date-field input {
+  font-family: inherit;
+}
+
+.form-group.date-field input::-webkit-calendar-picker-indicator {
+  padding: 8px;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+}
+
+.form-group.date-field input::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+}
+
+/* Status field styling */
+.form-group.status-field select {
+  font-weight: 500;
+}
+
+/* Validation styling */
+.form-group.required label::after {
+  content: '*';
+  color: #C62828;
+  margin-left: 4px;
 }
 
 .form-group input:focus,
@@ -195,12 +251,7 @@
 .form-group textarea:focus {
   outline: none;
   border-color: #8B3A2B;
-  box-shadow: 0 0 0 2px rgba(139, 58, 43, 0.1);
-}
-
-.form-group textarea {
-  resize: vertical;
-  min-height: 100px;
+  box-shadow: 0 0 0 3px rgba(139, 58, 43, 0.1);
 }
 
 .modal-actions {
@@ -208,44 +259,84 @@
   justify-content: flex-end;
   gap: 16px;
   margin-top: 24px;
-  padding-top: 16px;
-  border-top: 1px solid #ddd;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+}
+
+.cancel-button,
+.save-button {
+  padding: 12px 28px;
+  border-radius: 8px;
+  font-size: 1em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .cancel-button {
-  padding: 10px 24px;
   border: 2px solid #8B3A2B;
   background: white;
   color: #8B3A2B;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: all 0.2s ease;
+}
+
+.save-button {
+  border: none;
+  background: #8B3A2B;
+  color: white;
 }
 
 .cancel-button:hover {
   background: #8B3A2B;
   color: white;
-}
-
-.save-button {
-  padding: 10px 24px;
-  border: none;
-  background: #8B3A2B;
-  color: white;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: all 0.2s ease;
+  transform: translateY(-1px);
 }
 
 .save-button:hover {
   background: #7A3225;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(139, 58, 43, 0.2);
 }
 
 .save-button:disabled {
   background: #ccc;
   cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Scrollbar styling */
+.edit-agreement-modal::-webkit-scrollbar {
+  width: 8px;
+}
+
+.edit-agreement-modal::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.edit-agreement-modal::-webkit-scrollbar-thumb {
+  background: #8B3A2B;
+  border-radius: 4px;
+}
+
+.edit-agreement-modal::-webkit-scrollbar-thumb:hover {
+  background: #7A3225;
 }
 
 @media (max-width: 768px) {
@@ -255,7 +346,80 @@
   }
   
   .edit-agreement-modal {
-    padding: 16px;
+    padding: 20px;
     width: 95%;
   }
+  
+  .modal-header h2 {
+    font-size: 1.5em;
+  }
+}
+
+/* Add styles for checkbox */
+.form-group input[type="checkbox"] {
+  margin-right: 8px;
+  width: 16px;
+  height: 16px;
+  accent-color: #8B3A2B;
+}
+
+.form-group label[for="forRenewal"] {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* Error message styling */
+.error-message {
+  background-color: #FFEBEE;
+  color: #C62828;
+  padding: 12px;
+  border-radius: 4px;
+  margin-bottom: 16px;
+  border-left: 4px solid #C62828;
+}
+
+/* Add new styles for the renewal section */
+.renewal-section {
+  background-color: #FFF8E1;
+  border: 1px solid #FFE082;
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin-top: 8px;
+}
+
+.renewal-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.renewal-checkbox input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  accent-color: #8B3A2B;
+  cursor: pointer;
+}
+
+.renewal-checkbox label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: #333;
+  cursor: pointer;
+  user-select: none;
+}
+
+.renewal-checkbox i {
+  color: #FFA000;
+  font-size: 1.1em;
+}
+
+.renewal-description {
+  margin-top: 8px;
+  font-size: 0.9em;
+  color: #666;
+  padding-left: 32px;
 } 

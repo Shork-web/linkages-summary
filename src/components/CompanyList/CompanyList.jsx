@@ -205,7 +205,7 @@ const CompanyList = () => {
         </div>
       </div>
 
-      <div className="company-table-container">
+      <div className="table-container">
         <table className="company-list-table">
           <thead>
             <tr>

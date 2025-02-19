@@ -14,15 +14,36 @@ export const subscribeToAgreements = (callback, statusFilter = null) => {
     const agreementsRef = collection(db, 'agreementform');
     let q = agreementsRef;
     
-    if (statusFilter) {
-      q = query(agreementsRef, where('status', '==', statusFilter));
+    if (statusFilter === 'renewal') {
+      // For renewal page, only check forRenewal flag
+      q = query(agreementsRef, where('forRenewal', '==', true));
+    } else if (statusFilter) {
+      // Handle 'renewed' status as 'active'
+      if (statusFilter === 'active') {
+        q = query(
+          agreementsRef, 
+          where('status', 'in', ['active', 'renewed'])
+        );
+      } else {
+        q = query(agreementsRef, where('status', '==', statusFilter.toLowerCase()));
+      }
     }
 
     return onSnapshot(q, 
       (querySnapshot) => {
         const agreements = [];
         querySnapshot.forEach((doc) => {
-          agreements.push({ id: doc.id, ...doc.data() });
+          const data = doc.data();
+          // Convert 'renewed' status to 'active'
+          if (data.status && data.status.toLowerCase() === 'renewed') {
+            data.status = 'active';
+          }
+          // Add expiration check for active agreements
+          if (statusFilter === 'active' && data.dateExpired) {
+            const isExpired = new Date(data.dateExpired) < new Date();
+            if (isExpired) return; // Skip if expired
+          }
+          agreements.push({ id: doc.id, ...data });
         });
         callback(agreements);
       },

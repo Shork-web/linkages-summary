@@ -9,7 +9,10 @@ const ActiveAgreements = () => {
   const { filters, handleFilterChange, filteredAgreements } = useAgreementFilters(agreements);
 
   useEffect(() => {
-    const unsubscribe = subscribeToAgreements(setAgreements, 'active');
+    const unsubscribe = subscribeToAgreements((fetchedAgreements) => {
+      const activeAgreements = fetchedAgreements.filter(agreement => agreement.status.toLowerCase() === 'active' && !agreement.forRenewal);
+      setAgreements(activeAgreements);
+    });
     return () => unsubscribe();
   }, []);
 
@@ -141,12 +144,8 @@ const ActiveAgreements = () => {
                 <td colSpan="12">
                   <div className="empty-state">
                     <i className="fas fa-check-circle"></i>
-                    <p>No agreements found</p>
-                    <p className="empty-subtitle">
-                      {(filters.search || filters.type || filters.partnerType) 
-                        ? 'Try adjusting your filters'
-                        : 'Create a new agreement to get started'}
-                    </p>
+                    <p>No active agreements</p>
+                    <p className="empty-subtitle">All agreements are currently inactive or expired</p>
                   </div>
                 </td>
               </tr>

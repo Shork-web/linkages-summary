@@ -1,50 +1,153 @@
-/* Keep only layout-related styles here */
+/* Reset and base styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;     /* Firefox */
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+/* Layout styles */
 .main-layout {
   display: flex;
   min-height: 100vh;
   background-color: #f5f5f5;
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .main-content {
-  flex: 1;
-  margin-left: 220px;
+  flex: 1 0 auto;
+  margin-left: 180px;
   transition: margin-left 0.3s ease;
   min-height: 100vh;
+  width: calc(100% - 180px);
+  position: relative;
+  overflow-x: hidden;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content::-webkit-scrollbar {
+  width: 0;  /* Chrome, Safari, and Opera */
+  display: none;
 }
 
 .main-content.sidebar-collapsed {
   margin-left: 60px;
+  width: calc(100% - 60px);
 }
 
 .App-header {
   background-color: #8B3A2B;
   padding: 1rem 2rem;
-  color: white;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  text-align: center;
-}
-
-.App-header h1 {
-  margin: 0;
-  font-size: 1.8rem;
-  font-weight: 500;
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 60px;
+  width: 100%;
+  flex-shrink: 0;
+}
+
+.App-header h1 {
+  color: white;
+  margin: 0;
+  font-size: clamp(1.2rem, 2vw, 1.5rem);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+  font-weight: 500;
 }
 
 main {
-  padding: 2rem;
-  max-width: 1400px;
-  margin: 0 auto;
+  flex: 1 0 auto;
+  padding: 20px;
+  width: 100%;
+  margin: 0;
+  position: relative;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+  .main-content {
+    margin-left: 180px;
+    width: calc(100% - 180px);
+  }
 }
 
 @media (max-width: 768px) {
   .main-content {
     margin-left: 60px;
+    width: calc(100% - 60px);
   }
-  .App-header h1 {
-    font-size: 1.5rem;
+
+  .App-header {
+    padding: 0.8rem 1rem;
   }
+
+  .main-content.collapsed {
+    margin-left: 0;
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-content {
+    margin-left: 0;
+    width: 100%;
+    margin-bottom: 60px;
+  }
+
+  .App-header {
+    padding: 0.6rem 1rem;
+  }
+
+  main {
+    padding: 15px;
+  }
+}
+
+/* Fix for zoom levels */
+@media screen and (min-width: 1px) {
+  .main-layout {
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  .main-content {
+    flex: 1 0 auto;
+    width: calc(100% - 180px);
+  }
+  
+  .main-content.sidebar-collapsed {
+    width: calc(100% - 60px);
+  }
+}
+
+/* Custom scrollbar styles */
+::-webkit-scrollbar {
+  display: none;
+}
+
+/* Keep horizontal scrollbar visible */
+::-webkit-scrollbar:horizontal {
+  height: 12px;
+  display: block;
 }
