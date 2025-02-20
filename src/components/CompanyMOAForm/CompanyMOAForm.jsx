@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Select from 'react-select';
 import { db } from '../../firebase-config';
 import { collection, addDoc } from 'firebase/firestore';
 import Notification from '../Notification/Notification';
@@ -51,6 +52,15 @@ const CompanyMOAForm = () => {
     'SHIPPING LINES/TRANSPORT',
     'BANK'
   ];
+
+  const companyTypeOptions = companyTypes.map(type => ({ value: type, label: type }));
+
+  const handleSelectChange = (selectedOption) => {
+    setFormData(prev => ({
+      ...prev,
+      companyType: selectedOption ? selectedOption.value : ''
+    }));
+  };
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -244,18 +254,15 @@ const CompanyMOAForm = () => {
 
         <div className="form-group">
           <label htmlFor="companyType">Company Type: <span className="required">*</span></label>
-          <select
+          <Select
             id="companyType"
             name="companyType"
-            value={formData.companyType}
-            onChange={handleChange}
-            required
-          >
-            <option value="">Select Company Type</option>
-            {companyTypes.map(type => (
-              <option key={type} value={type}>{type}</option>
-            ))}
-          </select>
+            value={companyTypeOptions.find(option => option.value === formData.companyType)}
+            onChange={handleSelectChange}
+            options={companyTypeOptions}
+            placeholder="Select Company Type"
+            isClearable
+          />
         </div>
 
         <div className="expiration-checkbox-group">
