@@ -117,8 +117,8 @@
 }
 
 .reset-button:hover {
-  background-color: #f0f0f0;
-  color: #8B3A2B;
+  background-color: #8B3A2B;
+  color: white;
 }
 
 .submit-button {
@@ -214,30 +214,4 @@ input:disabled,
   background-color: #FFEBEE;
   border-radius: 4px;
   border: 1px solid #C62828;
-}
-
-.form-group .react-select__control {
-  border: none;
-  border-radius: 6px;
-  transition: all 0.3s ease;
-  box-shadow: none;
-}
-
-.form-group .react-select__control--is-focused {
-  border-color: transparent;
-  box-shadow: none;
-}
-
-.form-group .react-select__menu {
-  border-radius: 6px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.form-group .react-select__option--is-focused {
-  background-color: rgba(139, 58, 43, 0.1);
-}
-
-.form-group .react-select__option--is-selected {
-  background-color: #8B3A2B;
-  color: white;
 } 
