@@ -25,6 +25,7 @@ const EditCompanyModal = ({ company, onClose, onUpdate }) => {
   const [showDropdown, setShowDropdown] = useState(false);
 
   const companyTypes = [
+    'SALES/MARKETING',
     'BPO',
     'INSURANCE',
     'ENGINEERING SERVICES',
@@ -43,7 +44,8 @@ const EditCompanyModal = ({ company, onClose, onUpdate }) => {
     'CONSULTANCY',
     'BOOKKEEPING',
     'SHIPPING LINES/TRANSPORT',
-    'BANK'
+    'BANK',
+    'N/A',
   ];
 
   useEffect(() => {

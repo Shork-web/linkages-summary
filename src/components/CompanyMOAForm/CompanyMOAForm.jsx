@@ -54,7 +54,8 @@ const CompanyMOAForm = () => {
     'CONSULTANCY',
     'BOOKKEEPING',
     'SHIPPING LINES/TRANSPORT',
-    'BANK'
+    'BANK',
+    'N/A',
   ];
 
   const handleChange = (e) => {
