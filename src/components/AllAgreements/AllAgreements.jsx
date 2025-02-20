@@ -87,31 +87,45 @@ const AllAgreements = () => {
     { value: 'Government', label: 'Government' }
   ];
 
-  const filteredAgreements = agreements.filter(agreement => {
-    const searchTerm = filters.search.toLowerCase().trim();
-    const normalizedPartnerType = normalizePartnerType(agreement.partnerType);
-    
-    const matchesSearch = [
-      agreement.name,
-      agreement.address,
-      agreement.signedBy,
-      agreement.designation,
-      agreement.description,
-      agreement.agreementType,
-      normalizedPartnerType,
-      agreement.status
-    ].some(field => 
-      String(field || '').toLowerCase().includes(searchTerm)
-    );
+  const filteredAgreements = agreements
+    .filter(agreement => {
+      const searchTerm = filters.search.toLowerCase().trim();
+      const normalizedPartnerType = normalizePartnerType(agreement.partnerType);
+      
+      const matchesSearch = [
+        agreement.name,
+        agreement.address,
+        agreement.signedBy,
+        agreement.designation,
+        agreement.description,
+        agreement.agreementType,
+        normalizedPartnerType,
+        agreement.status
+      ].some(field => 
+        String(field || '').toLowerCase().includes(searchTerm)
+      );
 
-    const matchesType = filters.type === '' || agreement.agreementType === filters.type;
-    const matchesPartnerType = filters.partnerType === '' || normalizedPartnerType === filters.partnerType;
-    const matchesStatus = filters.status ? 
-      agreement.status.toLowerCase() === filters.status.toLowerCase() : 
-      true;
+      const matchesType = filters.type === '' || agreement.agreementType === filters.type;
+      const matchesPartnerType = filters.partnerType === '' || normalizedPartnerType === filters.partnerType;
+      const matchesStatus = filters.status ? 
+        agreement.status.toLowerCase() === filters.status.toLowerCase() : 
+        true;
 
-    return matchesSearch && matchesType && matchesPartnerType && matchesStatus;
-  });
+      return matchesSearch && matchesType && matchesPartnerType && matchesStatus;
+    })
+    .sort((a, b) => {
+      const nameA = a.name.toLowerCase();
+      const nameB = b.name.toLowerCase();
+
+      // Check if both names start with a number
+      const isNumberA = /^\d/.test(nameA);
+      const isNumberB = /^\d/.test(nameB);
+
+      if (isNumberA && !isNumberB) return -1;
+      if (!isNumberA && isNumberB) return 1;
+
+      return nameA.localeCompare(nameB);
+    });
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;

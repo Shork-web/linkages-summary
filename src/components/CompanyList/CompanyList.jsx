@@ -69,13 +69,27 @@ const CompanyList = () => {
     }));
   };
 
-  const filteredCompanies = companies.filter(company => {
-    const matchesSearch = company.companyName.toLowerCase().includes(filters.search.toLowerCase());
-    const matchesType = filters.type ? company.companyType === filters.type : true;
-    const matchesStatus = filters.status ? company.moaStatus === filters.status : true;
-    
-    return matchesSearch && matchesType && matchesStatus;
-  });
+  const filteredCompanies = companies
+    .filter(company => {
+      const matchesSearch = company.companyName.toLowerCase().includes(filters.search.toLowerCase());
+      const matchesType = filters.type ? company.companyType === filters.type : true;
+      const matchesStatus = filters.status ? company.moaStatus === filters.status : true;
+      
+      return matchesSearch && matchesType && matchesStatus;
+    })
+    .sort((a, b) => {
+      const nameA = a.companyName.toLowerCase();
+      const nameB = b.companyName.toLowerCase();
+
+      // Check if both names start with a number
+      const isNumberA = /^\d/.test(nameA);
+      const isNumberB = /^\d/.test(nameB);
+
+      if (isNumberA && !isNumberB) return -1;
+      if (!isNumberA && isNumberB) return 1;
+
+      return nameA.localeCompare(nameB);
+    });
 
   // Calculate pagination
   const calculateVisiblePages = (totalPages, currentPage) => {
