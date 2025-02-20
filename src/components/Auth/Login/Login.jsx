@@ -51,8 +51,8 @@ const Login = () => {
     <div className="login-container">
       <div className="login-form">
         <h2>
-          Linkage PAM
-          <span className="subtitle">Partnership Agreement Management</span>
+          WILD L.S.S
+          <span className="subtitle">Linkages Summary System</span>
         </h2>
         {error && <div className="error-message">{error}</div>}
         <form onSubmit={handleLogin}>
