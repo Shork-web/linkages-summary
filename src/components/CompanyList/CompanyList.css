@@ -43,58 +43,46 @@
 
 .company-search-box {
   position: relative;
-  min-width: 250px;
   flex: 1;
 }
 
-.company-search-box input {
+.company-search-input {
   width: 100%;
-  padding: 8px 8px 8px 35px;
+  padding: 8px 35px 8px 12px;
   border: 1px solid #ddd;
-  border-radius: 6px;
-  font-size: 13px;
-  transition: all 0.3s ease;
+  border-radius: 4px;
+  font-size: 14px;
+  transition: border-color 0.3s ease;
 }
 
-.company-search-box input:focus {
-  border-color: #8B3A2B;
-  box-shadow: 0 0 0 2px rgba(139, 58, 43, 0.1);
+.company-search-input:focus {
+  border-color: #1976d2;
 }
 
-.company-search-box i {
+.company-search-icon {
   position: absolute;
-  left: 10px;
+  right: 15px;
   top: 50%;
   transform: translateY(-50%);
-  color: #666;
-  font-size: 14px;
+  color: #888;
 }
 
-.company-filter-group {
+.company-filter-controls {
   display: flex;
   gap: 15px;
-  align-items: center;
-  flex-shrink: 0;
 }
 
-.company-filter-group select {
+.company-filter-select {
   padding: 8px 12px;
   border: 1px solid #ddd;
-  border-radius: 6px;
-  font-size: 13px;
-  min-width: 150px;
-  cursor: pointer;
+  border-radius: 4px;
   background-color: white;
+  min-width: 160px;
+  transition: border-color 0.3s ease;
 }
 
-.company-filter-group select:hover {
-  border-color: #8B3A2B;
-}
-
-.company-filter-group select:focus {
-  border-color: #8B3A2B;
-  box-shadow: 0 0 0 2px rgba(139, 58, 43, 0.1);
-  outline: none;
+.company-filter-select:focus {
+  border-color: #1976d2;
 }
 
 .company-table {
@@ -251,12 +239,12 @@
     min-width: unset;
   }
 
-  .company-filter-group {
+  .company-filter-controls {
     width: 100%;
     flex-direction: column;
   }
 
-  .company-filter-group select {
+  .company-filter-select {
     width: 100%;
   }
 }
@@ -754,4 +742,90 @@
 .company-page-ellipsis {
   color: #666;
   padding: 0 4px;
+}
+
+.company-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.company-details p {
+  margin: 0;
+  font-size: 14px;
+}
+
+/* Update the filters section styles */
+.company-filters-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  gap: 20px;
+}
+
+.company-search-box {
+  position: relative;
+  flex: 1;
+}
+
+.company-search-input {
+  width: 100%;
+  padding: 8px 35px 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  transition: border-color 0.3s ease;
+}
+
+.company-search-input:focus {
+  border-color: #8B3A2B;
+  outline: none;
+}
+
+.company-search-icon {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #888;
+}
+
+.company-filter-controls {
+  display: flex;
+  gap: 15px;
+}
+
+.company-filter-select {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: white;
+  min-width: 160px;
+  transition: border-color 0.3s ease;
+  cursor: pointer;
+}
+
+.company-filter-select:focus {
+  border-color: #8B3A2B;
+  outline: none;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .company-filters-section {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .company-filter-controls {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .company-filter-select {
+    width: 100%;
+  }
 } 

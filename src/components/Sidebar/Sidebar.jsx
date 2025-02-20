@@ -74,6 +74,11 @@ const Sidebar = ({ isCollapsed, toggleSidebar }) => {
               <i className="fas fa-building"></i>
               <span>Company List</span>
             </NavLink>
+            
+            <NavLink to="/departments" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} title="Department List">
+              <i className="fas fa-university"></i>
+              <span>Department List</span>
+            </NavLink>
           </div>
           
           {/* Others Section */}

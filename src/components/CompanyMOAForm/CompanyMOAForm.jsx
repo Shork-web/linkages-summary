@@ -4,6 +4,55 @@ import { collection, addDoc } from 'firebase/firestore';
 import Notification from '../Notification/Notification';
 import './CompanyMOAForm.css';
 
+const COLLEGES = {
+  'COLLEGE OF ENGINEERING AND ARCHITECTURE': [
+    'BS Architecture',
+    'BS Chemical Engineering',
+    'BS Civil Engineering',
+    'BS Computer Engineering',
+    'BS Electrical Engineering',
+    'BS Electronics Engineering',
+    'BS Industrial Engineering',
+    'BS Mechanical Engineering',
+    'BS Mining Engineering'
+  ],
+  'COLLEGE OF MANAGEMENT, BUSINESS & ACCOUNTANCY': [
+    'BS Accountancy',
+    'BS Accounting Information Systems',
+    'BS Management Accounting',
+    'BS Business Administration',
+    'BS Hospitality Management',
+    'BS Tourism Management',
+    'BS Office Administration',
+    'Bachelor in Public Administration'
+  ],
+  'COLLEGE OF ARTS, SCIENCES, & EDUCATION': [
+    'AB Communication',
+    'AB English with Applied Linguistics',
+    'Bachelor of Elementary Education',
+    'Bachelor of Secondary Education',
+    'Bachelor of Multimedia Arts',
+    'BS Biology',
+    'BS Math with Applied Industrial Mathematics',
+    'BS Psychology'
+  ],
+  'COLLEGE OF NURSING & ALLIED HEALTH SCIENCES': [
+    'BS Nursing',
+    'BS Pharmacy'
+  ],
+  'COLLEGE OF COMPUTER STUDIES': [
+    'BS Computer Science',
+    'BS Information Technology'
+  ],
+  'COLLEGE OF CRIMINAL JUSTICE': [
+    'BS Criminology'
+  ]
+};
+
+const getProgramsByCollege = (college) => {
+  return COLLEGES[college] || [];
+};
+
 const CompanyMOAForm = () => {
   console.log('CompanyMOAForm component rendering');
 
@@ -20,10 +69,13 @@ const CompanyMOAForm = () => {
     moaYear: new Date().getFullYear().toString(),
     moaStatus: 'Active',
     companyType: '',
+    college: '',
+    department: '',
     withExpiration: false,
     moaValidity: '',
     moaExpirationDate: '',
-    moaRemarks: ''
+    moaRemarks: '',
+    validityUnit: 'years'
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -34,7 +86,13 @@ const CompanyMOAForm = () => {
   const suggestionsRef = useRef(null);
   const [showDropdown, setShowDropdown] = useState(false);
 
+  const [collegeSuggestions, setCollegeSuggestions] = useState([]);
+  const [departmentSuggestions, setDepartmentSuggestions] = useState([]);
+  const [showCollegeDropdown, setShowCollegeDropdown] = useState(false);
+  const [showDepartmentDropdown, setShowDepartmentDropdown] = useState(false);
+
   const companyTypes = [
+    'N/A',
     'SALES/MARKETING',
     'BPO',
     'INSURANCE',
@@ -54,8 +112,7 @@ const CompanyMOAForm = () => {
     'CONSULTANCY',
     'BOOKKEEPING',
     'SHIPPING LINES/TRANSPORT',
-    'BANK',
-    'N/A',
+    'BANK'
   ];
 
   const handleChange = (e) => {
@@ -95,7 +152,7 @@ const CompanyMOAForm = () => {
     }
   };
 
-  const handleFocus = () => {
+  const handleCompanyTypeFocus = () => {
     setShowDropdown(true);
     setSuggestions(companyTypes); // Show all options on focus
   };
@@ -111,35 +168,6 @@ const CompanyMOAForm = () => {
     setSuggestions([]);
   };
 
-  const handleKeyDown = (e) => {
-    if (!suggestions.length) return;
-
-    switch (e.key) {
-      case 'ArrowDown':
-        e.preventDefault();
-        setSelectedIndex(prev => 
-          prev < suggestions.length - 1 ? prev + 1 : prev
-        );
-        break;
-      case 'ArrowUp':
-        e.preventDefault();
-        setSelectedIndex(prev => prev > 0 ? prev - 1 : 0);
-        break;
-      case 'Enter':
-        e.preventDefault();
-        if (selectedIndex >= 0) {
-          handleSuggestionClick(suggestions[selectedIndex]);
-        }
-        break;
-      case 'Escape':
-        setSuggestions([]);
-        setSelectedIndex(-1);
-        break;
-      default:
-        break;
-    }
-  };
-
   // Close suggestions when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -152,6 +180,61 @@ const CompanyMOAForm = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  const handleCollegeChange = (e) => {
+    const value = e.target.value;
+    setFormData(prev => ({ ...prev, college: value, department: '' }));
+    
+    // Filter college suggestions based on input
+    const filtered = Object.keys(COLLEGES).filter(college =>
+      college.toLowerCase().includes(value.toLowerCase())
+    );
+    setCollegeSuggestions(filtered);
+    setShowCollegeDropdown(true);
+  };
+
+  const handleCollegeSelect = (college) => {
+    console.log('Selected college:', college); // For debugging
+    setFormData(prev => ({
+      ...prev,
+      college: college,
+      department: '' // Reset department when college changes
+    }));
+    setShowCollegeDropdown(false);
+    setCollegeSuggestions([]); // Clear suggestions after selection
+  };
+
+  const handleDepartmentChange = (e) => {
+    const value = e.target.value;
+    setFormData(prev => ({ ...prev, department: value }));
+    
+    // Get programs for the selected college and filter based on input
+    const collegePrograms = getProgramsByCollege(formData.college);
+    const filtered = collegePrograms.filter(program =>
+      program.toLowerCase().includes(value.toLowerCase())
+    );
+    setDepartmentSuggestions(filtered);
+    setShowDepartmentDropdown(true);
+  };
+
+  const handleDepartmentSelect = (department) => {
+    setFormData(prev => ({ ...prev, department }));
+    setShowDepartmentDropdown(false);
+    setDepartmentSuggestions([]); // Clear suggestions after selection
+  };
+
+  const handleDepartmentFocus = () => {
+    if (formData.college) {
+      setShowDepartmentDropdown(true);
+      // Show all programs for the selected college
+      setDepartmentSuggestions(getProgramsByCollege(formData.college));
+    }
+  };
+
+  const handleCollegeFocus = () => {
+    setShowCollegeDropdown(true);
+    setCollegeSuggestions(Object.keys(COLLEGES)); // Show all colleges on focus
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -161,6 +244,7 @@ const CompanyMOAForm = () => {
     try {
       const docRef = await addDoc(collection(db, 'companyMOA'), {
         ...formData,
+        validityUnit: formData.validityUnit,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       });
@@ -176,17 +260,24 @@ const CompanyMOAForm = () => {
         moaYear: new Date().getFullYear().toString(),
         moaStatus: 'Active',
         companyType: '',
+        college: '',
+        department: '',
         withExpiration: false,
         moaValidity: '',
         moaExpirationDate: '',
-        moaRemarks: ''
+        moaRemarks: '',
+        validityUnit: 'years'
       });
 
       setSuggestions([]); // Clear suggestions
-      setNotification({ type: 'success', message: 'MOA submitted successfully!' });
+      setNotification({
+        show: true,
+        type: 'success',
+        message: 'MOA submitted successfully!'
+      });
     } catch (error) {
-      console.error('Error adding MOA:', error);
-      setNotification({ type: 'error', message: 'Failed to submit MOA' });
+      console.error('Error adding document: ', error);
+      setError('Failed to submit MOA');
     } finally {
       setIsSubmitting(false);
     }
@@ -281,33 +372,100 @@ const CompanyMOAForm = () => {
         </div>
 
         <div className="form-group">
-          <label htmlFor="companyType">
-            Company Type:
-            <span className="helper-text"> Select the type of company</span>
-          </label>
-          <div className="company-type-autocomplete" ref={suggestionsRef}>
+          <label htmlFor="companyType">Company Type:</label>
+          <input
+            type="text"
+            id="companyType"
+            name="companyType"
+            value={formData.companyType}
+            onChange={handleCompanyTypeChange}
+            onFocus={handleCompanyTypeFocus}
+            onBlur={handleBlur}
+            placeholder="Start typing to see suggestions..."
+            required
+          />
+          {showDropdown && suggestions.length > 0 && (
+            <div className="suggestions-list">
+              {suggestions.map((type, index) => (
+                <div
+                  key={type}
+                  className={`suggestion-item ${index === selectedIndex ? 'selected' : ''}`}
+                  onClick={() => handleSuggestionClick(type)}
+                >
+                  {type}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="college">College:</label>
+          <div className="company-type-autocomplete">
             <input
               type="text"
-              id="companyType"
-              name="companyType"
-              className="company-type-input"
-              value={formData.companyType}
-              onChange={handleCompanyTypeChange}
-              onKeyDown={handleKeyDown}
-              onFocus={handleFocus}
-              onBlur={handleBlur}
-              placeholder="Start typing to see suggestions..."
-              required
+              id="college"
+              name="college"
+              value={formData.college}
+              onChange={handleCollegeChange}
+              onFocus={handleCollegeFocus}
+              onBlur={() => {
+                // Delay hiding dropdown to allow click to register
+                setTimeout(() => {
+                  setShowCollegeDropdown(false);
+                }, 200);
+              }}
+              placeholder="Select a college..."
             />
-            {showDropdown && suggestions.length > 0 && (
+            {showCollegeDropdown && collegeSuggestions.length > 0 && (
               <div className="suggestions-list">
-                {suggestions.map((type, index) => (
+                {collegeSuggestions.map((college) => (
                   <div
-                    key={type}
-                    className={`suggestion-item ${index === selectedIndex ? 'selected' : ''}`}
-                    onClick={() => handleSuggestionClick(type)}
+                    key={college}
+                    className="suggestion-item"
+                    onMouseDown={(e) => {
+                      e.preventDefault(); // Prevent input blur
+                      handleCollegeSelect(college);
+                    }}
                   >
-                    {type}
+                    {college}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="department">Department:</label>
+          <div className="company-type-autocomplete">
+            <input
+              type="text"
+              id="department"
+              name="department"
+              value={formData.department}
+              onChange={handleDepartmentChange}
+              onFocus={handleDepartmentFocus}
+              onBlur={() => {
+                setTimeout(() => {
+                  setShowDepartmentDropdown(false);
+                }, 200);
+              }}
+              placeholder="Select a department..."
+              disabled={!formData.college}
+            />
+            {showDepartmentDropdown && departmentSuggestions.length > 0 && (
+              <div className="suggestions-list">
+                {departmentSuggestions.map((program) => (
+                  <div
+                    key={program}
+                    className="suggestion-item"
+                    onMouseDown={(e) => {
+                      e.preventDefault(); // Prevent input blur
+                      handleDepartmentSelect(program);
+                    }}
+                  >
+                    {program}
                   </div>
                 ))}
               </div>
@@ -330,19 +488,30 @@ const CompanyMOAForm = () => {
         <div className="form-row">
           <div className="form-group">
             <label htmlFor="moaValidity">
-              Validity (years):
-              <span className="helper-text">Duration of the MOA</span>
+              Validity
+              <span className="helper-text"> Duration of the MOA</span>
             </label>
-            <input
-              type="number"
-              id="moaValidity"
-              name="moaValidity"
-              value={formData.moaValidity}
-              onChange={handleChange}
-              min="1"
-              required={formData.withExpiration}
-              disabled={!formData.withExpiration}
-            />
+            <div className="validity-input-group">
+              <input
+                type="number"
+                id="moaValidity"
+                name="moaValidity"
+                value={formData.moaValidity}
+                onChange={handleChange}
+                min="1"
+                required={formData.withExpiration}
+                disabled={!formData.withExpiration}
+              />
+              <select
+                id="validityUnit"
+                name="validityUnit"
+                value={formData.validityUnit || 'years'}
+                onChange={handleChange}
+              >
+                <option value="years">Years</option>
+                <option value="months">Months</option>
+              </select>
+            </div>
           </div>
 
           <div className="form-group">

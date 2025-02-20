@@ -11,6 +11,7 @@ import RenewalAgreements from './components/RenewalAgreements/RenewalAgreements'
 import ExpiredAgreements from './components/ExpiredAgreements/ExpiredAgreements';
 import Partners from './components/Partners/Partners';
 import CompanyList from './components/CompanyList/CompanyList';
+import DepartmentList from './components/DepartmentList/DepartmentList';
 import './App.css';
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
         <Route path="/new-agreement" element={<AgreementForm />} />
         <Route path="/company-moa" element={<CompanyMOAForm />} />
         <Route path="/company-list" element={<CompanyList />} />
+        <Route path="/departments" element={<DepartmentList />} />
         <Route path="/agreements" element={<AllAgreements />} />
         <Route path="/active" element={<ActiveAgreements />} />
         <Route path="/pending" element={<PendingAgreements />} />

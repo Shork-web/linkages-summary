@@ -7,13 +7,21 @@ service cloud.firestore {
       // Validation rules for company MOA documents
       allow create, update: if request.auth != null &&
         request.resource.data.companyName is string &&
+        request.resource.data.companyName.trim().size() > 0 &&
         request.resource.data.companyAddress is string &&
+        request.resource.data.companyAddress.trim().size() > 0 &&
         request.resource.data.companyLongitude is string &&
         request.resource.data.companyLatitude is string &&
         request.resource.data.moaYear is number &&
         request.resource.data.moaStatus in ['Active', 'For-Update', 'Blacklisted'] &&
         request.resource.data.companyType is string &&
+        request.resource.data.companyType.trim().size() > 0 &&
+        request.resource.data.college is string &&
+        request.resource.data.college.trim().size() > 0 &&
+        request.resource.data.department is string &&
+        request.resource.data.department.trim().size() > 0 &&
         request.resource.data.moaValidity is number &&
+        request.resource.data.validityUnit in ['years', 'months'] &&
         request.resource.data.moaExpirationDate is string &&
         request.resource.data.moaRemarks is string &&
         request.resource.data.withExpiration is bool &&

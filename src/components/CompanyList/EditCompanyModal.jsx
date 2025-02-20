@@ -3,6 +3,56 @@ import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '../../firebase-config';
 import './EditCompanyModal.css';
 
+// Add the college data here
+const COLLEGES = {
+  'COLLEGE OF ENGINEERING AND ARCHITECTURE': [
+    'BS Architecture',
+    'BS Chemical Engineering',
+    'BS Civil Engineering',
+    'BS Computer Engineering',
+    'BS Electrical Engineering',
+    'BS Electronics Engineering',
+    'BS Industrial Engineering',
+    'BS Mechanical Engineering',
+    'BS Mining Engineering'
+  ],
+  'COLLEGE OF MANAGEMENT, BUSINESS & ACCOUNTANCY': [
+    'BS Accountancy',
+    'BS Accounting Information Systems',
+    'BS Management Accounting',
+    'BS Business Administration',
+    'BS Hospitality Management',
+    'BS Tourism Management',
+    'BS Office Administration',
+    'Bachelor in Public Administration'
+  ],
+  'COLLEGE OF ARTS, SCIENCES, & EDUCATION': [
+    'AB Communication',
+    'AB English with Applied Linguistics',
+    'Bachelor of Elementary Education',
+    'Bachelor of Secondary Education',
+    'Bachelor of Multimedia Arts',
+    'BS Biology',
+    'BS Math with Applied Industrial Mathematics',
+    'BS Psychology'
+  ],
+  'COLLEGE OF NURSING & ALLIED HEALTH SCIENCES': [
+    'BS Nursing',
+    'BS Pharmacy'
+  ],
+  'COLLEGE OF COMPUTER STUDIES': [
+    'BS Computer Science',
+    'BS Information Technology'
+  ],
+  'COLLEGE OF CRIMINAL JUSTICE': [
+    'BS Criminology'
+  ]
+};
+
+const getProgramsByCollege = (college) => {
+  return COLLEGES[college] || [];
+};
+
 const EditCompanyModal = ({ company, onClose, onUpdate }) => {
   const [formData, setFormData] = useState({
     companyName: '',
@@ -12,10 +62,13 @@ const EditCompanyModal = ({ company, onClose, onUpdate }) => {
     moaYear: '',
     moaStatus: '',
     companyType: '',
+    college: '',
+    department: '',
     withExpiration: false,
     moaValidity: '',
     moaExpirationDate: '',
-    moaRemarks: ''
+    moaRemarks: '',
+    validityUnit: 'years'
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -24,7 +77,13 @@ const EditCompanyModal = ({ company, onClose, onUpdate }) => {
   const suggestionsRef = useRef(null);
   const [showDropdown, setShowDropdown] = useState(false);
 
+  const [collegeSuggestions, setCollegeSuggestions] = useState([]);
+  const [departmentSuggestions, setDepartmentSuggestions] = useState([]);
+  const [showCollegeDropdown, setShowCollegeDropdown] = useState(false);
+  const [showDepartmentDropdown, setShowDepartmentDropdown] = useState(false);
+
   const companyTypes = [
+    'N/A',
     'SALES/MARKETING',
     'BPO',
     'INSURANCE',
@@ -44,8 +103,7 @@ const EditCompanyModal = ({ company, onClose, onUpdate }) => {
     'CONSULTANCY',
     'BOOKKEEPING',
     'SHIPPING LINES/TRANSPORT',
-    'BANK',
-    'N/A',
+    'BANK'
   ];
 
   useEffect(() => {
@@ -91,7 +149,7 @@ const EditCompanyModal = ({ company, onClose, onUpdate }) => {
     }
   };
 
-  const handleFocus = () => {
+  const handleCompanyTypeFocus = () => {
     setShowDropdown(true);
     setSuggestions(companyTypes); // Show all options on focus
   };
@@ -136,17 +194,66 @@ const EditCompanyModal = ({ company, onClose, onUpdate }) => {
     }
   };
 
+  const handleCollegeChange = (e) => {
+    const value = e.target.value;
+    setFormData(prev => ({ ...prev, college: value, department: '' }));
+    
+    // Filter college suggestions based on input
+    const filtered = Object.keys(COLLEGES).filter(college =>
+      college.toLowerCase().includes(value.toLowerCase())
+    );
+    setCollegeSuggestions(filtered);
+    setShowCollegeDropdown(true);
+  };
+
+  const handleCollegeSelect = (college) => {
+    console.log('Selected college:', college); // For debugging
+    setFormData(prev => ({
+      ...prev,
+      college: college,
+      department: '' // Reset department when college changes
+    }));
+    setShowCollegeDropdown(false);
+    setCollegeSuggestions([]); // Clear suggestions after selection
+  };
+
+  const handleCollegeFocus = () => {
+    setShowCollegeDropdown(true);
+    setCollegeSuggestions(Object.keys(COLLEGES)); // Show all colleges on focus
+  };
+
+  const handleDepartmentChange = (e) => {
+    const value = e.target.value;
+    setFormData(prev => ({ ...prev, department: value }));
+    setDepartmentSuggestions(
+      getProgramsByCollege(formData.college).filter(program =>
+        program.toLowerCase().includes(value.toLowerCase())
+      )
+    );
+    setShowDepartmentDropdown(true);
+  };
+
+  const handleDepartmentSelect = (department) => {
+    setFormData(prev => ({ ...prev, department }));
+    setShowDepartmentDropdown(false);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
 
     try {
       const companyRef = doc(db, 'companyMOA', company.id);
-      await updateDoc(companyRef, formData);
-      onUpdate('Company updated successfully');
+      await updateDoc(companyRef, {
+        ...formData,
+        validityUnit: formData.validityUnit,
+        updatedAt: new Date().toISOString()
+      });
+
+      onUpdate();
       onClose();
     } catch (error) {
-      console.error('Error updating company MOA:', error);
+      console.error('Error updating document: ', error);
     } finally {
       setIsSubmitting(false);
     }
@@ -185,7 +292,7 @@ const EditCompanyModal = ({ company, onClose, onUpdate }) => {
                   value={formData.companyType}
                   onChange={handleCompanyTypeChange}
                   onKeyDown={handleKeyDown}
-                  onFocus={handleFocus}
+                  onFocus={handleCompanyTypeFocus}
                   onBlur={handleBlur}
                   placeholder="Start typing to see suggestions..."
                   required
@@ -205,6 +312,70 @@ const EditCompanyModal = ({ company, onClose, onUpdate }) => {
                 )}
               </div>
             </div>
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="college">College:</label>
+            <div className="company-type-autocomplete">
+              <input
+                type="text"
+                id="college"
+                name="college"
+                value={formData.college}
+                onChange={handleCollegeChange}
+                onFocus={handleCollegeFocus}
+                onBlur={() => {
+                  // Delay hiding dropdown to allow click to register
+                  setTimeout(() => {
+                    setShowCollegeDropdown(false);
+                  }, 200);
+                }}
+                placeholder="Select a college..."
+              />
+              {showCollegeDropdown && collegeSuggestions.length > 0 && (
+                <div className="suggestions-list">
+                  {collegeSuggestions.map((college) => (
+                    <div
+                      key={college}
+                      className="suggestion-item"
+                      onMouseDown={(e) => {
+                        e.preventDefault(); // Prevent input blur
+                        handleCollegeSelect(college);
+                      }}
+                    >
+                      {college}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="department">Department:</label>
+            <input
+              type="text"
+              id="department"
+              name="department"
+              value={formData.department}
+              onChange={handleDepartmentChange}
+              onFocus={() => setShowDepartmentDropdown(true)}
+              onBlur={() => setShowDepartmentDropdown(false)}
+              disabled={!formData.college}
+            />
+            {showDepartmentDropdown && departmentSuggestions.length > 0 && (
+              <div className="suggestions-list">
+                {departmentSuggestions.map((program) => (
+                  <div
+                    key={program}
+                    className="suggestion-item"
+                    onClick={() => handleDepartmentSelect(program)}
+                  >
+                    {program}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="form-group full-width address-field required">
@@ -271,19 +442,30 @@ const EditCompanyModal = ({ company, onClose, onUpdate }) => {
           <div className="form-row">
             <div className="form-group">
               <label htmlFor="moaValidity">
-                Validity (years)
+                Validity
                 <span className="helper-text"> Duration of the MOA</span>
               </label>
-              <input
-                type="number"
-                id="moaValidity"
-                name="moaValidity"
-                value={formData.moaValidity}
-                onChange={handleChange}
-                min="1"
-                required={formData.withExpiration}
-                disabled={!formData.withExpiration}
-              />
+              <div className="validity-input-group">
+                <input
+                  type="number"
+                  id="moaValidity"
+                  name="moaValidity"
+                  value={formData.moaValidity}
+                  onChange={handleChange}
+                  min="1"
+                  required={formData.withExpiration}
+                  disabled={!formData.withExpiration}
+                />
+                <select
+                  id="validityUnit"
+                  name="validityUnit"
+                  value={formData.validityUnit || 'years'}
+                  onChange={handleChange}
+                >
+                  <option value="years">Years</option>
+                  <option value="months">Months</option>
+                </select>
+              </div>
             </div>
 
             <div className="form-group">

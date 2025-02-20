@@ -81,6 +81,7 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
+  margin-bottom: 15px;
 }
 
 .form-group label {
@@ -370,4 +371,54 @@
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(-4px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+.validity-input-group {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.validity-input-group input {
+  flex: 2;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.validity-input-group select {
+  flex: 0;
+  width: auto;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.suggestions-list {
+  position: absolute;
+  top: 100%; /* Position directly below the input */
+  left: 0;
+  right: 0;
+  width: 100%;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  max-height: 150px;
+  overflow-y: auto;
+  z-index: 1000;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.suggestion-item {
+  padding: 10px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.suggestion-item:hover {
+  background-color: #f0f0f0;
 } 

@@ -165,8 +165,11 @@ const CompanyList = () => {
     });
   };
 
-  const handleEdit = (company) => {
-    setEditingCompany(company);
+  const handleEditCompany = (company) => {
+    setEditingCompany({
+      ...company,
+      validityUnit: company.validityUnit || 'years' // Default to 'years' if not set
+    });
   };
 
   const handleUpdate = (message, type = 'success') => {
@@ -216,7 +219,7 @@ const CompanyList = () => {
         </div>
       )}
 
-      {/* Add the edit modal */}
+      {/* Edit Modal */}
       {editingCompany && (
         <EditCompanyModal
           company={editingCompany}
@@ -226,40 +229,45 @@ const CompanyList = () => {
       )}
 
       <h2 className="company-list-title">Company List</h2>
-      <div className="company-list-header">
-        <div className="company-header-controls">
-          <div className="company-search-box">
-            <i className="fas fa-search"></i>
-            <input
-              type="text"
-              name="search"
-              value={filters.search}
-              onChange={handleFilterChange}
-              placeholder="Search companies..."
-            />
-          </div>
-          <div className="company-filter-group">
-            <select
-              name="type"
-              value={filters.type}
-              onChange={handleFilterChange}
-            >
-              <option value="">All Types</option>
-              {companyTypes.map(type => (
-                <option key={type} value={type}>{type}</option>
-              ))}
-            </select>
-            <select
-              name="status"
-              value={filters.status}
-              onChange={handleFilterChange}
-            >
-              <option value="">All Status</option>
-              <option value="Active">Active</option>
-              <option value="For-Update">For Update</option>
-              <option value="Blacklisted">Blacklisted</option>
-            </select>
-          </div>
+
+      {/* Search and Filter Section */}
+      <div className="company-filters-section">
+        <div className="company-search-box">
+          <input
+            type="text"
+            className="company-search-input"
+            placeholder="Search companies..."
+            name="search"
+            value={filters.search}
+            onChange={handleFilterChange}
+          />
+          <i className="fas fa-search company-search-icon"></i>
+        </div>
+
+        <div className="company-filter-controls">
+          <select
+            className="company-filter-select"
+            name="type"
+            value={filters.type}
+            onChange={handleFilterChange}
+          >
+            <option value="">All Types</option>
+            {companyTypes.map(type => (
+              <option key={type} value={type}>{type}</option>
+            ))}
+          </select>
+
+          <select
+            className="company-filter-select"
+            name="status"
+            value={filters.status}
+            onChange={handleFilterChange}
+          >
+            <option value="">All Status</option>
+            <option value="Active">Active</option>
+            <option value="For-Update">For Update</option>
+            <option value="Blacklisted">Blacklisted</option>
+          </select>
         </div>
       </div>
 
@@ -296,13 +304,13 @@ const CompanyList = () => {
                   </td>
                   <td>{company.companyType}</td>
                   <td>{company.withExpiration ? 'Yes' : 'No'}</td>
-                  <td>{company.withExpiration ? `${company.moaValidity} years` : 'Active'}</td>
+                  <td>{company.withExpiration ? `${company.moaValidity} ${company.validityUnit}` : 'Active'}</td>
                   <td>{company.moaRemarks}</td>
                   <td className="company-action-buttons">
                     <button 
                       className="company-action-btn company-edit-btn" 
                       title="Edit"
-                      onClick={() => handleEdit(company)}
+                      onClick={() => handleEditCompany(company)}
                     >
                       <i className="fas fa-edit"></i>
                     </button>
