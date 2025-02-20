@@ -214,4 +214,56 @@ input:disabled,
   background-color: #FFEBEE;
   border-radius: 4px;
   border: 1px solid #C62828;
+}
+
+/* Add these styles for the autocomplete container */
+.company-type-autocomplete {
+  position: relative;
+  width: 100%;
+}
+
+.suggestions-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #ddd;
+  border-top: none;
+  border-radius: 0 0 6px 6px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.suggestion-item {
+  padding: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #333;
+}
+
+.suggestion-item:hover {
+  background-color: rgba(139, 58, 43, 0.1);
+}
+
+.suggestion-item.selected {
+  background-color: rgba(139, 58, 43, 0.2);
+}
+
+/* Style the input to match your existing form styles */
+.company-type-input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.company-type-input:focus {
+  outline: none;
+  border-color: #8B3A2B;
+  box-shadow: 0 0 0 2px rgba(139, 58, 43, 0.1);
 } 

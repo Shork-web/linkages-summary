@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { db } from '../../firebase-config';
 import { collection, addDoc } from 'firebase/firestore';
 import Notification from '../Notification/Notification';
 import './CompanyMOAForm.css';
 
-const CompanyMOAForm = ({ onUpdate }) => {
+const CompanyMOAForm = () => {
   console.log('CompanyMOAForm component rendering');
 
   useEffect(() => {
@@ -29,6 +29,10 @@ const CompanyMOAForm = ({ onUpdate }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [notification, setNotification] = useState(null);
+  const [suggestions, setSuggestions] = useState([]);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
+  const suggestionsRef = useRef(null);
+  const [showDropdown, setShowDropdown] = useState(false);
 
   const companyTypes = [
     'SALES/MARKETING',
@@ -74,15 +78,95 @@ const CompanyMOAForm = ({ onUpdate }) => {
     }));
   };
 
+  const handleCompanyTypeChange = (e) => {
+    const value = e.target.value;
+    setFormData(prev => ({ ...prev, companyType: value }));
+    
+    // Filter suggestions based on input
+    if (value.trim()) {
+      const filtered = companyTypes.filter(type =>
+        type.toLowerCase().includes(value.toLowerCase())
+      );
+      setSuggestions(filtered);
+      setSelectedIndex(-1);
+    } else {
+      setSuggestions(companyTypes); // Show all if input is empty
+    }
+  };
+
+  const handleFocus = () => {
+    setShowDropdown(true);
+    setSuggestions(companyTypes); // Show all options on focus
+  };
+
+  const handleBlur = () => {
+    setTimeout(() => {
+      setShowDropdown(false);
+    }, 100); // Delay to allow click event to register
+  };
+
+  const handleSuggestionClick = (type) => {
+    setFormData(prev => ({ ...prev, companyType: type }));
+    setSuggestions([]);
+  };
+
+  const handleKeyDown = (e) => {
+    if (!suggestions.length) return;
+
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        setSelectedIndex(prev => 
+          prev < suggestions.length - 1 ? prev + 1 : prev
+        );
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        setSelectedIndex(prev => prev > 0 ? prev - 1 : 0);
+        break;
+      case 'Enter':
+        e.preventDefault();
+        if (selectedIndex >= 0) {
+          handleSuggestionClick(suggestions[selectedIndex]);
+        }
+        break;
+      case 'Escape':
+        setSuggestions([]);
+        setSelectedIndex(-1);
+        break;
+      default:
+        break;
+    }
+  };
+
+  // Close suggestions when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (suggestionsRef.current && !suggestionsRef.current.contains(event.target)) {
+        setSuggestions([]);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     setError('');
+    setNotification(null);
 
     try {
-      await addDoc(collection(db, 'companyMOA'), formData);
-      setNotification({ type: 'success', message: 'MOA submitted successfully!' });
-      onUpdate('Company MOA added successfully');
+      const docRef = await addDoc(collection(db, 'companyMOA'), {
+        ...formData,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      });
+
+      console.log('Document written with ID: ', docRef.id);
+
+      // Clear the form
       setFormData({
         companyName: '',
         companyAddress: '',
@@ -96,8 +180,12 @@ const CompanyMOAForm = ({ onUpdate }) => {
         moaExpirationDate: '',
         moaRemarks: ''
       });
+
+      setSuggestions([]); // Clear suggestions
+      setNotification({ type: 'success', message: 'MOA submitted successfully!' });
     } catch (error) {
-      setError('Error submitting MOA. Please try again.');
+      console.error('Error adding MOA:', error);
+      setNotification({ type: 'error', message: 'Failed to submit MOA' });
     } finally {
       setIsSubmitting(false);
     }
@@ -192,19 +280,38 @@ const CompanyMOAForm = ({ onUpdate }) => {
         </div>
 
         <div className="form-group">
-          <label htmlFor="companyType">Company Type: <span className="required">*</span></label>
-          <select
-            id="companyType"
-            name="companyType"
-            value={formData.companyType}
-            onChange={handleChange}
-            required
-          >
-            <option value="">Select Company Type</option>
-            {companyTypes.map(type => (
-              <option key={type} value={type}>{type}</option>
-            ))}
-          </select>
+          <label htmlFor="companyType">
+            Company Type:
+            <span className="helper-text"> Select the type of company</span>
+          </label>
+          <div className="company-type-autocomplete" ref={suggestionsRef}>
+            <input
+              type="text"
+              id="companyType"
+              name="companyType"
+              className="company-type-input"
+              value={formData.companyType}
+              onChange={handleCompanyTypeChange}
+              onKeyDown={handleKeyDown}
+              onFocus={handleFocus}
+              onBlur={handleBlur}
+              placeholder="Start typing to see suggestions..."
+              required
+            />
+            {showDropdown && suggestions.length > 0 && (
+              <div className="suggestions-list">
+                {suggestions.map((type, index) => (
+                  <div
+                    key={type}
+                    className={`suggestion-item ${index === selectedIndex ? 'selected' : ''}`}
+                    onClick={() => handleSuggestionClick(type)}
+                  >
+                    {type}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="expiration-checkbox-group">

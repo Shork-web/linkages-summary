@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '../../firebase-config';
 import './EditCompanyModal.css';
@@ -19,6 +19,10 @@ const EditCompanyModal = ({ company, onClose, onUpdate }) => {
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [suggestions, setSuggestions] = useState([]);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
+  const suggestionsRef = useRef(null);
+  const [showDropdown, setShowDropdown] = useState(false);
 
   const companyTypes = [
     'BPO',
@@ -69,6 +73,67 @@ const EditCompanyModal = ({ company, onClose, onUpdate }) => {
     }));
   };
 
+  const handleCompanyTypeChange = (e) => {
+    const value = e.target.value;
+    setFormData(prev => ({ ...prev, companyType: value }));
+    
+    // Filter suggestions based on input
+    if (value.trim()) {
+      const filtered = companyTypes.filter(type =>
+        type.toLowerCase().includes(value.toLowerCase())
+      );
+      setSuggestions(filtered);
+      setSelectedIndex(-1);
+    } else {
+      setSuggestions(companyTypes); // Show all if input is empty
+    }
+  };
+
+  const handleFocus = () => {
+    setShowDropdown(true);
+    setSuggestions(companyTypes); // Show all options on focus
+  };
+
+  const handleBlur = () => {
+    setTimeout(() => {
+      setShowDropdown(false);
+    }, 100); // Delay to allow click event to register
+  };
+
+  const handleSuggestionClick = (type) => {
+    setFormData(prev => ({ ...prev, companyType: type }));
+    setSuggestions([]);
+  };
+
+  const handleKeyDown = (e) => {
+    if (!suggestions.length) return;
+
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        setSelectedIndex(prev => 
+          prev < suggestions.length - 1 ? prev + 1 : prev
+        );
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        setSelectedIndex(prev => prev > 0 ? prev - 1 : 0);
+        break;
+      case 'Enter':
+        e.preventDefault();
+        if (selectedIndex >= 0) {
+          handleSuggestionClick(suggestions[selectedIndex]);
+        }
+        break;
+      case 'Escape':
+        setSuggestions([]);
+        setSelectedIndex(-1);
+        break;
+      default:
+        break;
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -107,20 +172,36 @@ const EditCompanyModal = ({ company, onClose, onUpdate }) => {
                 required
               />
             </div>
-            <div className="form-group required">
-              <label htmlFor="companyType">Company Type</label>
-              <select
-                id="companyType"
-                name="companyType"
-                value={formData.companyType}
-                onChange={handleChange}
-                required
-              >
-                <option value="">Select Company Type</option>
-                {companyTypes.map(type => (
-                  <option key={type} value={type}>{type}</option>
-                ))}
-              </select>
+            <div className="form-group">
+              <label htmlFor="companyType">Company Type:</label>
+              <div className="company-type-autocomplete" ref={suggestionsRef}>
+                <input
+                  type="text"
+                  id="companyType"
+                  name="companyType"
+                  className="company-type-input"
+                  value={formData.companyType}
+                  onChange={handleCompanyTypeChange}
+                  onKeyDown={handleKeyDown}
+                  onFocus={handleFocus}
+                  onBlur={handleBlur}
+                  placeholder="Start typing to see suggestions..."
+                  required
+                />
+                {showDropdown && suggestions.length > 0 && (
+                  <div className="suggestions-list">
+                    {suggestions.map((type, index) => (
+                      <div
+                        key={type}
+                        className={`suggestion-item ${index === selectedIndex ? 'selected' : ''}`}
+                        onClick={() => handleSuggestionClick(type)}
+                      >
+                        {type}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
