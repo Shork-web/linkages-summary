@@ -25,6 +25,7 @@ const CompanyList = () => {
   const [visiblePages, setVisiblePages] = useState([]);
 
   const companyTypes = [
+    'N/A',
     'BPO',
     'INSURANCE',
     'ENGINEERING SERVICES',
