@@ -9,7 +9,7 @@ const DepartmentList = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingDepartment, setEditingDepartment] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(7);
+  const [itemsPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState('');
   const [filters, setFilters] = useState({
     status: '',
