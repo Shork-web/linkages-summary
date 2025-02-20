@@ -1,14 +1,54 @@
 .loading-screen {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, #8B3A2B, #2C1810);
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  z-index: 9999;
+  height: 100vh;
+  background-color: #f5f5f5;
+  color: #8B3A2B;
+}
+
+.loading-title {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.double-bounce1, .double-bounce2 {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-color: #8B3A2B;
+  opacity: 0.6;
+  position: absolute;
+  top: 0;
+  left: 0;
+  animation: bounce 2.0s infinite ease-in-out;
+}
+
+.double-bounce2 {
+  animation-delay: -1.0s;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: scale(0.0);
+  }
+  50% {
+    transform: scale(1.0);
+  }
+}
+
+.loading-text {
+  font-size: 1.2rem;
+  font-weight: 500;
 }
 
 .loading-content {
@@ -28,7 +68,7 @@
   width: 200px;
   height: 100px;
   position: relative;
-  margin: 0 auto;
+  margin-bottom: 20px;
 }
 
 .car-body {
@@ -37,7 +77,7 @@
   height: 30px;
   bottom: 30px;
   left: 30px;
-  background: #fff;
+  background: #8B3A2B;
   border-radius: 10px;
   animation: car-bounce 0.5s ease-in-out infinite;
 }
@@ -46,7 +86,7 @@
   position: absolute;
   width: 80px;
   height: 20px;
-  background: #fff;
+  background: #8B3A2B;
   top: -15px;
   left: 30px;
   border-radius: 8px;
@@ -200,4 +240,89 @@
   50% {
     transform: scaleX(0.95);
   }
+}
+
+.running-man {
+  position: relative;
+  width: 50px;
+  height: 50px;
+  margin-bottom: 20px;
+}
+
+.man-body {
+  position: absolute;
+  width: 20px;
+  height: 40px;
+  background-color: #8B3A2B;
+  border-radius: 10px;
+  top: 5px;
+  left: 15px;
+  animation: run 1s infinite linear;
+}
+
+.head {
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  background-color: #8B3A2B;
+  border-radius: 50%;
+  top: -10px;
+  left: 2.5px;
+}
+
+.arm {
+  position: absolute;
+  width: 5px;
+  height: 20px;
+  background-color: #8B3A2B;
+  border-radius: 5px;
+  top: 10px;
+}
+
+.arm-left {
+  left: -5px;
+  transform-origin: top;
+  animation: arm-swing 1s infinite alternate;
+}
+
+.arm-right {
+  right: -5px;
+  transform-origin: top;
+  animation: arm-swing 1s infinite alternate-reverse;
+}
+
+.leg {
+  position: absolute;
+  width: 5px;
+  height: 20px;
+  background-color: #8B3A2B;
+  border-radius: 5px;
+  bottom: 0;
+}
+
+.leg-left {
+  left: 0;
+  transform-origin: top;
+  animation: leg-swing 1s infinite alternate;
+}
+
+.leg-right {
+  right: 0;
+  transform-origin: top;
+  animation: leg-swing 1s infinite alternate-reverse;
+}
+
+@keyframes run {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(100px); }
+}
+
+@keyframes arm-swing {
+  0% { transform: rotate(30deg); }
+  100% { transform: rotate(-30deg); }
+}
+
+@keyframes leg-swing {
+  0% { transform: rotate(-30deg); }
+  100% { transform: rotate(30deg); }
 } 

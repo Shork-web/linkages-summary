@@ -10,7 +10,6 @@ import PendingAgreements from './components/PendingAgreements/PendingAgreements'
 import RenewalAgreements from './components/RenewalAgreements/RenewalAgreements';
 import ExpiredAgreements from './components/ExpiredAgreements/ExpiredAgreements';
 import Partners from './components/Partners/Partners';
-import PrivateRoute from './components/Auth/PrivateRoute';
 import CompanyList from './components/CompanyList/CompanyList';
 import './App.css';
 
@@ -21,7 +20,7 @@ function App() {
       <Route path="/login" element={<Login />} />
 
       {/* Protected Routes */}
-      <Route element={<PrivateRoute><MainLayout /></PrivateRoute>}>
+      <Route element={<MainLayout />}>
         <Route path="/" element={<Navigate to="/agreements" replace />} />
         <Route path="/new-agreement" element={<AgreementForm />} />
         <Route path="/company-moa" element={<CompanyMOAForm />} />
