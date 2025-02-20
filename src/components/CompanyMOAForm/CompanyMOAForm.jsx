@@ -31,6 +31,7 @@ const CompanyMOAForm = ({ onUpdate }) => {
   const [notification, setNotification] = useState(null);
 
   const companyTypes = [
+    'SALES/MARKETING',
     'BPO',
     'INSURANCE',
     'ENGINEERING SERVICES',
