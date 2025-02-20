@@ -19,7 +19,6 @@ const EditCompanyModal = ({ company, onClose, onUpdate }) => {
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [dateError, setDateError] = useState('');
 
   const companyTypes = [
     'BPO',
@@ -64,45 +63,10 @@ const EditCompanyModal = ({ company, onClose, onUpdate }) => {
       return;
     }
 
-    if (name === 'moaExpirationDate') {
-      try {
-        const dateValue = new Date(value);
-        if (isNaN(dateValue.getTime())) {
-          setDateError('Please enter a valid date');
-          return;
-        }
-        setDateError('');
-      } catch (error) {
-        setDateError('Invalid date format');
-        return;
-      }
-    }
-
     setFormData(prev => ({
       ...prev,
       [name]: value
     }));
-
-    if (name === 'moaValidity' && value && formData.withExpiration) {
-      try {
-        const today = new Date();
-        if (!isNaN(parseInt(value))) {
-          const expirationDate = new Date(today);
-          expirationDate.setFullYear(today.getFullYear() + parseInt(value));
-          
-          const formattedDate = expirationDate.toISOString().split('T')[0];
-          
-          setFormData(prev => ({
-            ...prev,
-            [name]: value,
-            moaExpirationDate: formattedDate
-          }));
-        }
-      } catch (error) {
-        console.error('Error calculating expiration date:', error);
-        setDateError('Error calculating expiration date');
-      }
-    }
   };
 
   const handleSubmit = async (e) => {
@@ -111,15 +75,11 @@ const EditCompanyModal = ({ company, onClose, onUpdate }) => {
 
     try {
       const companyRef = doc(db, 'companyMOA', company.id);
-      await updateDoc(companyRef, {
-        ...formData,
-        updatedAt: new Date().toISOString()
-      });
-
+      await updateDoc(companyRef, formData);
       onUpdate('Company updated successfully');
       onClose();
     } catch (error) {
-      onUpdate('Error updating company: ' + error.message, 'error');
+      console.error('Error updating company MOA:', error);
     } finally {
       setIsSubmitting(false);
     }
@@ -245,18 +205,15 @@ const EditCompanyModal = ({ company, onClose, onUpdate }) => {
 
             <div className="form-group">
               <label htmlFor="moaExpirationDate">Expiration Date</label>
-              <div className="date-input-container">
-                <input
-                  type="date"
-                  id="moaExpirationDate"
-                  name="moaExpirationDate"
-                  value={formData.moaExpirationDate}
-                  className={`readonly-input ${dateError ? 'error' : ''}`}
-                  readOnly
-                  disabled={!formData.withExpiration}
-                />
-                {dateError && <div className="date-error-tooltip">{dateError}</div>}
-              </div>
+              <input
+                type="date"
+                id="moaExpirationDate"
+                name="moaExpirationDate"
+                value={formData.moaExpirationDate}
+                onChange={handleChange}
+                required={formData.withExpiration}
+                disabled={!formData.withExpiration}
+              />
             </div>
           </div>
 

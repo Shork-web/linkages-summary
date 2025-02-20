@@ -4,7 +4,7 @@ import { collection, addDoc } from 'firebase/firestore';
 import Notification from '../Notification/Notification';
 import './CompanyMOAForm.css';
 
-const CompanyMOAForm = () => {
+const CompanyMOAForm = ({ onUpdate }) => {
   console.log('CompanyMOAForm component rendering');
 
   useEffect(() => {
@@ -71,29 +71,6 @@ const CompanyMOAForm = () => {
       ...prev,
       [name]: value
     }));
-
-    // Calculate expiration date when validity changes
-    if (name === 'moaValidity' && value && formData.withExpiration) {
-      try {
-        const validityYears = parseInt(value);
-        if (!isNaN(validityYears)) {
-          const today = new Date();
-          const expirationDate = new Date(today);
-          expirationDate.setFullYear(today.getFullYear() + validityYears);
-          
-          // Format date to YYYY-MM-DD
-          const formattedDate = expirationDate.toISOString().split('T')[0];
-          
-          setFormData(prev => ({
-            ...prev,
-            [name]: value,
-            moaExpirationDate: formattedDate
-          }));
-        }
-      } catch (error) {
-        console.error('Error calculating expiration date:', error);
-      }
-    }
   };
 
   const handleSubmit = async (e) => {
@@ -102,23 +79,9 @@ const CompanyMOAForm = () => {
     setError('');
 
     try {
-      // Validate required fields
-      if (!formData.companyName || !formData.companyAddress || !formData.companyType) {
-        throw new Error('Please fill in all required fields');
-      }
-
-      if (formData.withExpiration && (!formData.moaValidity || !formData.moaExpirationDate)) {
-        throw new Error('Please fill in validity and expiration date');
-      }
-
-      // Add document to Firestore
-      await addDoc(collection(db, 'companyMOA'), {
-        ...formData,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      });
-
-      // Reset form after successful submission
+      await addDoc(collection(db, 'companyMOA'), formData);
+      setNotification({ type: 'success', message: 'MOA submitted successfully!' });
+      onUpdate('Company MOA added successfully');
       setFormData({
         companyName: '',
         companyAddress: '',
@@ -132,23 +95,8 @@ const CompanyMOAForm = () => {
         moaExpirationDate: '',
         moaRemarks: ''
       });
-
-      setNotification({
-        message: 'Company MOA successfully added!',
-        type: 'success'
-      });
-
-      // Auto-dismiss notification after 3 seconds
-      setTimeout(() => {
-        setNotification(null);
-      }, 3000);
-
-    } catch (err) {
-      console.error('Error adding company MOA:', err);
-      setNotification({
-        message: err.message,
-        type: 'error'
-      });
+    } catch (error) {
+      setError('Error submitting MOA. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -295,8 +243,8 @@ const CompanyMOAForm = () => {
               id="moaExpirationDate"
               name="moaExpirationDate"
               value={formData.moaExpirationDate}
-              className="readonly-input"
-              readOnly
+              onChange={handleChange}
+              required={formData.withExpiration}
               disabled={!formData.withExpiration}
             />
           </div>
