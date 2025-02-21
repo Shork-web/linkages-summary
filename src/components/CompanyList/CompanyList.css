@@ -17,6 +17,7 @@
 .company-table-container {
   max-height: 70vh;
   overflow-y: auto;
+  overflow-x: auto;
   margin-top: 20px;
   padding-right: 5px;
   border-radius: 8px;
@@ -90,44 +91,59 @@
   border-collapse: collapse;
   margin-bottom: 20px;
   min-width: 1500px;
+  border: none;
 }
 
 .company-table th,
 .company-table td {
   padding: 12px 15px;
   text-align: left;
-  border-bottom: 1px solid #ddd;
+  border: none;
+  border-bottom: 1px solid #e0e0e0;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .company-table th {
-  background-color: #f8f8f8;
-  color: #333;
-  font-weight: 600;
-  padding: 12px 20px;
   position: sticky;
   top: 0;
   z-index: 1;
   background: white;
-  border-bottom: 2px solid #8B3A2B;
+  background-color: #f8f9fa;
+  color: #495057;
+  font-weight: 600;
+  border-bottom: 2px solid #dee2e6;
 }
 
-/* Column widths */
-.company-table th:nth-child(1) { width: 15%; }
-.company-table th:nth-child(2) { width: 22%; }
+/* Remove the last row's bottom border */
+.company-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Remove border from actions column */
+.company-table th:last-child,
+.company-table td:last-child {
+  border-right: none;
+}
+
+/* Keep hover effect */
+.company-table tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+/* Update Column widths */
+.company-table th:nth-child(1) { width: 25%; }  /* Increased company name width from 15% to 20% */
+.company-table th:nth-child(2) { width: 20%; }  /* Adjusted address width to maintain balance */
 .company-table th:nth-child(3) { width: 8%; }
 .company-table th:nth-child(4) { width: 8%; }
-.company-table th:nth-child(5) { width: 6%; }
-.company-table th:nth-child(6) { width: 8%; }
+.company-table th:nth-child(5) { width: 10%; }
+.company-table th:nth-child(6) { width: 15%; }
 .company-table th:nth-child(7) { width: 12%; }
 .company-table th:nth-child(8) { width: 8%; }
 .company-table th:nth-child(9) { width: 6%; }
-.company-table th:nth-child(10) { width: 18%; }
+.company-table th:nth-child(10) { width: 15%; }  /* Adjusted remarks width */
 .company-table th:nth-child(11) { width: 6%; }
-
-.company-table tbody tr:hover {
-  background-color: rgba(139, 58, 43, 0.05);
-}
 
 .company-status-badge {
   padding: 4px 8px;
@@ -249,19 +265,20 @@
   }
 }
 
-/* Scrollbar styling */
+/* Update scrollbar styles to be thinner */
 .company-table-container::-webkit-scrollbar {
-  width: 12px;
+  width: 6px;  /* Reduced from 12px to 6px */
+  height: 6px; /* Also make horizontal scrollbar thinner */
 }
 
 .company-table-container::-webkit-scrollbar-track {
   background: #f1f1f1;
-  border-radius: 10px;
+  border-radius: 3px; /* Reduced from 10px to 3px */
 }
 
 .company-table-container::-webkit-scrollbar-thumb {
   background: #8B3A2B;
-  border-radius: 10px;
+  border-radius: 3px; /* Reduced from 10px to 3px */
 }
 
 .company-table-container::-webkit-scrollbar-thumb:hover {
@@ -270,13 +287,13 @@
 
 /* For Firefox */
 .company-table-container {
-  scrollbar-width: auto;
+  scrollbar-width: thin; /* Changed from 'auto' to 'thin' */
   scrollbar-color: #8B3A2B #f1f1f1;
 }
 
 /* Keep horizontal scrollbar visible */
 .company-table-container::-webkit-scrollbar:horizontal {
-  height: 12px;
+  height: 6px;
   display: block;
 }
 
@@ -349,17 +366,18 @@
 
 /* Custom scrollbar styles */
 .company-table-container::-webkit-scrollbar {
-  width: 12px;
+  width: 6px;
+  height: 6px;
 }
 
 .company-table-container::-webkit-scrollbar-track {
   background: #f1f1f1;
-  border-radius: 10px;
+  border-radius: 3px;
 }
 
 .company-table-container::-webkit-scrollbar-thumb {
   background: #8B3A2B;
-  border-radius: 10px;
+  border-radius: 3px;
 }
 
 .company-table-container::-webkit-scrollbar-thumb:hover {
@@ -368,7 +386,7 @@
 
 /* For Firefox */
 .company-table-container {
-  scrollbar-width: auto;
+  scrollbar-width: thin;
   scrollbar-color: #8B3A2B #f1f1f1;
 }
 
@@ -623,12 +641,14 @@
 
 .company-list-table {
   width: 100%;
+  min-width: 1500px;
   border-collapse: collapse;
+  margin-bottom: 20px;
 }
 
 .company-list-table th,
 .company-list-table td {
-  border: 1px solid #ddd; /* Add border to create dividers */
+  border: none;
   padding: 8px;
   text-align: left;
 }
@@ -637,10 +657,11 @@
   background-color: #f2f2f2;
   color: #333;
   font-weight: 600;
+  border-bottom: 2px solid #dee2e6;
 }
 
-.company-list-table tr:nth-child(even) {
-  background-color: #f9f9f9;
+.company-list-table tr:not(:last-child) td {
+  border-bottom: 1px solid #eee;
 }
 
 .company-list-table tr:hover {
@@ -660,17 +681,18 @@
 
 /* Custom scrollbar styles */
 .table-container::-webkit-scrollbar {
-  width: 12px;
+  width: 6px;
+  height: 6px;
 }
 
 .table-container::-webkit-scrollbar-track {
   background: #f1f1f1;
-  border-radius: 10px;
+  border-radius: 3px;
 }
 
 .table-container::-webkit-scrollbar-thumb {
   background: #8B3A2B;
-  border-radius: 10px;
+  border-radius: 3px;
 }
 
 .table-container::-webkit-scrollbar-thumb:hover {
@@ -679,13 +701,13 @@
 
 /* For Firefox */
 .table-container {
-  scrollbar-width: auto;
+  scrollbar-width: thin;
   scrollbar-color: #8B3A2B #f1f1f1;
 }
 
 /* Keep horizontal scrollbar visible */
 .table-container::-webkit-scrollbar:horizontal {
-  height: 12px;
+  height: 6px;
   display: block;
 }
 
@@ -828,4 +850,114 @@
   .company-filter-select {
     width: 100%;
   }
+}
+
+.notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 16px 24px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 300px;
+  max-width: 450px;
+  animation: slideIn 0.3s ease-out;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.notification.success {
+  background-color: #E8F5E9;
+  border: 1px solid #2E7D32;
+  color: #2E7D32;
+}
+
+.notification.error {
+  background-color: #FFEBEE;
+  border: 1px solid #C62828;
+  color: #C62828;
+}
+
+.notification-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.notification-content i {
+  font-size: 1.2em;
+}
+
+.notification-close {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  padding: 4px;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.notification-close:hover {
+  opacity: 1;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Update the address cell and tooltip styles */
+.company-list-table td.address-cell {
+  max-width: 300px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  position: relative;
+  cursor: help;
+}
+
+.address-cell[data-tooltip] {
+  position: relative;
+}
+
+.address-cell[data-tooltip]:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 120%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  white-space: normal;
+  max-width: 400px;
+  width: max-content;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  pointer-events: none;
+}
+
+/* Add arrow to tooltip */
+.address-cell[data-tooltip]:hover::before {
+  content: '';
+  position: absolute;
+  bottom: 110%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 6px;
+  border-style: solid;
+  border-color: rgba(0, 0, 0, 0.9) transparent transparent transparent;
+  pointer-events: none;
 } 

@@ -250,7 +250,7 @@ const EditCompanyModal = ({ company, onClose, onUpdate }) => {
         updatedAt: new Date().toISOString()
       });
 
-      onUpdate();
+      onUpdate('Company details updated successfully');
       onClose();
     } catch (error) {
       console.error('Error updating document: ', error);
