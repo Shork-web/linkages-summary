@@ -197,20 +197,8 @@ const DepartmentList = () => {
                     {department.moaStatus}
                   </span>
                 </td>
-                <td className="address-cell" data-tooltip={department.college || ''}>
-                  {department.college 
-                    ? (department.college.length > 50 
-                        ? department.college.substring(0, 50) + '...' 
-                        : department.college)
-                    : ''}
-                </td>
-                <td className="address-cell" data-tooltip={department.department || ''}>
-                  {department.department 
-                    ? (department.department.length > 50 
-                        ? department.department.substring(0, 50) + '...' 
-                        : department.department)
-                    : ''}
-                </td>
+                <td>{department.college || ''}</td>
+                <td>{department.department || ''}</td>
                 <td className="dept-action-buttons">
                   <button 
                     className="dept-edit-button"
