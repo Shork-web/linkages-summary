@@ -1,10 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { subscribeToAgreements } from '../../utils/fetchAgreements';
 import './ExpiredAgreements.css';
+import ExcelExport from '../ExcelExport/ExcelExport';
 
 const ExpiredAgreements = () => {
   const [agreements, setAgreements] = useState([]);
   const [expandedDescriptions, setExpandedDescriptions] = useState(new Set());
+  const [filters, setFilters] = useState({
+    search: '',
+    type: '',
+    partnerType: ''
+  });
 
   useEffect(() => {
     const unsubscribe = subscribeToAgreements((fetchedAgreements) => {
@@ -16,6 +22,35 @@ const ExpiredAgreements = () => {
     });
     return () => unsubscribe();
   }, []);
+
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    setFilters(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  // Filter agreements based on search and type
+  const filteredAgreements = agreements.filter(agreement => {
+    const searchTerm = filters.search.toLowerCase().trim();
+    
+    const matchesSearch = [
+      agreement.name,
+      agreement.address,
+      agreement.signedBy,
+      agreement.designation,
+      agreement.description,
+      agreement.agreementType,
+      agreement.partnerType
+    ].some(field => 
+      String(field || '').toLowerCase().includes(searchTerm)
+    );
+
+    const matchesType = !filters.type || agreement.agreementType === filters.type;
+
+    return matchesSearch && matchesType;
+  });
 
   const toggleDescription = (id) => {
     setExpandedDescriptions(prev => {
@@ -40,15 +75,23 @@ const ExpiredAgreements = () => {
             <i className="fas fa-search"></i>
             <input 
               type="text" 
+              name="search"
+              value={filters.search}
+              onChange={handleFilterChange}
               placeholder="Search expired agreements..."
             />
           </div>
           <div className="filter-group">
-            <select defaultValue="">
+            <select
+              name="type"
+              value={filters.type}
+              onChange={handleFilterChange}
+            >
               <option value="">All Types</option>
               <option value="MOU">MOU</option>
               <option value="MOA">MOA</option>
             </select>
+            <ExcelExport agreements={filteredAgreements} />
           </div>
         </div>
       </div>
@@ -72,8 +115,8 @@ const ExpiredAgreements = () => {
             </tr>
           </thead>
           <tbody>
-            {agreements.length > 0 ? (
-              agreements.map(agreement => (
+            {filteredAgreements.length > 0 ? (
+              filteredAgreements.map(agreement => (
                 <tr key={agreement.id} className="expired">
                   <td>{agreement.name}</td>
                   <td>{agreement.address}</td>
@@ -128,8 +171,12 @@ const ExpiredAgreements = () => {
                 <td colSpan="12">
                   <div className="empty-state">
                     <i className="fas fa-times-circle"></i>
-                    <p>No expired agreements</p>
-                    <p className="empty-subtitle">All agreements are currently valid</p>
+                    <p>No expired agreements found</p>
+                    <p className="empty-subtitle">
+                      {filters.search || filters.type ? 
+                        'Try adjusting your filters' : 
+                        'All agreements are currently valid'}
+                    </p>
                   </div>
                 </td>
               </tr>

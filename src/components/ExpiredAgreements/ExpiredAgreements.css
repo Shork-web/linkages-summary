@@ -58,4 +58,107 @@
 .table-container {
   scrollbar-width: auto;
   scrollbar-color: #8B3A2B #f1f1f1;
+}
+
+/* Update header controls to accommodate export button */
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 60px;
+  flex-wrap: wrap;
+}
+
+.filter-group {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+/* Style for the export button container */
+.excel-export-btn {
+  background-color: #217346;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.excel-export-btn:hover {
+  background-color: #1a5c38;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.excel-export-btn i {
+  font-size: 1.1rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .header-controls {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .filter-group {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .excel-export-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Update search box styles */
+.search-box input {
+  width: 100%;
+  padding: 8px 8px 8px 35px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 13px;
+  transition: all 0.3s ease;
+}
+
+.search-box input:focus {
+  border-color: #C62828;
+  box-shadow: 0 0 0 2px rgba(198, 40, 40, 0.1);
+  outline: none;
+}
+
+/* Update filter select styles */
+.filter-group select {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 13px;
+  min-width: 150px;
+  cursor: pointer;
+  background-color: white;
+  transition: all 0.2s ease;
+}
+
+.filter-group select:hover {
+  border-color: #C62828;
+}
+
+.filter-group select:focus {
+  border-color: #C62828;
+  box-shadow: 0 0 0 2px rgba(198, 40, 40, 0.1);
+  outline: none;
+}
+
+/* Update empty state message */
+.empty-subtitle {
+  color: #666;
+  font-size: 0.9em;
+  margin-top: 5px;
 } 
