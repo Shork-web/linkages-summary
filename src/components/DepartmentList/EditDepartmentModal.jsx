@@ -61,11 +61,6 @@ const EditDepartmentModal = ({ department, onClose, onUpdate }) => {
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [collegeSuggestions, setCollegeSuggestions] = useState([]);
-  const [departmentSuggestions, setDepartmentSuggestions] = useState([]);
-  const [showCollegeDropdown, setShowCollegeDropdown] = useState(false);
-  const [showDepartmentDropdown, setShowDepartmentDropdown] = useState(false);
-  const [notification, setNotification] = useState(null);
 
   useEffect(() => {
     if (department) {
@@ -78,42 +73,12 @@ const EditDepartmentModal = ({ department, onClose, onUpdate }) => {
     }
   }, [department]);
 
-  const handleCollegeChange = (e) => {
-    const value = e.target.value;
-    setFormData(prev => ({ ...prev, college: value, department: '' }));
-    
-    const filtered = Object.keys(COLLEGES).filter(college =>
-      college.toLowerCase().includes(value.toLowerCase())
-    );
-    setCollegeSuggestions(filtered);
-    setShowCollegeDropdown(true);
-  };
-
-  const handleCollegeSelect = (college) => {
+  const handleChange = (e) => {
+    const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      college: college,
-      department: '' // Reset department when college changes
+      [name]: value
     }));
-    setShowCollegeDropdown(false);
-    setCollegeSuggestions([]);
-  };
-
-  const handleCollegeFocus = () => {
-    setShowCollegeDropdown(true);
-    setCollegeSuggestions(Object.keys(COLLEGES));
-  };
-
-  const handleDepartmentChange = (e) => {
-    const value = e.target.value;
-    setFormData(prev => ({ ...prev, department: value }));
-    
-    const programs = getProgramsByCollege(formData.college) || [];
-    const filtered = programs.filter(program =>
-      program.toLowerCase().includes(value.toLowerCase())
-    );
-    setDepartmentSuggestions(filtered);
-    setShowDepartmentDropdown(true);
   };
 
   const handleSubmit = async (e) => {
@@ -122,19 +87,11 @@ const EditDepartmentModal = ({ department, onClose, onUpdate }) => {
 
     try {
       const departmentRef = doc(db, 'companyMOA', department.id);
-      await updateDoc(departmentRef, {
-        ...formData,
-        updatedAt: new Date().toISOString()
-      });
-
-      onUpdate(`${formData.companyName} has been updated successfully`);
+      await updateDoc(departmentRef, formData);
+      onUpdate('Department updated successfully');
       onClose();
     } catch (error) {
       console.error('Error updating department:', error);
-      setNotification({
-        type: 'error',
-        message: 'Failed to update department'
-      });
     } finally {
       setIsSubmitting(false);
     }
@@ -142,35 +99,32 @@ const EditDepartmentModal = ({ department, onClose, onUpdate }) => {
 
   return (
     <div className="dept-modal-overlay">
-      {notification && (
-        <div className={`dept-notification ${notification.type}`}>
-          {notification.message}
-        </div>
-      )}
       <div className="dept-edit-modal">
         <div className="dept-modal-header">
           <h2>Edit Department</h2>
-          <button className="dept-close-button" onClick={onClose}>×</button>
+          <button className="dept-close-button" onClick={onClose}>
+            <i className="fas fa-times"></i>
+          </button>
         </div>
-
         <form onSubmit={handleSubmit}>
           <div className="dept-form-group">
             <label>Company Name</label>
             <input
               type="text"
+              name="companyName"
               value={formData.companyName}
-              disabled
+              onChange={handleChange}
+              required
             />
           </div>
 
           <div className="dept-form-group">
-            <label>Status</label>
+            <label>MOA Status</label>
             <select
+              name="moaStatus"
               value={formData.moaStatus}
-              onChange={(e) => setFormData(prev => ({
-                ...prev,
-                moaStatus: e.target.value
-              }))}
+              onChange={handleChange}
+              required
             >
               <option value="Active">Active</option>
               <option value="For-Update">For Update</option>
@@ -180,63 +134,33 @@ const EditDepartmentModal = ({ department, onClose, onUpdate }) => {
 
           <div className="dept-form-group">
             <label>College</label>
-            <div className="dept-type-autocomplete">
-              <input
-                type="text"
-                value={formData.college}
-                onChange={handleCollegeChange}
-                onFocus={handleCollegeFocus}
-                onBlur={() => {
-                  setTimeout(() => {
-                    setShowCollegeDropdown(false);
-                  }, 200);
-                }}
-                placeholder="Select a college..."
-              />
-              {showCollegeDropdown && collegeSuggestions.length > 0 && (
-                <div className="dept-suggestions-list">
-                  {collegeSuggestions.map((college) => (
-                    <div
-                      key={college}
-                      className="dept-suggestion-item"
-                      onMouseDown={(e) => {
-                        e.preventDefault();
-                        handleCollegeSelect(college);
-                      }}
-                    >
-                      {college}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+            <select
+              name="college"
+              value={formData.college}
+              onChange={handleChange}
+              required
+            >
+              <option value="">Select a college</option>
+              {Object.keys(COLLEGES).map(college => (
+                <option key={college} value={college}>{college}</option>
+              ))}
+            </select>
           </div>
 
           <div className="dept-form-group">
             <label>Department</label>
-            <input
-              type="text"
+            <select
+              name="department"
               value={formData.department}
-              onChange={handleDepartmentChange}
+              onChange={handleChange}
+              required
               disabled={!formData.college}
-              placeholder={formData.college ? "Select a department..." : "Select a college first"}
-            />
-            {showDepartmentDropdown && departmentSuggestions.length > 0 && (
-              <div className="dept-suggestions-list">
-                {departmentSuggestions.map((dept) => (
-                  <div
-                    key={dept}
-                    className="dept-suggestion-item"
-                    onClick={() => {
-                      setFormData(prev => ({ ...prev, department: dept }));
-                      setShowDepartmentDropdown(false);
-                    }}
-                  >
-                    {dept}
-                  </div>
-                ))}
-              </div>
-            )}
+            >
+              <option value="">Select a department</option>
+              {getProgramsByCollege(formData.college).map(dept => (
+                <option key={dept} value={dept}>{dept}</option>
+              ))}
+            </select>
           </div>
 
           <div className="dept-modal-actions">

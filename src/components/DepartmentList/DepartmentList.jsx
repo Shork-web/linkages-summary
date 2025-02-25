@@ -2,14 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { collection, deleteDoc, doc, onSnapshot } from 'firebase/firestore';
 import { db } from '../../firebase-config';
 import EditDepartmentModal from './EditDepartmentModal';
+import ExportToExcel from './ExportToExcel';
 import './DepartmentList.css';
 
 const DepartmentList = () => {
   const [departments, setDepartments] = useState([]);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingDepartment, setEditingDepartment] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState('');
   const [filters, setFilters] = useState({
     status: '',
@@ -82,45 +81,6 @@ const DepartmentList = () => {
     .filter(Boolean)
     .sort((a, b) => a.localeCompare(b));
 
-  // Get current departments for pagination
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentDepartments = filteredDepartments.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(filteredDepartments.length / itemsPerPage);
-
-  // Update the pagination section
-  const getPageNumbers = () => {
-    const pageNumbers = [];
-    if (totalPages <= 7) {
-      for (let i = 1; i <= totalPages; i++) {
-        pageNumbers.push(i);
-      }
-    } else {
-      if (currentPage <= 4) {
-        for (let i = 1; i <= 5; i++) {
-          pageNumbers.push(i);
-        }
-        pageNumbers.push('...');
-        pageNumbers.push(totalPages);
-      } else if (currentPage >= totalPages - 3) {
-        pageNumbers.push(1);
-        pageNumbers.push('...');
-        for (let i = totalPages - 4; i <= totalPages; i++) {
-          pageNumbers.push(i);
-        }
-      } else {
-        pageNumbers.push(1);
-        pageNumbers.push('...');
-        for (let i = currentPage - 1; i <= currentPage + 1; i++) {
-          pageNumbers.push(i);
-        }
-        pageNumbers.push('...');
-        pageNumbers.push(totalPages);
-      }
-    }
-    return pageNumbers;
-  };
-
   const handleDelete = async () => {
     try {
       await deleteDoc(doc(db, 'companyMOA', deleteConfirm.departmentId));
@@ -163,7 +123,10 @@ const DepartmentList = () => {
           {notification.message}
         </div>
       )}
-      <h2>Department List</h2>
+      <div className="dept-list-header">
+        <h2>Department List</h2>
+        <ExportToExcel data={filteredDepartments} />
+      </div>
 
       {/* Search and Filter Section */}
       <div className="dept-filters-section">
@@ -226,22 +189,16 @@ const DepartmentList = () => {
             </tr>
           </thead>
           <tbody>
-            {currentDepartments.map(department => (
+            {filteredDepartments.map(department => (
               <tr key={department.id}>
-                <td data-full-text={department.companyName}>
-                  {department.companyName}
-                </td>
+                <td>{department.companyName}</td>
                 <td>
                   <span className={`dept-status-badge dept-status-${department.moaStatus.toLowerCase()}`}>
                     {department.moaStatus}
                   </span>
                 </td>
-                <td data-full-text={department.college}>
-                  {department.college}
-                </td>
-                <td data-full-text={department.department}>
-                  {department.department}
-                </td>
+                <td>{department.college || ''}</td>
+                <td>{department.department || ''}</td>
                 <td className="dept-action-buttons">
                   <button 
                     className="dept-edit-button"
@@ -262,43 +219,6 @@ const DepartmentList = () => {
             ))}
           </tbody>
         </table>
-      </div>
-
-      {/* Update pagination section */}
-      <div className="dept-pagination">
-        <button
-          onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-          disabled={currentPage === 1}
-          className="dept-page-btn"
-        >
-          <i className="fas fa-chevron-left"></i>
-        </button>
-
-        {getPageNumbers().map((number, index) => (
-          number === '...' ? (
-            <span key={index} className="dept-page-ellipsis">...</span>
-          ) : (
-            <button
-              key={index}
-              className={`dept-page-btn ${currentPage === number ? 'active' : ''}`}
-              onClick={() => setCurrentPage(number)}
-            >
-              {number}
-            </button>
-          )
-        ))}
-
-        <button
-          onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-          disabled={currentPage === totalPages}
-          className="dept-page-btn"
-        >
-          <i className="fas fa-chevron-right"></i>
-        </button>
-      </div>
-
-      <div className="dept-page-info">
-        Page {currentPage} of {totalPages}
       </div>
 
       {deleteConfirm.show && (

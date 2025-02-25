@@ -112,11 +112,12 @@
   border-collapse: collapse;
   margin-bottom: 20px;
   min-width: 1200px;
+  border: none;
 }
 
 .agreements-table th,
 .agreements-table td {
-  border: 1px solid #ddd;
+  border: none;
   padding: 8px;
   text-align: left;
 }
@@ -126,14 +127,15 @@
   color: #333;
   font-weight: 600;
   padding: 12px 20px;
+  border: none;
 }
 
 .agreements-table tr:nth-child(even) {
-  background-color: #f9f9f9;
+  background-color: transparent;
 }
 
 .agreements-table tr:hover {
-  background-color: #f1f1f1;
+  background-color: #f5f5f5;
 }
 
 .agreements-table th:nth-child(1),
@@ -931,4 +933,14 @@ main {
 .partner-type-badge.Government {
   background-color: #FFF3E0;
   color: #F57C00;
+}
+
+/* Remove all borders using !important */
+.agreements-table,
+.agreements-table thead,
+.agreements-table tbody,
+.agreements-table tr,
+.agreements-table th,
+.agreements-table td {
+  border: none !important;
 } 

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { collection, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '../../firebase-config';
-import Notification from '../Notification/Notification';
 import EditCompanyModal from './EditCompanyModal';
 import './CompanyList.css';
 
@@ -173,12 +172,12 @@ const CompanyList = () => {
     });
   };
 
-  const handleUpdate = (message, type = 'success') => {
+  const handleUpdate = (message) => {
     setNotification({
-      message,
-      type
+      type: 'success',
+      message: message || 'Company updated successfully' // Provide fallback message
     });
-    setTimeout(() => setNotification(null), 3000);
+    setTimeout(() => setNotification(null), 3000); // Hide notification after 3 seconds
   };
 
   if (loading) {
@@ -188,11 +187,15 @@ const CompanyList = () => {
   return (
     <div className="company-list-container">
       {notification && (
-        <Notification
-          message={notification.message}
-          type={notification.type}
-          onClose={() => setNotification(null)}
-        />
+        <div className={`notification ${notification.type}`}>
+          <div className="notification-content">
+            <i className={`fas ${notification.type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}`}></i>
+            <span>{notification.message}</span>
+          </div>
+          <button className="notification-close" onClick={() => setNotification(null)}>
+            <i className="fas fa-times"></i>
+          </button>
+        </div>
       )}
 
       {/* Delete Confirmation Modal */}

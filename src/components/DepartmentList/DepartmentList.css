@@ -15,42 +15,37 @@
 .dept-table-container {
   max-height: 70vh;
   overflow-y: auto;
+  overflow-x: hidden;
   margin-top: 20px;
   padding-right: 5px;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   background: white;
   position: relative;
-  overflow-x: auto;
 }
 
 .dept-table {
   width: 100%;
   border-collapse: collapse;
   margin-bottom: 20px;
-  min-width: 750px; /* Increased to prevent cramping */
-  table-layout: fixed; /* This ensures fixed column widths */
-}
-
-.dept-table th, 
-.dept-table td {
-  padding: 12px 15px;
-  text-align: left;
-  border-bottom: 1px solid #e0e0e0;
+  table-layout: fixed;
+  border: none;
 }
 
 .dept-table th {
   position: sticky;
   top: 0;
   z-index: 1;
-  background: white;
   background-color: #f8f9fa;
   color: #495057;
   font-weight: 600;
+  padding: 12px 15px;
+  text-align: left;
+  border: none;
 }
 
 .dept-table th:nth-child(1) {
-  width: 35%; /* Company Name - wider to accommodate longer names */
+  width: 30%; /* Company Name */
 }
 
 .dept-table th:nth-child(2) {
@@ -62,7 +57,7 @@
 }
 
 .dept-table th:nth-child(4) {
-  width: 15%; /* Department */
+  width: 20%; /* Department */
 }
 
 .dept-table th:nth-child(5) {
@@ -70,19 +65,18 @@
 }
 
 .dept-table td {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  border-bottom: 1px solid #e0e0e0;
+  padding: 12px 15px;
+  text-align: left;
+  border: none;
 }
 
 .dept-status-badge {
-  padding: 6px 12px;
-  border-radius: 4px;
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 12px;
   font-size: 0.85em;
   font-weight: 500;
-  display: inline-block;
-  text-align: center;
+  margin: 0 auto;
 }
 
 .dept-status-active {
@@ -102,55 +96,30 @@
 
 .dept-action-buttons {
   display: flex;
-  gap: 8px;
+  gap: 10px;
   justify-content: center;
-  border-bottom: none;
-  padding-bottom: 0;
-  padding-top: 8px;
-  align-items: flex-end;
-  height: 100%;
+  align-items: center;
 }
 
-.dept-edit-button,
+.dept-edit-button, 
 .dept-delete-button {
-  padding: 6px;
   background: none;
   border: none;
   cursor: pointer;
-  transition: all 0.3s ease;
+  color: #8B3A2B;
+  font-size: 1.2em;
+  transition: color 0.2s;
+  padding: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 4px;
-  width: 29px;
-  height: 29px;
-  margin-bottom: 2.99px;
+  width: 32px;
+  height: 32px;
 }
 
-.dept-edit-button {
-  color: #8B3A2B;
-  background-color: rgba(139, 58, 43, 0.1);
-}
-
-.dept-delete-button {
-  color: #DC3545;
-  background-color: rgba(220, 53, 69, 0.1);
-}
-
-.dept-edit-button:hover {
-  background-color: rgba(139, 58, 43, 0.2);
-}
-
+.dept-edit-button:hover, 
 .dept-delete-button:hover {
-  background-color: rgba(220, 53, 69, 0.2);
-}
-
-.dept-edit-button:hover {
-  color: #0d47a1;
-}
-
-.dept-delete-button:hover {
-  color: #b71c1c;
+  color: #7A3225;
 }
 
 .dept-filters-section {
@@ -258,44 +227,36 @@
   margin-top: 10px;
 }
 
-.dept-delete-confirmation-modal {
-  background: white;
-  padding: 25px;
-  border-radius: 10px;
-  width: 450px;
-  max-width: 90%;
-  text-align: center;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.dept-delete-confirmation-modal h3 {
-  color: #d32f2f;
-  margin-bottom: 20px;
-}
-
 .dept-notification {
   position: fixed;
   top: 20px;
   right: 20px;
-  padding: 15px 25px;
+  padding: 16px 24px;
   border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 300px;
+  max-width: 450px;
+  animation: slideIn 0.3s ease-out;
   z-index: 1000;
-  animation: deptSlideIn 0.3s ease-out;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .dept-notification.success {
-  background-color: #d4edda;
-  color: #155724;
-  border: 1px solid #c3e6cb;
+  background-color: #E8F5E9;
+  border: 1px solid #2E7D32;
+  color: #2E7D32;
 }
 
 .dept-notification.error {
-  background-color: #f8d7da;
-  color: #721c24;
-  border: 1px solid #f5c6cb;
+  background-color: #FFEBEE;
+  border: 1px solid #C62828;
+  color: #C62828;
 }
 
-@keyframes deptSlideIn {
+@keyframes slideIn {
   from {
     transform: translateX(100%);
     opacity: 0;
@@ -306,49 +267,103 @@
   }
 }
 
-.dept-table td {
-  position: relative;
+.dept-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.dept-delete-confirmation-modal {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 500px;
+  max-width: 90%;
+}
+
+.dept-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.dept-modal-header h2 {
+  margin: 0;
+  color: #8B3A2B;
+}
+
+.dept-close-button {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #666;
+}
+
+.dept-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.dept-modal-actions button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.dept-modal-actions .dept-delete-button {
+  background-color: #C62828;
+  color: white;
+}
+
+.dept-modal-actions .dept-delete-button:hover {
+  background-color: #B71C1C;
+}
+
+.dept-modal-actions .dept-cancel-button {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.dept-modal-actions .dept-cancel-button:hover {
+  background-color: #e0e0e0;
 }
 
 .dept-table td:hover::after {
-  content: attr(data-full-text);
-  position: absolute;
-  left: 0;
-  top: 100%;
-  background: #333;
-  color: white;
-  padding: 5px 10px;
-  border-radius: 4px;
-  z-index: 1000;
-  white-space: normal;
-  max-width: 300px;
   display: none;
-}
-
-.dept-table td[data-full-text]:hover::after {
-  display: block;
 }
 
 /* Remove border from actions column */
 .dept-table th:last-child,
 .dept-table td:last-child {
-  border-bottom: 1px solid #e0e0e0;
+  border-right: none;
 }
 
 /* Scrollbar styling */
 .dept-table-container::-webkit-scrollbar {
-  width: 12px;
-  height: 12px; /* For horizontal scrollbar */
+  width: 6px;
+  height: 6px;
 }
 
 .dept-table-container::-webkit-scrollbar-track {
   background: #f1f1f1;
-  border-radius: 10px;
+  border-radius: 3px;
 }
 
 .dept-table-container::-webkit-scrollbar-thumb {
   background: #8B3A2B;
-  border-radius: 10px;
+  border-radius: 3px;
 }
 
 .dept-table-container::-webkit-scrollbar-thumb:hover {
@@ -357,14 +372,13 @@
 
 /* For Firefox */
 .dept-table-container {
-  scrollbar-width: auto;
+  scrollbar-width: thin;
   scrollbar-color: #8B3A2B #f1f1f1;
 }
 
 /* Keep horizontal scrollbar visible */
 .dept-table-container::-webkit-scrollbar:horizontal {
-  height: 12px;
-  display: block;
+  display: none;
 }
 
 /* Make sure the company name column doesn't wrap */
@@ -372,4 +386,269 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-} 
+}
+
+/* Update the actions column width */
+.dept-table th:nth-child(5),
+.dept-table td:nth-child(5) {
+  width: 100px;
+  text-align: center;
+}
+
+/* Update hover effect for rows */
+.dept-table tbody tr:hover {
+  background-color: #f5f5f5;
+}
+
+/* Center the content in the status column */
+.dept-table td:nth-child(2) {
+  text-align: center;
+}
+
+/* Center the content in the actions column */
+.dept-table td:last-child {
+  text-align: center;
+}
+
+.dept-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.dept-export-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background-color: #8B3A2B;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.dept-export-button:hover {
+  background-color: #7A3225;
+}
+
+.dept-export-button i {
+  font-size: 16px;
+}
+
+@media (max-width: 768px) {
+  .dept-list-header {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .dept-export-button {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Remove all tooltip and cursor related styles */
+.dept-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border: none;
+  border-bottom: 1px solid #e0e0e0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Update horizontal scrollbar styles */
+.dept-table-container::-webkit-scrollbar:horizontal {
+  height: 6px;
+}
+
+.dept-table-container::-webkit-scrollbar-track:horizontal {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.dept-table-container::-webkit-scrollbar-thumb:horizontal {
+  background: #8B3A2B;
+  border-radius: 3px;
+}
+
+/* Update table cell styles for College and Department columns */
+.dept-table td:nth-child(3), /* College column */
+.dept-table td:nth-child(4) { /* Department column */
+  white-space: normal; /* Allow text to wrap */
+  overflow: visible; /* Show full content */
+  text-overflow: clip; /* Remove ellipsis */
+  word-wrap: break-word; /* Break long words if needed */
+  max-width: none; /* Remove max-width constraint */
+}
+
+/* Keep other columns with ellipsis */
+.dept-table td {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Remove last row border */
+.dept-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Update table header styles */
+.dept-table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background-color: #f8f9fa;
+  color: #495057;
+  font-weight: 600;
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 2px solid #dee2e6;
+}
+
+/* Remove any right borders */
+.dept-table th,
+.dept-table td {
+  border-right: none;
+}
+
+/* Ensure consistent border styling */
+.dept-table thead {
+  border-bottom: 2px solid #dee2e6;
+}
+
+/* Remove any conflicting border styles */
+.dept-table th:last-child {
+  border-right: none;
+}
+
+/* Remove any remaining borders */
+.dept-table thead,
+.dept-table tbody tr,
+.dept-table td {
+  border: none;
+}
+
+/* Update table styles - remove all borders */
+.dept-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+  table-layout: fixed;
+  border: none;
+}
+
+/* Update header styles - keep only bottom border */
+.dept-table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background-color: #f8f9fa;
+  color: #495057;
+  font-weight: 600;
+  padding: 12px 15px;
+  text-align: left;
+  border: none;
+  border-bottom: 2px solid #dee2e6;
+}
+
+/* Remove all borders from cells */
+.dept-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border: none;
+}
+
+/* Remove any remaining borders */
+.dept-table thead,
+.dept-table tbody tr,
+.dept-table td,
+.dept-table th:last-child,
+.dept-table td:last-child {
+  border: none;
+}
+
+/* Update hover effect for better visibility */
+.dept-table tbody tr:hover {
+  background-color: #f5f5f5;
+}
+
+/* Status column alignment */
+.dept-table td:nth-child(2) {
+  text-align: center;
+}
+
+/* College and Department columns */
+.dept-table td:nth-child(3),
+.dept-table td:nth-child(4) {
+  white-space: normal;
+  word-wrap: break-word;
+}
+
+/* Actions column */
+.dept-table td:last-child {
+  text-align: center;
+}
+
+/* Row hover effect */
+.dept-table tbody tr:hover {
+  background-color: #f5f5f5;
+}
+
+/* Base table styles */
+.dept-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+  table-layout: fixed;
+  border: none;
+}
+
+/* Header styles - no borders */
+.dept-table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background-color: #f8f9fa;
+  color: #495057;
+  font-weight: 600;
+  padding: 12px 15px;
+  text-align: left;
+  border: none;
+}
+
+/* Cell styles - no borders */
+.dept-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border: none;
+}
+
+/* Remove ALL borders */
+.dept-table,
+.dept-table thead,
+.dept-table tbody,
+.dept-table tr,
+.dept-table th,
+.dept-table td {
+  border: none !important;
+}
+
+/* Column widths */
+.dept-table th:nth-child(1) { width: 30%; } /* Company Name */
+.dept-table th:nth-child(2) { width: 15%; } /* Status */
+.dept-table th:nth-child(3) { width: 25%; } /* College */
+.dept-table th:nth-child(4) { width: 20%; } /* Department */
+.dept-table th:nth-child(5) { width: 10%; } /* Actions */
+
+/* Row hover effect for visual separation */
+.dept-table tbody tr:hover {
+  background-color: #f5f5f5;
+}
+
