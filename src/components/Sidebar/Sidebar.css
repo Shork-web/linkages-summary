@@ -1,6 +1,6 @@
 .sidebar {
-  width: clamp(180px, 16vw, 220px); /* Reduced from 220px-280px to 180px-220px */
-  min-height: 100vh;
+  width: clamp(180px, 16vw, 220px);
+  height: 100vh;
   background-color: #8B3A2B;
   color: white;
   position: fixed;
@@ -11,6 +11,7 @@
   box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
   z-index: 100;
+  overflow-y: auto;
 }
 
 .sidebar.collapsed {
@@ -38,8 +39,8 @@
 }
 
 .menu-item {
-  padding: 10px 12px; /* Reduced horizontal padding */
-  font-size: 12px; /* Slightly smaller font */
+  padding: 10px 12px;
+  font-size: 12px;
   display: flex;
   align-items: center;
   color: rgba(255, 255, 255, 0.85);
@@ -66,8 +67,8 @@
 }
 
 .menu-item i {
-  width: 20px; /* Smaller icon width */
-  margin-right: 6px; /* Reduced margin */
+  width: 20px;
+  margin-right: 6px;
   font-size: 15px;
   text-align: center;
 }
@@ -157,7 +158,9 @@
 
 .sidebar-nav {
   flex: 1;
-  padding: 20px 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
 }
 
 .sidebar-nav ul {
@@ -169,7 +172,7 @@
 }
 
 .nav-item {
-  padding: 10px 12px; /* Reduced horizontal padding */
+  padding: 10px 12px;
   font-size: 12px;
   display: flex;
   align-items: center;
@@ -255,7 +258,7 @@
   padding: 15px;
   background-color: #231309;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
-  margin-top: auto; /* Push to bottom */
+  margin-top: auto;
 }
 
 .sidebar-footer .nav-item {
@@ -302,51 +305,51 @@
 /* Responsive styles */
 @media screen and (max-width: 1200px) {
   .sidebar {
-    width: 180px; /* Reduced from 220px */
+    width: 180px;
   }
   .main-content {
     margin-left: 180px;
   }
 }
 
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 768px) and (min-width: 481px) {
   .sidebar {
     width: 60px;
   }
+  
+  .sidebar:hover {
+    width: 180px;
+  }
+  
+  .sidebar:hover .nav-item span {
+    display: inline;
+  }
+  
+  .sidebar .nav-item span {
+    display: none;
+  }
+  
   .main-content {
     margin-left: 60px;
   }
-  
-  .sidebar.collapsed {
-    width: 0;
-    overflow: hidden;
-  }
-  
-  .main-content.collapsed {
-    margin-left: 0;
-  }
 }
 
-/* For very small screens */
 @media screen and (max-width: 480px) {
   .sidebar {
     width: 100%;
     height: auto;
-    position: fixed;
-    bottom: 0;
-    top: auto;
-    transform: translateY(calc(100% - 60px));
-    transition: transform 0.3s ease;
+    max-height: 100vh;
+    overflow-y: auto;
   }
   
-  .sidebar:hover,
-  .sidebar:focus-within {
-    transform: translateY(0);
+  .sidebar.collapsed {
+    width: 60px;
+    height: 100vh;
   }
   
   .main-content {
     margin-left: 0;
-    margin-bottom: 60px;
+    margin-top: 60px;
   }
 }
 
@@ -385,4 +388,38 @@
 .locked-icon {
   margin-left: 5px;
   font-size: 12px;
+}
+
+/* Improve responsive behavior */
+@media screen and (max-height: 700px) {
+  .sidebar {
+    font-size: 0.9rem;
+  }
+  
+  .nav-item {
+    padding: 8px 12px;
+  }
+  
+  .section-title {
+    margin: 15px 0 8px;
+  }
+}
+
+/* Ensure the sidebar content is scrollable on smaller screens */
+.sidebar-nav::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sidebar-nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+}
+
+/* Make sure the sidebar footer stays at the bottom */
+.sidebar-footer {
+  margin-top: auto;
 } 
