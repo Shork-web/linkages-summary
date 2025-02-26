@@ -413,4 +413,12 @@ button.signup-button {
 
 button.signup-button:hover:not(:disabled) {
   background-color: #6d2e22;
+}
+
+.password-hint {
+  display: block;
+  color: #666;
+  font-size: 0.8rem;
+  margin-top: 5px;
+  font-style: italic;
 } 

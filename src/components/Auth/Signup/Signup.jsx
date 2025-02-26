@@ -228,8 +228,11 @@ const Signup = () => {
               onChange={handleChange}
               required
               minLength="8"
-              placeholder="Create a strong password"
+              placeholder="Min 8 chars with uppercase, number & symbol"
             />
+            <small className="password-hint">
+              Password must contain at least 8 characters including an uppercase letter, a number, and a special character.
+            </small>
           </div>
 
           <div className="form-group">
