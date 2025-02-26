@@ -55,8 +55,50 @@ service cloud.firestore {
         request.resource.data.remarks is string &&
         request.resource.data.updatedAt is string;
     }
-    match /accessKeys/{keyId} {
-      allow read: if true; // Allow anyone to read (since this is just an access key)
+    match /users/{userId} {
+      // Allow reading user data
+      allow read: if true;
+      
+      // Allow creation of new user accounts without requiring auth
+      allow create: if 
+        // Required fields
+        request.resource.data.keys().hasAll([
+          'uid',
+          'email', 
+          'firstName', 
+          'lastName', 
+          'role', 
+          'createdAt', 
+          'status',
+          'lastLogin',
+          'updatedAt'
+        ]) &&
+        // Field validations
+        request.resource.data.uid is string &&
+        request.resource.data.uid.size() > 0 &&
+        request.resource.data.email is string &&
+        request.resource.data.email.matches('^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$') &&
+        request.resource.data.firstName is string &&
+        request.resource.data.firstName.trim().size() > 0 &&
+        request.resource.data.lastName is string &&
+        request.resource.data.lastName.trim().size() > 0 &&
+        request.resource.data.role == 'user' &&
+        request.resource.data.status == 'active' &&
+        request.resource.data.createdAt is string &&
+        request.resource.data.updatedAt is string &&
+        request.resource.data.lastLogin == null;
+      
+      // Allow users to update their own data only when authenticated
+      allow update: if request.auth != null && 
+        request.auth.uid == resource.data.uid &&
+        request.resource.data.role == resource.data.role;
+      
+      allow delete: if false;
+    }
+
+    // Other collections require authentication
+    match /{collection}/{document=**} {
+      allow read, write: if request.auth != null;
     }
   }
 } 

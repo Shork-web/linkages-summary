@@ -1,32 +1,27 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import { auth } from '../../../firebase-config';
-import { 
-  signInWithEmailAndPassword, 
-  setPersistence, 
-  browserLocalPersistence,
-  onAuthStateChanged
-} from 'firebase/auth';
-import { useNavigate } from 'react-router-dom';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { db } from '../../../firebase-config';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import './Login.css';
 
 const Login = () => {
-  const email = 'ADMINNLO@gmail.com';
-  const [password, setPassword] = useState('');
+  const [formData, setFormData] = useState({
+    email: '',
+    password: ''
+  });
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  // Check authentication state on component mount
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        // User is signed in, redirect to home
-        navigate('/');
-      }
-    });
-
-    return () => unsubscribe();
-  }, [navigate]);
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -34,14 +29,61 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      // Set persistence to LOCAL
-      await setPersistence(auth, browserLocalPersistence);
-      // Then sign in
-      await signInWithEmailAndPassword(auth, email, password);
-      // No need to navigate here as onAuthStateChanged will handle it
-    } catch (err) {
-      console.error('Login error:', err);
-      setError('Invalid access key');
+      // Sign in with Firebase Auth
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        formData.email,
+        formData.password
+      );
+
+      // Get user data from Firestore
+      const userRef = doc(db, 'users', userCredential.user.uid);
+      const userSnap = await getDoc(userRef);
+
+      if (!userSnap.exists()) {
+        await auth.signOut();
+        throw new Error('User data not found');
+      }
+
+      const userData = userSnap.data();
+
+      // Check if user is active
+      if (userData.status !== 'active') {
+        await auth.signOut();
+        throw new Error('Account is not active');
+      }
+
+      // Update last login
+      await updateDoc(userRef, {
+        lastLogin: new Date().toISOString()
+      });
+
+      // Redirect based on user role
+      if (userData.role === 'user') {
+        navigate('/departments');
+      } else if (userData.role === 'admin' || userData.role === 'superadmin') {
+        navigate('/'); // Original routing for admin and superadmin
+      } else {
+        // Handle unexpected role
+        await auth.signOut();
+        throw new Error('Invalid user role');
+      }
+
+    } catch (error) {
+      console.error('Login error:', error);
+      let errorMessage = 'Invalid email or password';
+
+      if (error.code === 'auth/user-not-found') {
+        errorMessage = 'No account found with this email';
+      } else if (error.code === 'auth/wrong-password') {
+        errorMessage = 'Invalid password';
+      } else if (error.code === 'auth/too-many-requests') {
+        errorMessage = 'Too many failed attempts. Please try again later';
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -57,23 +99,48 @@ const Login = () => {
         {error && <div className="error-message">{error}</div>}
         <form onSubmit={handleLogin}>
           <div className="form-group">
-            <label htmlFor="password">Access Key:</label>
+            <label htmlFor="email">Email Address</label>
             <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              type="email"
+              id="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
               required
+              placeholder="Enter your email"
+              autoComplete="email"
             />
+          </div>
+          <div className="form-group">
+            <label htmlFor="password">Password</label>
+            <div className="password-input-group">
+              <input
+                type="password"
+                id="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+                placeholder="Enter your password"
+                autoComplete="current-password"
+              />
+            </div>
           </div>
           <button 
             type="submit" 
             className={`login-button ${isLoading ? 'loading' : ''}`}
             disabled={isLoading}
           >
-            {isLoading ? 'Logging in...' : 'Login'}
+            {isLoading ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
+        <div className="auth-switch">
+          <p>Don't have an account?</p>
+          <Link to="/signup" className="switch-button">
+            Create Account
+            <i className="fas fa-arrow-right"></i>
+          </Link>
+        </div>
       </div>
     </div>
   );

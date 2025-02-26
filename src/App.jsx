@@ -2,6 +2,7 @@ import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import MainLayout from './components/MainLayout/MainLayout';
 import Login from './components/Auth/Login/Login';
+import Signup from './components/Auth/Signup/Signup';
 import AgreementForm from './components/AgreementForm/AgreementForm';
 import CompanyMOAForm from './components/CompanyMOAForm/CompanyMOAForm';
 import AllAgreements from './components/AllAgreements/AllAgreements';
@@ -17,8 +18,9 @@ import './App.css';
 function App() {
   return (
     <Routes>
-      {/* Public Route */}
+      {/* Public Routes */}
       <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<Signup />} />
 
       {/* Protected Routes */}
       <Route element={<MainLayout />}>

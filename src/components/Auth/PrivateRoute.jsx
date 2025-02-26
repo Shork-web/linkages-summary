@@ -1,37 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
+// eslint-disable-next-line no-unused-vars
 import { auth } from '../../firebase-config';
 import './PrivateRoute.css';
 
 const PrivateRoute = ({ children }) => {
-  const [authChecked, setAuthChecked] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const location = useLocation();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
+    const unsubscribe = auth.onAuthStateChanged(user => {
       setIsAuthenticated(!!user);
-      setAuthChecked(true);
+      setLoading(false);
     });
-
-    // Cleanup subscription
+    
     return () => unsubscribe();
   }, []);
 
-  if (!authChecked) {
-    return (
-      <div className="auth-loading">
-        <div className="loader"></div>
-        <p>Loading...</p>
-      </div>
-    );
+  if (loading) {
+    return <div>Loading...</div>; // Or a loading spinner
   }
-
+  
   if (!isAuthenticated) {
-    // Redirect to login while saving the attempted location
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    return <Navigate to="/login" />;
   }
-
+  
   return children;
 };
 

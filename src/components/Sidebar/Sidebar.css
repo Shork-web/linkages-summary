@@ -370,4 +370,19 @@
 /* Optional: Add hover effect for better visibility */
 .nav-section:hover .section-title {
   color: rgba(255, 255, 255, 0.9);
+}
+
+.sidebar-menu-item.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.disabled-text {
+  text-decoration: none;
+  color: #888;
+}
+
+.locked-icon {
+  margin-left: 5px;
+  font-size: 12px;
 } 
