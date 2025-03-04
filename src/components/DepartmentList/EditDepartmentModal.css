@@ -273,4 +273,35 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* Add status badge styling for the edit modal */
+.dept-status-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.dept-status-active {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.dept-status-for-update {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.dept-status-blacklisted {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.dept-status-on {
+  background-color: #fff3cd;
+  color: #856404;
 } 

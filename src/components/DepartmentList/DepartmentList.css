@@ -72,26 +72,32 @@
 
 .dept-status-badge {
   display: inline-block;
-  padding: 3px 6px;
-  border-radius: 10px;
-  font-size: 0.75em;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
   font-weight: 500;
-  margin: 0 auto;
+  text-align: center;
+  white-space: nowrap;
 }
 
 .dept-status-active {
-  background-color: #E8F5E9;
-  color: #2E7D32;
+  background-color: #d4edda;
+  color: #155724;
 }
 
 .dept-status-for-update {
-  background-color: #FFF3E0;
-  color: #F57C00;
+  background-color: #fff3cd;
+  color: #856404;
 }
 
 .dept-status-blacklisted {
-  background-color: #FFEBEE;
-  color: #C62828;
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.dept-status-on {
+  background-color: #fff3cd;
+  color: #856404;
 }
 
 .dept-action-buttons {
