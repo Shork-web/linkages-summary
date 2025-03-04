@@ -60,35 +60,27 @@ const AgreementForm = () => {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData(prevState => ({
-      ...prevState,
-      [name]: type === 'checkbox' ? checked : value
-    }));
-  };
-
-  // Update the handleDateOrValidityChange function
-  const handleDateOrValidityChange = (e) => {
-    const { name, value } = e.target;
+    
     setFormData(prevState => {
       const newState = {
         ...prevState,
-        [name]: value
+        [name]: type === 'checkbox' ? checked : value
       };
       
+      // If date signed or validity changes, recalculate expiry date
       if ((name === 'dateSigned' && prevState.validity) || 
           (name === 'validity' && prevState.dateSigned)) {
-        // Convert text validity to number for calculation
+        
         const validityYears = name === 'validity' ? 
           parseInt(value) || 0 : 
           parseInt(prevState.validity) || 0;
         
-        if (validityYears > 0) {
-          newState.dateExpired = calculateExpiryDate(
-            name === 'dateSigned' ? value : prevState.dateSigned,
-            validityYears
-          );
-        } else {
-          newState.dateExpired = '';
+        const dateToUse = name === 'dateSigned' ? 
+          value : 
+          prevState.dateSigned;
+        
+        if (validityYears > 0 && dateToUse) {
+          newState.dateExpired = calculateExpiryDate(dateToUse, validityYears);
         }
       }
       
@@ -96,7 +88,6 @@ const AgreementForm = () => {
     });
   };
 
-  // Modify handleSubmit to handle single partner
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -129,9 +120,15 @@ const AgreementForm = () => {
       return;
     }
 
+    // Ensure expiry date is calculated
+    let submissionData = { ...formData };
+    if (formData.dateSigned && formData.validity) {
+      submissionData.dateExpired = calculateExpiryDate(formData.dateSigned, formData.validity);
+    }
+
     try {
       const docRef = await addDoc(collection(db, 'agreementform'), {
-        ...formData,
+        ...submissionData,
         createdBy: auth.currentUser.uid,
         createdAt: new Date().toISOString()
       });
@@ -275,24 +272,8 @@ const AgreementForm = () => {
               id="dateSigned"
               name="dateSigned"
               value={formData.dateSigned}
-              onChange={handleDateOrValidityChange}
+              onChange={handleChange}
               required
-              onFocus={(e) => e.target.type = 'date'}
-              onBlur={(e) => {
-                if (!e.target.value) {
-                  e.target.type = 'text';
-                } else {
-                  const date = new Date(e.target.value);
-                  const formattedDate = date.toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                  });
-                  e.target.type = 'text';
-                  e.target.value = formattedDate;
-                }
-              }}
-              placeholder="Select date"
             />
           </div>
           <div className="form-group">
@@ -301,11 +282,11 @@ const AgreementForm = () => {
               <span className="validity-helper">Duration of the agreement</span>
             </label>
             <input
-              type="text"
+              type="number"
               id="validity"
               name="validity"
               value={formData.validity}
-              onChange={handleDateOrValidityChange}
+              onChange={handleChange}
               placeholder="Enter validity period"
               required
             />

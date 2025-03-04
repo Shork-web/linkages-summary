@@ -386,10 +386,6 @@
   padding-right: 30px;
 }
 
-.date-input-container {
-  position: relative;
-}
-
 .date-input {
   width: 100%;
   padding: 12px 14px;
@@ -398,21 +394,10 @@
   font-size: 0.95rem;
   transition: all 0.3s;
   background-color: #fff;
-  padding-right: 40px; /* Make room for the calendar icon */
-}
-
-.date-icon {
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #8B3A2B;
-  pointer-events: none;
 }
 
 .duration-input:focus,
-.unit-select:focus,
-.date-input:focus {
+.unit-select:focus {
   border-color: #8B3A2B;
   outline: none;
   box-shadow: 0 0 0 3px rgba(139, 58, 43, 0.1);
@@ -423,5 +408,140 @@
   .expiration-fields-container {
     flex-direction: column;
     gap: 16px;
+  }
+}
+
+/* Updated Company Types Section Styles */
+.company-types-section {
+  margin-bottom: 28px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 20px;
+  background-color: #f9f9f9;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.section-header h3 {
+  margin: 0;
+  color: #333;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+}
+
+.section-header h3 i {
+  margin-right: 8px;
+  color: #8B3A2B;
+}
+
+.add-type-btn {
+  background-color: #8B3A2B;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: all 0.2s;
+}
+
+.add-type-btn i {
+  margin-right: 6px;
+}
+
+.add-type-btn:hover {
+  background-color: #7A3225;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.company-types-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.company-type-entry {
+  background-color: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.entry-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.entry-number {
+  font-weight: 600;
+  color: #555;
+  font-size: 0.95rem;
+}
+
+.remove-type-btn {
+  background-color: #f44336;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.remove-type-btn:hover {
+  background-color: #d32f2f;
+  transform: scale(1.1);
+}
+
+/* Updated type-field styles (no longer needs to be in a flex container) */
+.type-field {
+  margin-bottom: 0; /* Remove bottom margin since there's no second field */
+}
+
+.type-field label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #333;
+  font-size: 0.9rem;
+}
+
+.type-field select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  background-color: white;
+  transition: all 0.3s;
+}
+
+.type-field select:focus {
+  border-color: #8B3A2B;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(139, 58, 43, 0.1);
+}
+
+/* Responsive adjustments for company types section */
+@media (max-width: 768px) {
+  .add-type-btn {
+    padding: 6px 12px;
+    font-size: 0.85rem;
   }
 } 

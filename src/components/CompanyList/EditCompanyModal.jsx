@@ -15,10 +15,35 @@ const EditCompanyModal = ({ company, onClose, onUpdate }) => {
     moaValidity: '',
     moaExpirationDate: '',
     moaRemarks: '',
-    validityUnit: 'years'
+    validityUnit: 'years',
+    collegeEntries: []
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const companyTypes = [
+    'N/A',
+    'SALES/MARKETING',
+    'BPO',
+    'INSURANCE',
+    'ENGINEERING SERVICES',
+    'SOCIALWORK/FOUNDATION',
+    'BEHAVIORAL ASSESSMENT CENTER',
+    'AUTOMOTIVE',
+    'MANUFACTURING',
+    'SCHOOL',
+    'HOSPITAL',
+    'CONSTRUCTION',
+    'AIRLINES',
+    'HOTELS',
+    'TRAVEL AGENCY',
+    'IT/COMPUTER/SOFTWARE',
+    'GOV\'T/LGU',
+    'CONSULTANCY',
+    'BOOKKEEPING',
+    'SHIPPING LINES/TRANSPORT',
+    'BANK'
+  ];
 
   useEffect(() => {
     if (company) {
@@ -33,7 +58,10 @@ const EditCompanyModal = ({ company, onClose, onUpdate }) => {
         moaValidity: company.moaValidity || '',
         moaExpirationDate: company.moaExpirationDate || '',
         moaRemarks: company.moaRemarks || '',
-        validityUnit: company.validityUnit || 'years'
+        validityUnit: company.validityUnit || 'years',
+        collegeEntries: company.collegeEntries && company.collegeEntries.length > 0 
+          ? company.collegeEntries 
+          : [{ college: '', department: '', status: 'Active', companyType: '' }]
       });
     }
   }, [company]);
@@ -57,14 +85,50 @@ const EditCompanyModal = ({ company, onClose, onUpdate }) => {
     }));
   };
 
+  const handleCompanyTypeChange = (index, e) => {
+    const value = e.target.value;
+    
+    setFormData(prev => {
+      const updatedEntries = [...prev.collegeEntries];
+      updatedEntries[index] = { 
+        ...updatedEntries[index], 
+        companyType: value 
+      };
+      return { ...prev, collegeEntries: updatedEntries };
+    });
+  };
+
+  const handleAddCompanyType = () => {
+    setFormData(prev => ({
+      ...prev,
+      collegeEntries: [...prev.collegeEntries, { college: '', department: '', status: 'Active', companyType: '' }]
+    }));
+  };
+
+  const handleRemoveCompanyType = (index) => {
+    if (formData.collegeEntries.length <= 1) return;
+    
+    setFormData(prev => ({
+      ...prev,
+      collegeEntries: prev.collegeEntries.filter((_, i) => i !== index)
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
 
     try {
+      const validatedEntries = formData.collegeEntries.map(entry => ({
+        ...entry,
+        companyType: entry.companyType || 'N/A',
+        status: entry.status || 'Active'
+      }));
+
       const companyRef = doc(db, 'companyMOA', company.id);
       await updateDoc(companyRef, {
         ...formData,
+        collegeEntries: validatedEntries,
         validityUnit: formData.validityUnit,
         updatedAt: new Date().toISOString()
       });
@@ -183,7 +247,56 @@ const EditCompanyModal = ({ company, onClose, onUpdate }) => {
             </div>
           </div>
 
-          {/* Validity and Expiration Date Section - Updated to match design */}
+          {/* UPDATED: Company Types Section without status */}
+          <div className="company-types-section">
+            <div className="section-header">
+              <h3><i className="fas fa-tags"></i> Company Types</h3>
+              <button 
+                type="button" 
+                className="add-type-btn"
+                onClick={handleAddCompanyType}
+              >
+                <i className="fas fa-plus"></i> Add Type
+              </button>
+            </div>
+            
+            <div className="company-types-container">
+              {formData.collegeEntries.map((entry, index) => (
+                <div key={index} className="company-type-entry">
+                  <div className="entry-header">
+                    <span className="entry-number">Type #{index + 1}</span>
+                    {formData.collegeEntries.length > 1 && (
+                      <button 
+                        type="button" 
+                        className="remove-type-btn"
+                        onClick={() => handleRemoveCompanyType(index)}
+                      >
+                        <i className="fas fa-times"></i>
+                      </button>
+                    )}
+                  </div>
+                  
+                  {/* Simplified type-fields without the status field */}
+                  <div className="type-field">
+                    <label htmlFor={`companyType-${index}`}>Company Type:</label>
+                    <select
+                      id={`companyType-${index}`}
+                      value={entry.companyType || ''}
+                      onChange={(e) => handleCompanyTypeChange(index, e)}
+                      required
+                    >
+                      <option value="">Select Type</option>
+                      {companyTypes.map(type => (
+                        <option key={type} value={type}>{type}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Validity and Expiration Date Section */}
           <div className="expiration-fields-container">
             <div className="expiration-field">
               <label htmlFor="moaValidity">
@@ -217,20 +330,15 @@ const EditCompanyModal = ({ company, onClose, onUpdate }) => {
               <label htmlFor="moaExpirationDate">
                 <i className="fas fa-calendar"></i> Expiration Date
               </label>
-              <div className="date-input-container">
-                <input
-                  type="date"
-                  id="moaExpirationDate"
-                  name="moaExpirationDate"
-                  value={formData.moaExpirationDate}
-                  onChange={handleChange}
-                  className="date-input"
-                  placeholder="mm/dd/yyyy"
-                />
-                <span className="date-icon">
-                  <i className="fas fa-calendar-alt"></i>
-                </span>
-              </div>
+              <input
+                type="date"
+                id="moaExpirationDate"
+                name="moaExpirationDate"
+                value={formData.moaExpirationDate}
+                onChange={handleChange}
+                className="date-input"
+                placeholder="mm/dd/yyyy"
+              />
             </div>
           </div>
 

@@ -328,13 +328,32 @@ input:disabled,
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem;
+  margin-bottom: 15px;
 }
 
 .college-entry-header h4 {
   margin: 0;
   color: #555;
   font-size: 1rem;
+}
+
+.entry-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.reset-entry-btn {
+  background-color: #f0ad4e;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 5px 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.reset-entry-btn:hover {
+  background-color: #ec971f;
 }
 
 .remove-college-btn {
@@ -359,24 +378,22 @@ input:disabled,
   background-color: #8B3A2B;
   color: white;
   border: none;
-  padding: 10px 15px;
   border-radius: 4px;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 500;
   cursor: pointer;
-  font-size: 0.9rem;
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-top: 1rem;
-  transition: all 0.3s ease;
+  transition: background-color 0.2s;
 }
 
 .add-college-btn:hover {
-  background-color: #7A3225;
-  transform: translateY(-2px);
+  background-color: #7a3325;
 }
 
 .add-college-btn i {
-  font-size: 0.8rem;
+  margin-right: 8px;
 }
 
 /* Add responsive grid layout for larger screens */
@@ -393,4 +410,33 @@ input:disabled,
   .college-entry .form-group:last-child {
     grid-column: 1 / -1;
   }
+}
+
+.college-entry-actions {
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.reset-all-entries-btn {
+  background-color: #f0ad4e;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.2s;
+}
+
+.reset-all-entries-btn:hover {
+  background-color: #ec971f;
+}
+
+.reset-all-entries-btn i {
+  margin-right: 8px;
 } 
