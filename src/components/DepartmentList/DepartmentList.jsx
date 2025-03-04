@@ -317,7 +317,7 @@ const DepartmentList = () => {
                     department.collegeEntries.slice(1).map((entry, index) => (
                       <tr key={`${department.id}-entry-${index + 2}`} className="additional-entry-row">
                         <td className="indent-cell">
-                          <span className="entry-number">Entry #{index + 2}</span>
+                          {/* Removed the entry-number span with "Entry #" text */}
                         </td>
                         <td>
                           <span className={`dept-status-badge dept-status-${entry.status ? entry.status.toLowerCase() : 'active'}`}>
