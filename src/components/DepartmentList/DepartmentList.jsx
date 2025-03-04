@@ -60,10 +60,26 @@ const DepartmentList = () => {
   };
 
   const toggleRowExpansion = (id) => {
-    setExpandedRows(prev => ({
-      ...prev,
-      [id]: !prev[id]
-    }));
+    setExpandedRows(prev => {
+      // If this row is already expanded, just toggle it off
+      if (prev[id]) {
+        return {
+          ...prev,
+          [id]: false
+        };
+      }
+      
+      // Otherwise, close all rows and open only this one
+      const allClosed = {};
+      Object.keys(prev).forEach(key => {
+        allClosed[key] = false;
+      });
+      
+      return {
+        ...allClosed,
+        [id]: true
+      };
+    });
   };
 
   // Check if a department has multiple college entries
