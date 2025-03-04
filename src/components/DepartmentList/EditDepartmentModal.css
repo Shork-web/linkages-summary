@@ -176,6 +176,23 @@
   margin-bottom: 1rem;
   position: relative;
   animation: fadeIn 0.3s ease-in-out;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+}
+
+@media (min-width: 768px) {
+  .dept-college-entry {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .dept-college-entry-header {
+    grid-column: 1 / -1;
+  }
+  
+  .dept-college-entry .dept-form-group:last-child {
+    grid-column: 1 / -1;
+  }
 }
 
 .dept-college-entry-header {

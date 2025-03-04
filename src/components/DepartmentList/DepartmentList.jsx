@@ -100,7 +100,8 @@ const DepartmentList = () => {
     // Fallback for legacy data format
     return { 
       college: department.college || '', 
-      department: department.department || '' 
+      department: department.department || '',
+      status: department.moaStatus || 'Active' // Use company status as fallback
     };
   };
 
@@ -112,7 +113,11 @@ const DepartmentList = () => {
         entry.department?.toLowerCase().includes(searchTerm.toLowerCase())
       ));
 
-    const matchesStatus = !filters.status || dept.moaStatus === filters.status;
+    const matchesStatus = !filters.status || 
+      (dept.collegeEntries && dept.collegeEntries.some(entry => 
+        entry.status === filters.status
+      )) || 
+      dept.moaStatus === filters.status; // For backward compatibility
     
     const matchesDepartment = !filters.department || 
       (dept.collegeEntries && dept.collegeEntries.some(entry => 
@@ -267,6 +272,17 @@ const DepartmentList = () => {
                     <td className="company-name-cell">
                       <div className="company-name-container">
                         <span className="company-name-text">{department.companyName}</span>
+                      </div>
+                    </td>
+                    <td>
+                      <span className={`dept-status-badge dept-status-${firstEntry.status ? firstEntry.status.toLowerCase() : department.moaStatus.toLowerCase()}`}>
+                        {firstEntry.status || department.moaStatus}
+                      </span>
+                    </td>
+                    <td>{firstEntry.college || ''}</td>
+                    <td>
+                      <div className="department-container">
+                        <span className="department-text">{firstEntry.department || ''}</span>
                         {hasMultiple && (
                           <button 
                             className="expand-toggle-btn"
@@ -278,13 +294,6 @@ const DepartmentList = () => {
                         )}
                       </div>
                     </td>
-                    <td>
-                      <span className={`dept-status-badge dept-status-${department.moaStatus.toLowerCase()}`}>
-                        {department.moaStatus}
-                      </span>
-                    </td>
-                    <td>{firstEntry.college || ''}</td>
-                    <td>{firstEntry.department || ''}</td>
                     <td className="dept-action-buttons">
                       <button 
                         className="dept-edit-button"
@@ -310,7 +319,11 @@ const DepartmentList = () => {
                         <td className="indent-cell">
                           <span className="entry-number">Entry #{index + 2}</span>
                         </td>
-                        <td></td>
+                        <td>
+                          <span className={`dept-status-badge dept-status-${entry.status ? entry.status.toLowerCase() : 'active'}`}>
+                            {entry.status || 'Active'}
+                          </span>
+                        </td>
                         <td>{entry.college || ''}</td>
                         <td>{entry.department || ''}</td>
                         <td></td>

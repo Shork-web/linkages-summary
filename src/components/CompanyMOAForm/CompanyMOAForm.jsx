@@ -69,7 +69,7 @@ const CompanyMOAForm = () => {
     moaYear: new Date().getFullYear().toString(),
     moaStatus: 'Active',
     companyType: '',
-    collegeEntries: [{ college: '', department: '' }], // Array of college-department pairs
+    collegeEntries: [{ college: '', department: '', status: 'Active' }],
     withExpiration: false,
     moaValidity: '',
     moaExpirationDate: '',
@@ -472,7 +472,7 @@ const CompanyMOAForm = () => {
         moaYear: new Date().getFullYear().toString(),
         moaStatus: 'Active',
         companyType: '',
-        collegeEntries: [{ college: '', department: '' }],
+        collegeEntries: [{ college: '', department: '', status: 'Active' }],
         withExpiration: false,
         moaValidity: '',
         moaExpirationDate: '',
@@ -498,7 +498,7 @@ const CompanyMOAForm = () => {
   const handleAddCollege = () => {
     setFormData(prev => ({
       ...prev,
-      collegeEntries: [...prev.collegeEntries, { college: '', department: '' }]
+      collegeEntries: [...prev.collegeEntries, { college: '', department: '', status: 'Active' }]
     }));
   };
 
@@ -510,6 +510,20 @@ const CompanyMOAForm = () => {
       ...prev,
       collegeEntries: prev.collegeEntries.filter((_, i) => i !== index)
     }));
+  };
+
+  // Add a function to handle status change for a specific college entry
+  const handleCollegeStatusChange = (index, e) => {
+    const { value } = e.target;
+    
+    setFormData(prev => {
+      const updatedEntries = [...prev.collegeEntries];
+      updatedEntries[index] = { 
+        ...updatedEntries[index], 
+        status: value 
+      };
+      return { ...prev, collegeEntries: updatedEntries };
+    });
   };
 
   return (
@@ -584,48 +598,35 @@ const CompanyMOAForm = () => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="moaStatus">Status:</label>
-            <select
-              id="moaStatus"
-              name="moaStatus"
-              value={formData.moaStatus}
-              onChange={handleChange}
-              required
-            >
-              <option value="Active">Active</option>
-              <option value="For-Update">For Update</option>
-              <option value="Blacklisted">Blacklisted</option>
-            </select>
-          </div>
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="companyType">Company Type:</label>
-          <input
-            type="text"
-            id="companyType"
-            name="companyType"
-            value={formData.companyType}
-            onChange={handleCompanyTypeChange}
-            onFocus={handleCompanyTypeFocus}
-            onBlur={handleBlur}
-            onKeyDown={handleCompanyTypeKeyDown}
-            placeholder="Start typing to see suggestions..."
-            required
-          />
-          {showDropdown && suggestions.length > 0 && (
-            <div className="suggestions-list" ref={companyTypeListRef}>
-              {suggestions.map((type, index) => (
-                <div
-                  key={type}
-                  className={`suggestion-item ${index === companyTypeKeyIndex ? 'selected' : ''}`}
-                  onClick={() => handleSuggestionClick(type)}
-                >
-                  {type}
+            <label htmlFor="companyType">Company Type:</label>
+            <div className="company-type-autocomplete">
+              <input
+                type="text"
+                id="companyType"
+                name="companyType"
+                value={formData.companyType}
+                onChange={handleCompanyTypeChange}
+                onFocus={handleCompanyTypeFocus}
+                onBlur={handleBlur}
+                onKeyDown={handleCompanyTypeKeyDown}
+                placeholder="Start typing to see suggestions..."
+                required
+              />
+              {showDropdown && suggestions.length > 0 && (
+                <div className="suggestions-list" ref={companyTypeListRef}>
+                  {suggestions.map((type, index) => (
+                    <div
+                      key={type}
+                      className={`suggestion-item ${index === companyTypeKeyIndex ? 'selected' : ''}`}
+                      onClick={() => handleSuggestionClick(type)}
+                    >
+                      {type}
+                    </div>
+                  ))}
                 </div>
-              ))}
+              )}
             </div>
-          )}
+          </div>
         </div>
 
         {/* College and Department section */}
@@ -712,6 +713,22 @@ const CompanyMOAForm = () => {
                     </div>
                   )}
                 </div>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor={`status-${index}`}>Status:</label>
+                <select
+                  id={`status-${index}`}
+                  name={`status-${index}`}
+                  value={entry.status}
+                  onChange={(e) => handleCollegeStatusChange(index, e)}
+                  required
+                >
+                  <option value="Active">Active</option>
+                  <option value="For-Update">For Update</option>
+                  <option value="Blacklisted">Blacklisted</option>
+                  <option value="On process">On process</option>
+                </select>
               </div>
             </div>
           ))}

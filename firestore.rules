@@ -13,7 +13,7 @@ service cloud.firestore {
         request.resource.data.companyLongitude is string &&
         request.resource.data.companyLatitude is string &&
         request.resource.data.moaYear is number &&
-        request.resource.data.moaStatus in ['Active', 'For-Update', 'Blacklisted'] &&
+        request.resource.data.moaStatus in ['Active', 'For-Update', 'Blacklisted', 'On process'] &&
         request.resource.data.companyType is string &&
         request.resource.data.companyType.trim().size() > 0 &&
         request.resource.data.college is string &&

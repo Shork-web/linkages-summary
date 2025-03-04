@@ -55,8 +55,7 @@ const getProgramsByCollege = (college) => {
 const EditDepartmentModal = ({ department, onClose, onUpdate }) => {
   const [formData, setFormData] = useState({
     companyName: '',
-    moaStatus: '',
-    collegeEntries: [{ college: '', department: '' }]
+    collegeEntries: [{ college: '', department: '', status: 'Active' }]
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -66,19 +65,23 @@ const EditDepartmentModal = ({ department, onClose, onUpdate }) => {
       // Handle both new and legacy data formats
       if (department.collegeEntries && Array.isArray(department.collegeEntries)) {
         // New format with collegeEntries array
+        const updatedEntries = department.collegeEntries.map(entry => ({
+          ...entry,
+          status: entry.status || department.moaStatus || 'Active' // Use entry status if available, fall back to company status
+        }));
+        
         setFormData({
           companyName: department.companyName,
-          moaStatus: department.moaStatus,
-          collegeEntries: [...department.collegeEntries]
+          collegeEntries: updatedEntries
         });
       } else {
         // Legacy format with single college/department
         setFormData({
           companyName: department.companyName,
-          moaStatus: department.moaStatus,
           collegeEntries: [{ 
             college: department.college || '', 
-            department: department.department || '' 
+            department: department.department || '',
+            status: department.moaStatus || 'Active'
           }]
         });
       }
@@ -118,10 +121,22 @@ const EditDepartmentModal = ({ department, onClose, onUpdate }) => {
     });
   };
 
+  const handleStatusChange = (index, e) => {
+    const { value } = e.target;
+    setFormData(prev => {
+      const updatedEntries = [...prev.collegeEntries];
+      updatedEntries[index] = { 
+        ...updatedEntries[index], 
+        status: value 
+      };
+      return { ...prev, collegeEntries: updatedEntries };
+    });
+  };
+
   const handleAddCollege = () => {
     setFormData(prev => ({
       ...prev,
-      collegeEntries: [...prev.collegeEntries, { college: '', department: '' }]
+      collegeEntries: [...prev.collegeEntries, { college: '', department: '', status: 'Active' }]
     }));
   };
 
@@ -151,7 +166,7 @@ const EditDepartmentModal = ({ department, onClose, onUpdate }) => {
       
       // If no valid entries, add a placeholder
       if (updatedData.collegeEntries.length === 0) {
-        updatedData.collegeEntries = [{ college: '', department: '' }];
+        updatedData.collegeEntries = [{ college: '', department: '', status: 'Active' }];
       }
       
       await updateDoc(departmentRef, updatedData);
@@ -183,20 +198,6 @@ const EditDepartmentModal = ({ department, onClose, onUpdate }) => {
               onChange={handleChange}
               required
             />
-          </div>
-
-          <div className="dept-form-group">
-            <label>MOA Status</label>
-            <select
-              name="moaStatus"
-              value={formData.moaStatus}
-              onChange={handleChange}
-              required
-            >
-              <option value="Active">Active</option>
-              <option value="For-Update">For Update</option>
-              <option value="Blacklisted">Blacklisted</option>
-            </select>
           </div>
 
           <div className="dept-college-entries-section">
@@ -243,6 +244,20 @@ const EditDepartmentModal = ({ department, onClose, onUpdate }) => {
                     {getProgramsByCollege(entry.college).map(dept => (
                       <option key={dept} value={dept}>{dept}</option>
                     ))}
+                  </select>
+                </div>
+
+                <div className="dept-form-group">
+                  <label>Status</label>
+                  <select
+                    value={entry.status || 'Active'}
+                    onChange={(e) => handleStatusChange(index, e)}
+                    required
+                  >
+                    <option value="Active">Active</option>
+                    <option value="For-Update">For Update</option>
+                    <option value="Blacklisted">Blacklisted</option>
+                    <option value="On process">On process</option>
                   </select>
                 </div>
               </div>
