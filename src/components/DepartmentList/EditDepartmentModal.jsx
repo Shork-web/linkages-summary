@@ -56,20 +56,32 @@ const EditDepartmentModal = ({ department, onClose, onUpdate }) => {
   const [formData, setFormData] = useState({
     companyName: '',
     moaStatus: '',
-    college: '',
-    department: ''
+    collegeEntries: [{ college: '', department: '' }]
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (department) {
-      setFormData({
-        companyName: department.companyName,
-        moaStatus: department.moaStatus,
-        college: department.college,
-        department: department.department
-      });
+      // Handle both new and legacy data formats
+      if (department.collegeEntries && Array.isArray(department.collegeEntries)) {
+        // New format with collegeEntries array
+        setFormData({
+          companyName: department.companyName,
+          moaStatus: department.moaStatus,
+          collegeEntries: [...department.collegeEntries]
+        });
+      } else {
+        // Legacy format with single college/department
+        setFormData({
+          companyName: department.companyName,
+          moaStatus: department.moaStatus,
+          collegeEntries: [{ 
+            college: department.college || '', 
+            department: department.department || '' 
+          }]
+        });
+      }
     }
   }, [department]);
 
@@ -81,13 +93,68 @@ const EditDepartmentModal = ({ department, onClose, onUpdate }) => {
     }));
   };
 
+  const handleCollegeChange = (index, e) => {
+    const { value } = e.target;
+    setFormData(prev => {
+      const updatedEntries = [...prev.collegeEntries];
+      updatedEntries[index] = { 
+        ...updatedEntries[index], 
+        college: value,
+        department: '' // Reset department when college changes
+      };
+      return { ...prev, collegeEntries: updatedEntries };
+    });
+  };
+
+  const handleDepartmentChange = (index, e) => {
+    const { value } = e.target;
+    setFormData(prev => {
+      const updatedEntries = [...prev.collegeEntries];
+      updatedEntries[index] = { 
+        ...updatedEntries[index], 
+        department: value 
+      };
+      return { ...prev, collegeEntries: updatedEntries };
+    });
+  };
+
+  const handleAddCollege = () => {
+    setFormData(prev => ({
+      ...prev,
+      collegeEntries: [...prev.collegeEntries, { college: '', department: '' }]
+    }));
+  };
+
+  const handleRemoveCollege = (index) => {
+    if (formData.collegeEntries.length <= 1) return; // Keep at least one entry
+    
+    setFormData(prev => ({
+      ...prev,
+      collegeEntries: prev.collegeEntries.filter((_, i) => i !== index)
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
 
     try {
       const departmentRef = doc(db, 'companyMOA', department.id);
-      await updateDoc(departmentRef, formData);
+      
+      // Prepare data for update - ensure we're not sending empty entries
+      const updatedData = {
+        ...formData,
+        collegeEntries: formData.collegeEntries.filter(
+          entry => entry.college.trim() !== '' && entry.department.trim() !== ''
+        )
+      };
+      
+      // If no valid entries, add a placeholder
+      if (updatedData.collegeEntries.length === 0) {
+        updatedData.collegeEntries = [{ college: '', department: '' }];
+      }
+      
+      await updateDoc(departmentRef, updatedData);
       onUpdate('Department updated successfully');
       onClose();
     } catch (error) {
@@ -132,35 +199,62 @@ const EditDepartmentModal = ({ department, onClose, onUpdate }) => {
             </select>
           </div>
 
-          <div className="dept-form-group">
-            <label>College</label>
-            <select
-              name="college"
-              value={formData.college}
-              onChange={handleChange}
-              required
-            >
-              <option value="">Select a college</option>
-              {Object.keys(COLLEGES).map(college => (
-                <option key={college} value={college}>{college}</option>
-              ))}
-            </select>
-          </div>
+          <div className="dept-college-entries-section">
+            <h3>College and Department Information</h3>
+            
+            {formData.collegeEntries.map((entry, index) => (
+              <div key={index} className="dept-college-entry">
+                <div className="dept-college-entry-header">
+                  <h4>Entry #{index + 1}</h4>
+                  {formData.collegeEntries.length > 1 && (
+                    <button 
+                      type="button" 
+                      className="dept-remove-college-btn"
+                      onClick={() => handleRemoveCollege(index)}
+                    >
+                      <i className="fas fa-times"></i>
+                    </button>
+                  )}
+                </div>
+                
+                <div className="dept-form-group">
+                  <label>College</label>
+                  <select
+                    value={entry.college}
+                    onChange={(e) => handleCollegeChange(index, e)}
+                    required
+                  >
+                    <option value="">Select a college</option>
+                    {Object.keys(COLLEGES).map(college => (
+                      <option key={college} value={college}>{college}</option>
+                    ))}
+                  </select>
+                </div>
 
-          <div className="dept-form-group">
-            <label>Department</label>
-            <select
-              name="department"
-              value={formData.department}
-              onChange={handleChange}
-              required
-              disabled={!formData.college}
+                <div className="dept-form-group">
+                  <label>Department</label>
+                  <select
+                    value={entry.department}
+                    onChange={(e) => handleDepartmentChange(index, e)}
+                    required
+                    disabled={!entry.college}
+                  >
+                    <option value="">Select a department</option>
+                    {getProgramsByCollege(entry.college).map(dept => (
+                      <option key={dept} value={dept}>{dept}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            ))}
+            
+            <button 
+              type="button" 
+              className="dept-add-college-btn"
+              onClick={handleAddCollege}
             >
-              <option value="">Select a department</option>
-              {getProgramsByCollege(formData.college).map(dept => (
-                <option key={dept} value={dept}>{dept}</option>
-              ))}
-            </select>
+              <i className="fas fa-plus"></i> Add Another College
+            </button>
           </div>
 
           <div className="dept-modal-actions">

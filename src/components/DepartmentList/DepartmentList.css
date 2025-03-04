@@ -280,64 +280,65 @@
   z-index: 1000;
 }
 
+/* Improved delete confirmation modal */
 .dept-delete-confirmation-modal {
   background: white;
-  padding: 20px;
+  padding: 24px;
   border-radius: 8px;
-  width: 500px;
+  width: 400px;
   max-width: 90%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  text-align: center;
 }
 
-.dept-modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.dept-modal-header h2 {
-  margin: 0;
+.dept-delete-confirmation-modal h3 {
   color: #8B3A2B;
+  margin-top: 0;
+  margin-bottom: 16px;
+  font-size: 1.3rem;
+  font-weight: 600;
 }
 
-.dept-close-button {
-  background: none;
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
-  color: #666;
+.dept-delete-confirmation-modal p {
+  margin-bottom: 24px;
+  color: #555;
+  font-size: 1rem;
+  line-height: 1.5;
 }
 
 .dept-modal-actions {
   display: flex;
-  justify-content: flex-end;
-  gap: 10px;
+  justify-content: center;
+  gap: 16px;
 }
 
 .dept-modal-actions button {
   padding: 10px 20px;
-  border: none;
   border-radius: 4px;
+  font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
+  min-width: 100px;
 }
 
-.dept-modal-actions .dept-delete-button {
-  background-color: #C62828;
+.dept-modal-actions button:first-child {
+  background: #f5f5f5;
+  border: 1px solid #ddd;
+  color: #555;
+}
+
+.dept-modal-actions button:first-child:hover {
+  background: #eaeaea;
+}
+
+.dept-modal-actions button.dept-delete-button {
+  background: #d32f2f;
   color: white;
+  border: none;
 }
 
-.dept-modal-actions .dept-delete-button:hover {
-  background-color: #B71C1C;
-}
-
-.dept-modal-actions .dept-cancel-button {
-  background-color: #f0f0f0;
-  color: #333;
-}
-
-.dept-modal-actions .dept-cancel-button:hover {
-  background-color: #e0e0e0;
+.dept-modal-actions button.dept-delete-button:hover {
+  background: #b71c1c;
 }
 
 .dept-table td:hover::after {
@@ -650,5 +651,127 @@
 /* Row hover effect for visual separation */
 .dept-table tbody tr:hover {
   background-color: #f5f5f5;
+}
+
+/* Refined expand toggle button styling */
+.expand-toggle-btn {
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  margin-left: 10px;
+  flex-shrink: 0;
+  background-color: rgba(139, 58, 43, 0.1);
+  border: 1px solid rgba(139, 58, 43, 0.2);
+  color: #8B3A2B;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.expand-toggle-btn:focus {
+  outline: none;
+  background-color: rgba(139, 58, 43, 0.2);
+}
+
+/* Improve company name container */
+.company-name-container {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.company-name-text {
+  font-weight: 500;
+  color: #333;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+}
+
+/* Make the expanded row more distinct */
+.expanded-row {
+  background-color: rgba(139, 58, 43, 0.03) !important;
+}
+
+/* Improve the entry number badge */
+.entry-number {
+  display: inline-block;
+  padding: 3px 8px;
+  background-color: rgba(139, 58, 43, 0.08);
+  border-radius: 4px;
+  font-size: 0.75em;
+  color: #8B3A2B;
+  font-weight: 500;
+  font-style: normal;
+}
+
+.additional-entry-row {
+  background-color: #f5f5f5;
+  font-size: 0.95em;
+}
+
+.indent-cell {
+  padding-left: 30px !important;
+  position: relative;
+}
+
+.entry-number {
+  font-size: 0.85em;
+  color: #666;
+  font-style: italic;
+}
+
+.additional-entry-row td {
+  border-top: 1px dashed #e0e0e0 !important;
+}
+
+/* Animation for expanding/collapsing */
+.additional-entry-row {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Style for the entry number badge */
+.entry-number {
+  display: inline-block;
+  padding: 2px 6px;
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  font-size: 0.75em;
+  color: #555;
+}
+
+/* Update the company name cell styling */
+.company-name-cell {
+  padding: 12px 15px;
+  text-align: left;
+  border: none;
+}
+
+.company-name-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.company-name-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
 }
 

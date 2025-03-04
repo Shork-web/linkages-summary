@@ -17,6 +17,7 @@ const DepartmentList = () => {
   });
   const [deleteConfirm, setDeleteConfirm] = useState({ show: false, departmentId: null, companyName: '' });
   const [notification, setNotification] = useState(null);
+  const [expandedRows, setExpandedRows] = useState({});
 
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, 'companyMOA'), (snapshot) => {
@@ -58,39 +59,90 @@ const DepartmentList = () => {
     setIsEditModalOpen(true);
   };
 
+  const toggleRowExpansion = (id) => {
+    setExpandedRows(prev => ({
+      ...prev,
+      [id]: !prev[id]
+    }));
+  };
+
+  // Check if a department has multiple college entries
+  const hasMultipleEntries = (department) => {
+    return department.collegeEntries && 
+           Array.isArray(department.collegeEntries) && 
+           department.collegeEntries.length > 1;
+  };
+
+  // Get the first college and department for display
+  const getFirstCollegeEntry = (department) => {
+    if (department.collegeEntries && 
+        Array.isArray(department.collegeEntries) && 
+        department.collegeEntries.length > 0) {
+      return department.collegeEntries[0];
+    }
+    
+    // Fallback for legacy data format
+    return { 
+      college: department.college || '', 
+      department: department.department || '' 
+    };
+  };
+
   // Filter departments based on search term and filters
   const filteredDepartments = departments.filter(dept => {
     const matchesSearch = 
       dept.companyName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      dept.department?.toLowerCase().includes(searchTerm.toLowerCase());
+      (dept.collegeEntries && dept.collegeEntries.some(entry => 
+        entry.department?.toLowerCase().includes(searchTerm.toLowerCase())
+      ));
 
     const matchesStatus = !filters.status || dept.moaStatus === filters.status;
-    const matchesDepartment = !filters.department || dept.department === filters.department;
-    const matchesCollege = !filters.college || dept.college === filters.college;
+    
+    const matchesDepartment = !filters.department || 
+      (dept.collegeEntries && dept.collegeEntries.some(entry => 
+        entry.department === filters.department
+      ));
+    
+    const matchesCollege = !filters.college || 
+      (dept.collegeEntries && dept.collegeEntries.some(entry => 
+        entry.college === filters.college
+      ));
 
     return matchesSearch && matchesStatus && matchesDepartment && matchesCollege;
   });
 
   // Get unique departments for filter dropdown - sort alphabetically
-  const uniqueDepartments = [...new Set(departments.map(dept => dept.department))]
-    .filter(Boolean)
-    .sort((a, b) => a.localeCompare(b));
+  const uniqueDepartments = [...new Set(
+    departments.flatMap(dept => 
+      dept.collegeEntries && Array.isArray(dept.collegeEntries) 
+        ? dept.collegeEntries.map(entry => entry.department)
+        : [dept.department]
+    ).filter(Boolean)
+  )].sort((a, b) => a.localeCompare(b));
 
   // Get unique colleges for filter dropdown - sort alphabetically
-  const uniqueColleges = [...new Set(departments.map(dept => dept.college))]
-    .filter(Boolean)
-    .sort((a, b) => a.localeCompare(b));
+  const uniqueColleges = [...new Set(
+    departments.flatMap(dept => 
+      dept.collegeEntries && Array.isArray(dept.collegeEntries) 
+        ? dept.collegeEntries.map(entry => entry.college)
+        : [dept.college]
+    ).filter(Boolean)
+  )].sort((a, b) => a.localeCompare(b));
 
   const handleDelete = async () => {
     try {
       await deleteDoc(doc(db, 'companyMOA', deleteConfirm.departmentId));
+      
+      // Update local state instead of reloading the page
+      setDepartments(prevDepartments => 
+        prevDepartments.filter(dept => dept.id !== deleteConfirm.departmentId)
+      );
+      
       setNotification({
         message: `Successfully deleted ${deleteConfirm.companyName}`,
         type: 'success'
       });
       setDeleteConfirm({ show: false, departmentId: null, companyName: '' });
-      // Refresh the list
-      window.location.reload();
     } catch (error) {
       setNotification({
         message: `Error deleting department: ${error.message}`,
@@ -189,34 +241,69 @@ const DepartmentList = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredDepartments.map(department => (
-              <tr key={department.id}>
-                <td>{department.companyName}</td>
-                <td>
-                  <span className={`dept-status-badge dept-status-${department.moaStatus.toLowerCase()}`}>
-                    {department.moaStatus}
-                  </span>
-                </td>
-                <td>{department.college || ''}</td>
-                <td>{department.department || ''}</td>
-                <td className="dept-action-buttons">
-                  <button 
-                    className="dept-edit-button"
-                    onClick={() => handleEdit(department)}
-                    title="Edit"
-                  >
-                    <i className="fas fa-edit"></i>
-                  </button>
-                  <button 
-                    className="dept-delete-button"
-                    onClick={() => confirmDelete(department.id, department.companyName)}
-                    title="Delete"
-                  >
-                    <i className="fas fa-trash-alt"></i>
-                  </button>
-                </td>
-              </tr>
-            ))}
+            {filteredDepartments.map(department => {
+              const firstEntry = getFirstCollegeEntry(department);
+              const hasMultiple = hasMultipleEntries(department);
+              
+              return (
+                <React.Fragment key={department.id}>
+                  <tr className={expandedRows[department.id] ? 'expanded-row' : ''}>
+                    <td className="company-name-cell">
+                      <div className="company-name-container">
+                        <span className="company-name-text">{department.companyName}</span>
+                        {hasMultiple && (
+                          <button 
+                            className="expand-toggle-btn"
+                            onClick={() => toggleRowExpansion(department.id)}
+                            title={expandedRows[department.id] ? "Collapse" : "Expand"}
+                          >
+                            <i className={`fas fa-chevron-${expandedRows[department.id] ? 'up' : 'down'}`}></i>
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                    <td>
+                      <span className={`dept-status-badge dept-status-${department.moaStatus.toLowerCase()}`}>
+                        {department.moaStatus}
+                      </span>
+                    </td>
+                    <td>{firstEntry.college || ''}</td>
+                    <td>{firstEntry.department || ''}</td>
+                    <td className="dept-action-buttons">
+                      <button 
+                        className="dept-edit-button"
+                        onClick={() => handleEdit(department)}
+                        title="Edit"
+                      >
+                        <i className="fas fa-edit"></i>
+                      </button>
+                      <button 
+                        className="dept-delete-button"
+                        onClick={() => confirmDelete(department.id, department.companyName)}
+                        title="Delete"
+                      >
+                        <i className="fas fa-trash-alt"></i>
+                      </button>
+                    </td>
+                  </tr>
+                  
+                  {/* Additional rows for multiple college entries */}
+                  {expandedRows[department.id] && hasMultiple && 
+                    department.collegeEntries.slice(1).map((entry, index) => (
+                      <tr key={`${department.id}-entry-${index + 2}`} className="additional-entry-row">
+                        <td className="indent-cell">
+                          <span className="entry-number">Entry #{index + 2}</span>
+                        </td>
+                        <td></td>
+                        <td>{entry.college || ''}</td>
+                        <td>{entry.department || ''}</td>
+                        <td></td>
+                      </tr>
+                    ))
+                  }
+                </React.Fragment>
+              );
+            })}
           </tbody>
         </table>
       </div>

@@ -69,8 +69,7 @@ const CompanyMOAForm = () => {
     moaYear: new Date().getFullYear().toString(),
     moaStatus: 'Active',
     companyType: '',
-    college: '',
-    department: '',
+    collegeEntries: [{ college: '', department: '' }], // Array of college-department pairs
     withExpiration: false,
     moaValidity: '',
     moaExpirationDate: '',
@@ -82,14 +81,15 @@ const CompanyMOAForm = () => {
   const [error, setError] = useState('');
   const [notification, setNotification] = useState(null);
   const [suggestions, setSuggestions] = useState([]);
-  const [selectedIndex, setSelectedIndex] = useState(-1);
   const suggestionsRef = useRef(null);
   const [showDropdown, setShowDropdown] = useState(false);
 
   const [collegeSuggestions, setCollegeSuggestions] = useState([]);
   const [departmentSuggestions, setDepartmentSuggestions] = useState([]);
-  const [showCollegeDropdown, setShowCollegeDropdown] = useState(false);
-  const [showDepartmentDropdown, setShowDepartmentDropdown] = useState(false);
+  const [showCollegeDropdowns, setShowCollegeDropdowns] = useState([]);
+  const [showDepartmentDropdowns, setShowDepartmentDropdowns] = useState([]);
+  const [activeCollegeIndex, setActiveCollegeIndex] = useState(-1);
+  const [activeDepartmentIndex, setActiveDepartmentIndex] = useState(-1);
 
   const companyTypes = [
     'N/A',
@@ -114,6 +114,16 @@ const CompanyMOAForm = () => {
     'SHIPPING LINES/TRANSPORT',
     'BANK'
   ];
+
+  // Add these new state variables for keyboard navigation
+  const [companyTypeKeyIndex, setCompanyTypeKeyIndex] = useState(-1);
+  const [collegeKeyIndex, setCollegeKeyIndex] = useState(-1);
+  const [departmentKeyIndex, setDepartmentKeyIndex] = useState(-1);
+  
+  // Add refs for scrolling
+  const companyTypeListRef = useRef(null);
+  const collegeListRef = useRef(null);
+  const departmentListRef = useRef(null);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -146,7 +156,6 @@ const CompanyMOAForm = () => {
         type.toLowerCase().includes(value.toLowerCase())
       );
       setSuggestions(filtered);
-      setSelectedIndex(-1);
     } else {
       setSuggestions(companyTypes); // Show all if input is empty
     }
@@ -180,60 +189,263 @@ const CompanyMOAForm = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleCollegeChange = (e) => {
+  const handleCollegeChange = (index, e) => {
     const value = e.target.value;
-    setFormData(prev => ({ ...prev, college: value, department: '' }));
+    
+    setFormData(prev => {
+      const updatedEntries = [...prev.collegeEntries];
+      updatedEntries[index] = { 
+        ...updatedEntries[index], 
+        college: value,
+        department: '' // Reset department when college changes
+      };
+      return { ...prev, collegeEntries: updatedEntries };
+    });
     
     // Filter college suggestions based on input
     const filtered = Object.keys(COLLEGES).filter(college =>
       college.toLowerCase().includes(value.toLowerCase())
     );
     setCollegeSuggestions(filtered);
-    setShowCollegeDropdown(true);
+    setShowCollegeDropdowns(Array(formData.collegeEntries.length).fill(false));
+    setActiveCollegeIndex(index);
   };
 
-  const handleCollegeSelect = (college) => {
-    console.log('Selected college:', college); // For debugging
-    setFormData(prev => ({
-      ...prev,
-      college: college,
-      department: '' // Reset department when college changes
-    }));
-    setShowCollegeDropdown(false);
-    setCollegeSuggestions([]); // Clear suggestions after selection
+  const handleCollegeSelect = (index, college) => {
+    setFormData(prev => {
+      const updatedEntries = [...prev.collegeEntries];
+      updatedEntries[index] = { 
+        ...updatedEntries[index], 
+        college: college,
+        department: '' // Reset department when college changes
+      };
+      return { ...prev, collegeEntries: updatedEntries };
+    });
+    
+    setShowCollegeDropdowns(Array(formData.collegeEntries.length).fill(false));
+    setCollegeSuggestions([]);
   };
 
-  const handleDepartmentChange = (e) => {
+  const handleDepartmentChange = (index, e) => {
     const value = e.target.value;
-    setFormData(prev => ({ ...prev, department: value }));
+    
+    setFormData(prev => {
+      const updatedEntries = [...prev.collegeEntries];
+      updatedEntries[index] = { 
+        ...updatedEntries[index], 
+        department: value 
+      };
+      return { ...prev, collegeEntries: updatedEntries };
+    });
     
     // Get programs for the selected college and filter based on input
-    const collegePrograms = getProgramsByCollege(formData.college);
+    const collegePrograms = getProgramsByCollege(formData.collegeEntries[index].college);
     const filtered = collegePrograms.filter(program =>
       program.toLowerCase().includes(value.toLowerCase())
     );
     setDepartmentSuggestions(filtered);
-    setShowDepartmentDropdown(true);
+    setShowDepartmentDropdowns(Array(formData.collegeEntries.length).fill(false));
+    setActiveDepartmentIndex(index);
   };
 
-  const handleDepartmentSelect = (department) => {
-    setFormData(prev => ({ ...prev, department }));
-    setShowDepartmentDropdown(false);
-    setDepartmentSuggestions([]); // Clear suggestions after selection
+  const handleDepartmentSelect = (index, department) => {
+    setFormData(prev => {
+      const updatedEntries = [...prev.collegeEntries];
+      updatedEntries[index] = { 
+        ...updatedEntries[index], 
+        department: department 
+      };
+      return { ...prev, collegeEntries: updatedEntries };
+    });
+    
+    setShowDepartmentDropdowns(Array(formData.collegeEntries.length).fill(false));
+    setDepartmentSuggestions([]);
   };
 
-  const handleDepartmentFocus = () => {
-    if (formData.college) {
-      setShowDepartmentDropdown(true);
-      // Show all programs for the selected college
-      setDepartmentSuggestions(getProgramsByCollege(formData.college));
+  const handleCollegeFocus = (index) => {
+    const newDropdowns = Array(formData.collegeEntries.length).fill(false);
+    newDropdowns[index] = true;
+    setShowCollegeDropdowns(newDropdowns);
+    setActiveCollegeIndex(index);
+    setCollegeSuggestions(Object.keys(COLLEGES)); // Show all colleges on focus
+  };
+
+  const handleDepartmentFocus = (index) => {
+    if (formData.collegeEntries[index].college) {
+      const newDropdowns = Array(formData.collegeEntries.length).fill(false);
+      newDropdowns[index] = true;
+      setShowDepartmentDropdowns(newDropdowns);
+      setActiveDepartmentIndex(index);
+      setDepartmentSuggestions(getProgramsByCollege(formData.collegeEntries[index].college));
     }
   };
 
-  const handleCollegeFocus = () => {
-    setShowCollegeDropdown(true);
-    setCollegeSuggestions(Object.keys(COLLEGES)); // Show all colleges on focus
+  const handleCollegeBlur = (index) => {
+    setTimeout(() => {
+      const newDropdowns = [...showCollegeDropdowns];
+      newDropdowns[index] = false;
+      setShowCollegeDropdowns(newDropdowns);
+    }, 200);
   };
+
+  const handleDepartmentBlur = (index) => {
+    setTimeout(() => {
+      const newDropdowns = [...showDepartmentDropdowns];
+      newDropdowns[index] = false;
+      setShowDepartmentDropdowns(newDropdowns);
+    }, 200);
+  };
+
+  // Handle keyboard navigation for company type dropdown
+  const handleCompanyTypeKeyDown = (e) => {
+    if (!showDropdown || suggestions.length === 0) return;
+    
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        setCompanyTypeKeyIndex(prev => 
+          prev < suggestions.length - 1 ? prev + 1 : prev
+        );
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        setCompanyTypeKeyIndex(prev => prev > 0 ? prev - 1 : 0);
+        break;
+      case 'Enter':
+        e.preventDefault();
+        if (companyTypeKeyIndex >= 0 && companyTypeKeyIndex < suggestions.length) {
+          handleSuggestionClick(suggestions[companyTypeKeyIndex]);
+          setShowDropdown(false);
+        }
+        break;
+      case 'Escape':
+        e.preventDefault();
+        setShowDropdown(false);
+        break;
+      default:
+        break;
+    }
+  };
+
+  // Handle keyboard navigation for college dropdown
+  const handleCollegeKeyDown = (e) => {
+    if (!showCollegeDropdowns[activeCollegeIndex] || collegeSuggestions.length === 0) return;
+    
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        setCollegeKeyIndex(prev => 
+          prev < collegeSuggestions.length - 1 ? prev + 1 : prev
+        );
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        setCollegeKeyIndex(prev => prev > 0 ? prev - 1 : 0);
+        break;
+      case 'Enter':
+        e.preventDefault();
+        if (collegeKeyIndex >= 0 && collegeKeyIndex < collegeSuggestions.length) {
+          handleCollegeSelect(activeCollegeIndex, collegeSuggestions[collegeKeyIndex]);
+          setShowCollegeDropdowns(Array(formData.collegeEntries.length).fill(false));
+        }
+        break;
+      case 'Escape':
+        e.preventDefault();
+        setShowCollegeDropdowns(Array(formData.collegeEntries.length).fill(false));
+        break;
+      default:
+        break;
+    }
+  };
+
+  // Handle keyboard navigation for department dropdown
+  const handleDepartmentKeyDown = (e) => {
+    if (!showDepartmentDropdowns[activeDepartmentIndex] || departmentSuggestions.length === 0) return;
+    
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        setDepartmentKeyIndex(prev => 
+          prev < departmentSuggestions.length - 1 ? prev + 1 : prev
+        );
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        setDepartmentKeyIndex(prev => prev > 0 ? prev - 1 : 0);
+        break;
+      case 'Enter':
+        e.preventDefault();
+        if (departmentKeyIndex >= 0 && departmentKeyIndex < departmentSuggestions.length) {
+          handleDepartmentSelect(activeDepartmentIndex, departmentSuggestions[departmentKeyIndex]);
+          setShowDepartmentDropdowns(Array(formData.collegeEntries.length).fill(false));
+        }
+        break;
+      case 'Escape':
+        e.preventDefault();
+        setShowDepartmentDropdowns(Array(formData.collegeEntries.length).fill(false));
+        break;
+      default:
+        break;
+    }
+  };
+
+  // Auto-scroll to the selected item in company type dropdown
+  useEffect(() => {
+    if (companyTypeKeyIndex >= 0 && companyTypeListRef.current) {
+      const listItems = companyTypeListRef.current.querySelectorAll('.suggestion-item');
+      if (listItems[companyTypeKeyIndex]) {
+        listItems[companyTypeKeyIndex].scrollIntoView({
+          behavior: 'smooth',
+          block: 'nearest'
+        });
+      }
+    }
+  }, [companyTypeKeyIndex]);
+
+  // Auto-scroll to the selected item in college dropdown
+  useEffect(() => {
+    if (collegeKeyIndex >= 0 && collegeListRef.current) {
+      const listItems = collegeListRef.current.querySelectorAll('.suggestion-item');
+      if (listItems[collegeKeyIndex]) {
+        listItems[collegeKeyIndex].scrollIntoView({
+          behavior: 'smooth',
+          block: 'nearest'
+        });
+      }
+    }
+  }, [collegeKeyIndex]);
+
+  // Auto-scroll to the selected item in department dropdown
+  useEffect(() => {
+    if (departmentKeyIndex >= 0 && departmentListRef.current) {
+      const listItems = departmentListRef.current.querySelectorAll('.suggestion-item');
+      if (listItems[departmentKeyIndex]) {
+        listItems[departmentKeyIndex].scrollIntoView({
+          behavior: 'smooth',
+          block: 'nearest'
+        });
+      }
+    }
+  }, [departmentKeyIndex]);
+
+  // Reset key index when dropdown visibility changes
+  useEffect(() => {
+    if (!showDropdown) setCompanyTypeKeyIndex(-1);
+  }, [showDropdown]);
+
+  useEffect(() => {
+    if (!showCollegeDropdowns.every(Boolean)) setCollegeKeyIndex(-1);
+  }, [showCollegeDropdowns]);
+
+  useEffect(() => {
+    if (!showDepartmentDropdowns.every(Boolean)) setDepartmentKeyIndex(-1);
+  }, [showDepartmentDropdowns]);
+
+  // Initialize dropdown states when entries change
+  useEffect(() => {
+    setShowCollegeDropdowns(Array(formData.collegeEntries.length).fill(false));
+    setShowDepartmentDropdowns(Array(formData.collegeEntries.length).fill(false));
+  }, [formData.collegeEntries.length]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -260,8 +472,7 @@ const CompanyMOAForm = () => {
         moaYear: new Date().getFullYear().toString(),
         moaStatus: 'Active',
         companyType: '',
-        college: '',
-        department: '',
+        collegeEntries: [{ college: '', department: '' }],
         withExpiration: false,
         moaValidity: '',
         moaExpirationDate: '',
@@ -281,6 +492,24 @@ const CompanyMOAForm = () => {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  // Add a function to handle adding another college entry
+  const handleAddCollege = () => {
+    setFormData(prev => ({
+      ...prev,
+      collegeEntries: [...prev.collegeEntries, { college: '', department: '' }]
+    }));
+  };
+
+  // Add a function to handle removing a college entry
+  const handleRemoveCollege = (index) => {
+    if (formData.collegeEntries.length <= 1) return; // Keep at least one entry
+    
+    setFormData(prev => ({
+      ...prev,
+      collegeEntries: prev.collegeEntries.filter((_, i) => i !== index)
+    }));
   };
 
   return (
@@ -381,15 +610,16 @@ const CompanyMOAForm = () => {
             onChange={handleCompanyTypeChange}
             onFocus={handleCompanyTypeFocus}
             onBlur={handleBlur}
+            onKeyDown={handleCompanyTypeKeyDown}
             placeholder="Start typing to see suggestions..."
             required
           />
           {showDropdown && suggestions.length > 0 && (
-            <div className="suggestions-list">
+            <div className="suggestions-list" ref={companyTypeListRef}>
               {suggestions.map((type, index) => (
                 <div
                   key={type}
-                  className={`suggestion-item ${index === selectedIndex ? 'selected' : ''}`}
+                  className={`suggestion-item ${index === companyTypeKeyIndex ? 'selected' : ''}`}
                   onClick={() => handleSuggestionClick(type)}
                 >
                   {type}
@@ -399,78 +629,101 @@ const CompanyMOAForm = () => {
           )}
         </div>
 
-        <div className="form-group">
-          <label htmlFor="college">College:</label>
-          <div className="company-type-autocomplete">
-            <input
-              type="text"
-              id="college"
-              name="college"
-              value={formData.college}
-              onChange={handleCollegeChange}
-              onFocus={handleCollegeFocus}
-              onBlur={() => {
-                // Delay hiding dropdown to allow click to register
-                setTimeout(() => {
-                  setShowCollegeDropdown(false);
-                }, 200);
-              }}
-              placeholder="Select a college..."
-            />
-            {showCollegeDropdown && collegeSuggestions.length > 0 && (
-              <div className="suggestions-list">
-                {collegeSuggestions.map((college) => (
-                  <div
-                    key={college}
-                    className="suggestion-item"
-                    onMouseDown={(e) => {
-                      e.preventDefault(); // Prevent input blur
-                      handleCollegeSelect(college);
-                    }}
+        {/* College and Department section */}
+        <div className="college-entries-section">
+          <h3>College and Department Information</h3>
+          
+          {formData.collegeEntries.map((entry, index) => (
+            <div key={index} className="college-entry">
+              <div className="college-entry-header">
+                <h4>Entry #{index + 1}</h4>
+                {formData.collegeEntries.length > 1 && (
+                  <button 
+                    type="button" 
+                    className="remove-college-btn"
+                    onClick={() => handleRemoveCollege(index)}
                   >
-                    {college}
-                  </div>
-                ))}
+                    <i className="fas fa-times"></i>
+                  </button>
+                )}
               </div>
-            )}
-          </div>
-        </div>
+              
+              <div className="form-group">
+                <label htmlFor={`college-${index}`}>College:</label>
+                <div className="company-type-autocomplete">
+                  <input
+                    type="text"
+                    id={`college-${index}`}
+                    name={`college-${index}`}
+                    value={entry.college}
+                    onChange={(e) => handleCollegeChange(index, e)}
+                    onFocus={() => handleCollegeFocus(index)}
+                    onKeyDown={activeCollegeIndex === index ? handleCollegeKeyDown : null}
+                    onBlur={() => handleCollegeBlur(index)}
+                    placeholder="Select a college..."
+                  />
+                  {showCollegeDropdowns[index] && collegeSuggestions.length > 0 && (
+                    <div className="suggestions-list" ref={collegeListRef}>
+                      {collegeSuggestions.map((college, i) => (
+                        <div
+                          key={college}
+                          className={`suggestion-item ${i === collegeKeyIndex ? 'selected' : ''}`}
+                          onMouseDown={(e) => {
+                            e.preventDefault();
+                            handleCollegeSelect(index, college);
+                          }}
+                        >
+                          {college}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
 
-        <div className="form-group">
-          <label htmlFor="department">Department:</label>
-          <div className="company-type-autocomplete">
-            <input
-              type="text"
-              id="department"
-              name="department"
-              value={formData.department}
-              onChange={handleDepartmentChange}
-              onFocus={handleDepartmentFocus}
-              onBlur={() => {
-                setTimeout(() => {
-                  setShowDepartmentDropdown(false);
-                }, 200);
-              }}
-              placeholder="Select a department..."
-              disabled={!formData.college}
-            />
-            {showDepartmentDropdown && departmentSuggestions.length > 0 && (
-              <div className="suggestions-list">
-                {departmentSuggestions.map((program) => (
-                  <div
-                    key={program}
-                    className="suggestion-item"
-                    onMouseDown={(e) => {
-                      e.preventDefault(); // Prevent input blur
-                      handleDepartmentSelect(program);
-                    }}
-                  >
-                    {program}
-                  </div>
-                ))}
+              <div className="form-group">
+                <label htmlFor={`department-${index}`}>Department:</label>
+                <div className="company-type-autocomplete">
+                  <input
+                    type="text"
+                    id={`department-${index}`}
+                    name={`department-${index}`}
+                    value={entry.department}
+                    onChange={(e) => handleDepartmentChange(index, e)}
+                    onFocus={() => handleDepartmentFocus(index)}
+                    onKeyDown={activeDepartmentIndex === index ? handleDepartmentKeyDown : null}
+                    onBlur={() => handleDepartmentBlur(index)}
+                    placeholder="Select a department..."
+                    disabled={!entry.college}
+                  />
+                  {showDepartmentDropdowns[index] && departmentSuggestions.length > 0 && (
+                    <div className="suggestions-list" ref={departmentListRef}>
+                      {departmentSuggestions.map((program, i) => (
+                        <div
+                          key={program}
+                          className={`suggestion-item ${i === departmentKeyIndex ? 'selected' : ''}`}
+                          onMouseDown={(e) => {
+                            e.preventDefault();
+                            handleDepartmentSelect(index, program);
+                          }}
+                        >
+                          {program}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
-            )}
-          </div>
+            </div>
+          ))}
+          
+          <button 
+            type="button" 
+            className="add-college-btn"
+            onClick={handleAddCollege}
+          >
+            <i className="fas fa-plus"></i> Add Another College
+          </button>
         </div>
 
         <div className="expiration-checkbox-group">
