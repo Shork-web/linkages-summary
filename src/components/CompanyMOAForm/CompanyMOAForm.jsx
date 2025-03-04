@@ -580,7 +580,6 @@ const CompanyMOAForm = () => {
               name="moaYear"
               value={formData.moaYear}
               onChange={handleChange}
-              required
             />
           </div>
 

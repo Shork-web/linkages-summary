@@ -411,7 +411,7 @@ const EditCompanyModal = ({ company, onClose, onUpdate }) => {
           </div>
 
           <div className="form-row">
-            <div className="form-group required">
+            <div className="form-group">
               <label htmlFor="moaYear">MOA Year</label>
               <input
                 type="number"
@@ -419,7 +419,6 @@ const EditCompanyModal = ({ company, onClose, onUpdate }) => {
                 name="moaYear"
                 value={formData.moaYear}
                 onChange={handleChange}
-                required
               />
             </div>
 
