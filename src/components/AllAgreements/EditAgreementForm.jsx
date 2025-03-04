@@ -25,10 +25,26 @@ const EditAgreementForm = ({ agreement, onClose, onUpdate }) => {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
-      ...prev,
+    
+    // Update the form data with the new value
+    const updatedFormData = {
+      ...formData,
       [name]: type === 'checkbox' ? checked : value
-    }));
+    };
+    
+    // If date signed or validity changes, recalculate expiry date
+    if (name === 'dateSigned' || name === 'validity') {
+      const newExpiryDate = calculateExpiryDate(
+        name === 'dateSigned' ? value : formData.dateSigned,
+        name === 'validity' ? value : formData.validity
+      );
+      
+      if (newExpiryDate) {
+        updatedFormData.dateExpired = newExpiryDate;
+      }
+    }
+    
+    setFormData(updatedFormData);
   };
 
   const calculateExpiryDate = (dateSigned, validity) => {
@@ -46,7 +62,7 @@ const EditAgreementForm = ({ agreement, onClose, onUpdate }) => {
     try {
       const agreementRef = doc(db, 'agreementform', agreement.id);
       
-      // Calculate new expiry date if date signed or validity changes
+      // Ensure expiry date is calculated correctly
       const newExpiryDate = calculateExpiryDate(formData.dateSigned, formData.validity);
       
       // Prepare update data
@@ -58,7 +74,7 @@ const EditAgreementForm = ({ agreement, onClose, onUpdate }) => {
 
       const updateData = {
         ...formData,
-        dateExpired: newExpiryDate,
+        dateExpired: newExpiryDate, // Use the calculated expiry date
         updatedAt: new Date().toISOString(),
         validity: parseInt(formData.validity),
         status: status,
@@ -237,8 +253,8 @@ const EditAgreementForm = ({ agreement, onClose, onUpdate }) => {
                 id="dateExpired"
                 name="dateExpired"
                 value={formData.dateExpired}
-                onChange={handleChange}
-                required
+                readOnly
+                className="readonly-input"
               />
             </div>
           </div>
