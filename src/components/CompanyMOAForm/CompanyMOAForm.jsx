@@ -68,8 +68,7 @@ const CompanyMOAForm = () => {
     companyLatitude: '',
     moaYear: new Date().getFullYear().toString(),
     moaStatus: 'Active',
-    companyType: '',
-    collegeEntries: [{ college: '', department: '', status: 'Active' }],
+    collegeEntries: [{ college: '', department: '', status: 'Active', companyType: '' }],
     withExpiration: false,
     moaValidity: '',
     moaExpirationDate: '',
@@ -125,6 +124,9 @@ const CompanyMOAForm = () => {
   const collegeListRef = useRef(null);
   const departmentListRef = useRef(null);
 
+  // Add a new state variable to track which entry's company type field is active
+  const [activeCompanyTypeIndex, setActiveCompanyTypeIndex] = useState(-1);
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     
@@ -146,9 +148,18 @@ const CompanyMOAForm = () => {
     }));
   };
 
-  const handleCompanyTypeChange = (e) => {
+  const handleCompanyTypeChange = (index, e) => {
     const value = e.target.value;
-    setFormData(prev => ({ ...prev, companyType: value }));
+    
+    // Update the company type for the specific college entry
+    setFormData(prev => {
+      const updatedEntries = [...prev.collegeEntries];
+      updatedEntries[index] = { 
+        ...updatedEntries[index], 
+        companyType: value 
+      };
+      return { ...prev, collegeEntries: updatedEntries };
+    });
     
     // Filter suggestions based on input
     if (value.trim()) {
@@ -161,8 +172,9 @@ const CompanyMOAForm = () => {
     }
   };
 
-  const handleCompanyTypeFocus = () => {
+  const handleCompanyTypeFocus = (index) => {
     setShowDropdown(true);
+    setActiveCompanyTypeIndex(index); // Track which entry's company type is active
     setSuggestions(companyTypes); // Show all options on focus
   };
 
@@ -172,8 +184,16 @@ const CompanyMOAForm = () => {
     }, 100); // Delay to allow click event to register
   };
 
-  const handleSuggestionClick = (type) => {
-    setFormData(prev => ({ ...prev, companyType: type }));
+  const handleSuggestionClick = (index, type) => {
+    // Update the company type for the specific college entry
+    setFormData(prev => {
+      const updatedEntries = [...prev.collegeEntries];
+      updatedEntries[index] = { 
+        ...updatedEntries[index], 
+        companyType: type 
+      };
+      return { ...prev, collegeEntries: updatedEntries };
+    });
     setSuggestions([]);
   };
 
@@ -298,7 +318,7 @@ const CompanyMOAForm = () => {
 
   // Handle keyboard navigation for company type dropdown
   const handleCompanyTypeKeyDown = (e) => {
-    if (!showDropdown || suggestions.length === 0) return;
+    if (!showDropdown || suggestions.length === 0 || activeCompanyTypeIndex === -1) return;
     
     switch (e.key) {
       case 'ArrowDown':
@@ -314,7 +334,7 @@ const CompanyMOAForm = () => {
       case 'Enter':
         e.preventDefault();
         if (companyTypeKeyIndex >= 0 && companyTypeKeyIndex < suggestions.length) {
-          handleSuggestionClick(suggestions[companyTypeKeyIndex]);
+          handleSuggestionClick(activeCompanyTypeIndex, suggestions[companyTypeKeyIndex]);
           setShowDropdown(false);
         }
         break;
@@ -430,7 +450,10 @@ const CompanyMOAForm = () => {
 
   // Reset key index when dropdown visibility changes
   useEffect(() => {
-    if (!showDropdown) setCompanyTypeKeyIndex(-1);
+    if (!showDropdown) {
+      setCompanyTypeKeyIndex(-1);
+      setActiveCompanyTypeIndex(-1);
+    }
   }, [showDropdown]);
 
   useEffect(() => {
@@ -454,8 +477,16 @@ const CompanyMOAForm = () => {
     setNotification(null);
 
     try {
+      // Ensure all college entries have a company type
+      const validatedEntries = formData.collegeEntries.map(entry => ({
+        ...entry,
+        companyType: entry.companyType || 'N/A',
+        status: entry.status || 'Active'
+      }));
+
       const docRef = await addDoc(collection(db, 'companyMOA'), {
         ...formData,
+        collegeEntries: validatedEntries,
         validityUnit: formData.validityUnit,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
@@ -471,8 +502,7 @@ const CompanyMOAForm = () => {
         companyLatitude: '',
         moaYear: new Date().getFullYear().toString(),
         moaStatus: 'Active',
-        companyType: '',
-        collegeEntries: [{ college: '', department: '', status: 'Active' }],
+        collegeEntries: [{ college: '', department: '', status: 'Active', companyType: '' }],
         withExpiration: false,
         moaValidity: '',
         moaExpirationDate: '',
@@ -494,11 +524,11 @@ const CompanyMOAForm = () => {
     }
   };
 
-  // Add a function to handle adding another college entry
+  // Update the add college function to include companyType
   const handleAddCollege = () => {
     setFormData(prev => ({
       ...prev,
-      collegeEntries: [...prev.collegeEntries, { college: '', department: '', status: 'Active' }]
+      collegeEntries: [...prev.collegeEntries, { college: '', department: '', status: 'Active', companyType: '' }]
     }));
   };
 
@@ -596,37 +626,6 @@ const CompanyMOAForm = () => {
               onChange={handleChange}
             />
           </div>
-
-          <div className="form-group">
-            <label htmlFor="companyType">Company Type:</label>
-            <div className="company-type-autocomplete">
-              <input
-                type="text"
-                id="companyType"
-                name="companyType"
-                value={formData.companyType}
-                onChange={handleCompanyTypeChange}
-                onFocus={handleCompanyTypeFocus}
-                onBlur={handleBlur}
-                onKeyDown={handleCompanyTypeKeyDown}
-                placeholder="Start typing to see suggestions..."
-                required
-              />
-              {showDropdown && suggestions.length > 0 && (
-                <div className="suggestions-list" ref={companyTypeListRef}>
-                  {suggestions.map((type, index) => (
-                    <div
-                      key={type}
-                      className={`suggestion-item ${index === companyTypeKeyIndex ? 'selected' : ''}`}
-                      onClick={() => handleSuggestionClick(type)}
-                    >
-                      {type}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
         </div>
 
         {/* College and Department section */}
@@ -648,6 +647,37 @@ const CompanyMOAForm = () => {
                 )}
               </div>
               
+              <div className="form-group">
+                <label htmlFor={`companyType-${index}`}>Company Type: <span className="required">*</span></label>
+                <div className="company-type-autocomplete">
+                  <input
+                    type="text"
+                    id={`companyType-${index}`}
+                    name={`companyType-${index}`}
+                    value={entry.companyType}
+                    onChange={(e) => handleCompanyTypeChange(index, e)}
+                    onFocus={() => handleCompanyTypeFocus(index)}
+                    onBlur={handleBlur}
+                    onKeyDown={activeCompanyTypeIndex === index ? handleCompanyTypeKeyDown : null}
+                    placeholder="Start typing to see suggestions..."
+                    required
+                  />
+                  {showDropdown && activeCompanyTypeIndex === index && suggestions.length > 0 && (
+                    <div className="suggestions-list" ref={companyTypeListRef}>
+                      {suggestions.map((type, idx) => (
+                        <div
+                          key={type}
+                          className={`suggestion-item ${idx === companyTypeKeyIndex ? 'selected' : ''}`}
+                          onClick={() => handleSuggestionClick(index, type)}
+                        >
+                          {type}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
               <div className="form-group">
                 <label htmlFor={`college-${index}`}>College:</label>
                 <div className="company-type-autocomplete">

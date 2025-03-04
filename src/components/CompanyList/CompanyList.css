@@ -1,177 +1,312 @@
 .company-list-container {
-  padding: 20px;
+  padding: 24px;
   background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
   margin: 0 -20px;
   max-width: 95vw;
+  overflow-x: hidden; /* Prevent container from causing horizontal scroll */
 }
 
-.company-list-title {
-  color: #8B3A2B;
-  margin-bottom: 30px;
-  font-size: 1.8em;
-  font-weight: 600;
-}
-
-.company-table-container {
-  max-height: 70vh;
-  overflow-y: auto;
-  overflow-x: auto;
-  margin-top: 20px;
-  padding-right: 5px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  background: white;
-  position: relative;
-}
-
+/* Header and Title */
 .company-list-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 30px;
+  margin-bottom: 24px;
   flex-wrap: wrap;
   gap: 20px;
 }
 
-.company-header-controls {
+.company-list-title {
+  color: #8B3A2B;
+  margin: 0;
+  font-size: 1.8em;
+  font-weight: 600;
+  position: relative;
+}
+
+.company-list-title::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 60px;
+  height: 3px;
+  background-color: #8B3A2B;
+  border-radius: 2px;
+}
+
+/* Search and Filter Section */
+.company-filters-section {
   display: flex;
+  gap: 16px;
   align-items: center;
-  gap: 15px;
   flex-wrap: wrap;
 }
 
 .company-search-box {
   position: relative;
-  flex: 1;
+  min-width: 280px;
 }
 
 .company-search-input {
   width: 100%;
-  padding: 8px 35px 8px 12px;
+  padding: 10px 16px 10px 40px;
   border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 14px;
-  transition: border-color 0.3s ease;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  background-color: #f9f9f9;
 }
 
 .company-search-input:focus {
-  border-color: #1976d2;
+  border-color: #8B3A2B;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(139, 58, 43, 0.1);
+  background-color: white;
 }
 
 .company-search-icon {
   position: absolute;
-  right: 15px;
+  left: 14px;
   top: 50%;
   transform: translateY(-50%);
-  color: #888;
+  color: #8B3A2B;
+  font-size: 0.9rem;
 }
 
 .company-filter-controls {
   display: flex;
-  gap: 15px;
+  gap: 12px;
 }
 
 .company-filter-select {
-  padding: 8px 12px;
+  padding: 10px 16px;
   border: 1px solid #ddd;
-  border-radius: 4px;
-  background-color: white;
-  min-width: 160px;
-  transition: border-color 0.3s ease;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  min-width: 180px;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+  padding-right: 36px;
 }
 
 .company-filter-select:focus {
-  border-color: #1976d2;
+  border-color: #8B3A2B;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(139, 58, 43, 0.1);
+  background-color: white;
 }
 
-.company-table {
+/* Table Container */
+.company-table-container {
+  overflow-x: auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  margin-bottom: 24px;
+  background-color: white;
+  border: 1px solid #eee;
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: #8B3A2B #f0f0f0; /* Firefox */
+  position: relative; /* For scroll indicators */
+}
+
+/* Custom scrollbar for Webkit browsers */
+.company-table-container::-webkit-scrollbar {
+  height: 8px;
+}
+
+.company-table-container::-webkit-scrollbar-track {
+  background: #f0f0f0;
+  border-radius: 4px;
+}
+
+.company-table-container::-webkit-scrollbar-thumb {
+  background-color: #8B3A2B;
+  border-radius: 4px;
+}
+
+/* Scroll indicators */
+.company-table-container::before,
+.company-table-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 15px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 5;
+}
+
+.company-table-container::before {
+  left: 0;
+  background: linear-gradient(to right, rgba(255,255,255,0.9), rgba(255,255,255,0));
+}
+
+.company-table-container::after {
+  right: 0;
+  background: linear-gradient(to left, rgba(255,255,255,0.9), rgba(255,255,255,0));
+}
+
+.company-table-container.scroll-left::before {
+  opacity: 1;
+}
+
+.company-table-container.scroll-right::after {
+  opacity: 1;
+}
+
+/* Table Styles */
+.company-list-table {
   width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 20px;
-  min-width: 1500px;
-  border: none;
+  border-collapse: separate;
+  border-spacing: 0;
+  min-width: 1200px; /* Ensures table doesn't shrink below this width */
 }
 
-.company-table th,
-.company-table td {
-  padding: 12px 15px;
+.company-list-table th,
+.company-list-table td {
+  padding: 14px 16px;
   text-align: left;
-  border: none;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid transparent; /* Make borders transparent instead of removing them */
+}
+
+.company-list-table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  color: #333;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  border-bottom: 2px solid #8B3A2B; /* Keep header border visible but make it themed */
+}
+
+.th-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.th-content i {
+  color: #8B3A2B;
+  font-size: 0.9rem;
+}
+
+/* Add subtle row separators instead of underlines */
+.company-list-table tbody tr {
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 0 0 rgba(0,0,0,0.05); /* Subtle shadow instead of border */
+}
+
+/* Add subtle spacing between rows */
+.company-list-table tbody tr:not(.additional-entry-row) {
+  margin-bottom: 4px;
+}
+
+/* Hover effect without underlines */
+.company-list-table tbody tr:hover {
+  background-color: #f9f9f9;
+  box-shadow: 0 0 0 1px #f0f0f0; /* Subtle outline on hover instead of underline */
+}
+
+/* Column Widths */
+.company-name-col { width: 18%; }
+.address-col { width: 20%; }
+.coordinates-col { width: 8%; }
+.year-col { width: 6%; }
+.type-col { width: 12%; }
+.expiration-col { width: 8%; }
+.validity-col { width: 8%; }
+.remarks-col { width: 14%; }
+.actions-col { width: 6%; }
+
+/* Cell Styles */
+.company-name-cell {
+  font-weight: 500;
+  color: #333;
+}
+
+.address-cell, .remarks-cell {
+  max-width: 250px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.company-table th {
-  position: sticky;
-  top: 0;
-  z-index: 1;
-  background: white;
-  background-color: #f8f9fa;
-  color: #495057;
-  font-weight: 600;
-  border-bottom: 2px solid #dee2e6;
+.coordinates-cell {
+  font-family: monospace;
+  color: #666;
+  font-size: 0.9em;
 }
 
-/* Remove the last row's bottom border */
-.company-table tbody tr:last-child td {
-  border-bottom: none;
+.year-cell {
+  text-align: center;
 }
 
-/* Remove border from actions column */
-.company-table th:last-child,
-.company-table td:last-child {
-  border-right: none;
+.type-cell {
+  position: relative;
 }
 
-/* Keep hover effect */
-.company-table tbody tr:hover {
-  background-color: #f8f9fa;
+.company-type-cell {
+  display: flex;
+  align-items: center;
 }
 
-/* Update Column widths */
-.company-table th:nth-child(1) { width: 25%; }  /* Increased company name width from 15% to 20% */
-.company-table th:nth-child(2) { width: 20%; }  /* Adjusted address width to maintain balance */
-.company-table th:nth-child(3) { width: 8%; }
-.company-table th:nth-child(4) { width: 8%; }
-.company-table th:nth-child(5) { width: 10%; }
-.company-table th:nth-child(6) { width: 15%; }
-.company-table th:nth-child(7) { width: 12%; }
-.company-table th:nth-child(8) { width: 8%; }
-.company-table th:nth-child(9) { width: 6%; }
-.company-table th:nth-child(10) { width: 15%; }  /* Adjusted remarks width */
-.company-table th:nth-child(11) { width: 6%; }
+.company-type-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  background-color: #f0f0f0;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  color: #333;
+}
 
-.company-status-badge {
-  padding: 4px 8px;
-  border-radius: 12px;
-  font-size: 0.85em;
+.expiration-cell {
+  text-align: center;
+}
+
+.expiration-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 0.85rem;
   font-weight: 500;
 }
 
-.company-status-badge.status-active {
-  background-color: #E8F5E9;
-  color: #2E7D32;
+.expiration-badge.yes {
+  background-color: #e8f5e9;
+  color: #2e7d32;
 }
 
-.company-status-badge.status-for-update {
-  background-color: #FFF3E0;
-  color: #F57C00;
+.expiration-badge.no {
+  background-color: #ffebee;
+  color: #c62828;
 }
 
-.company-status-badge.status-blacklisted {
-  background-color: #FFEBEE;
-  color: #C62828;
+.validity-cell {
+  text-align: center;
+  font-weight: 500;
 }
 
+.no-expiry {
+  color: #2e7d32;
+  font-style: italic;
+}
+
+/* Action Buttons */
 .company-action-buttons {
   display: flex;
-  gap: 2px;
+  gap: 8px;
   justify-content: center;
-  align-items: center;
 }
 
 .company-action-btn {
@@ -179,18 +314,12 @@
   align-items: center;
   justify-content: center;
   width: 32px;
-  height: 100px;
-  padding: 0;
+  height: 32px;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
-  background-color: transparent;
-  margin: 0 4px;
-}
-
-.company-action-btn:hover {
-  background-color: rgba(0, 0, 0, 0.05);
+  background-color: #f0f0f0;
 }
 
 .company-edit-btn {
@@ -198,6 +327,7 @@
 }
 
 .company-edit-btn:hover {
+  background-color: #FFF3E0;
   color: #E65100;
 }
 
@@ -206,19 +336,89 @@
 }
 
 .company-delete-btn:hover {
+  background-color: #FFEBEE;
   color: #B71C1C;
 }
 
-.company-loading {
-  padding: 2rem;
-  text-align: center;
-  color: #8B3A2B;
-  font-size: 1.2rem;
+/* Multiple Entries Styling - adjust for no visible borders */
+.has-multiple-entries {
+  border-bottom: none;
 }
 
+.toggle-entries-btn {
+  background: none;
+  border: none;
+  color: #8B3A2B;
+  cursor: pointer;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  padding: 0;
+  margin-left: 8px;
+}
+
+.toggle-entries-btn:hover {
+  background-color: rgba(139, 58, 43, 0.1);
+}
+
+.additional-entry-row {
+  background-color: #f9f9f9;
+  box-shadow: none; /* Remove shadow for additional entry rows */
+}
+
+/* Add subtle separator between main rows */
+.company-list-table tbody tr:not(.additional-entry-row):not(.has-multiple-entries) {
+  position: relative;
+}
+
+.company-list-table tbody tr:not(.additional-entry-row):not(.has-multiple-entries)::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(to right, rgba(0,0,0,0.03), rgba(0,0,0,0.06), rgba(0,0,0,0.03));
+  pointer-events: none;
+}
+
+.additional-entry-spacer {
+  background-color: #f9f9f9;
+}
+
+.additional-entry {
+  display: flex;
+  align-items: center;
+  padding: 4px 0;
+  margin-left: 10px;
+}
+
+.entry-number {
+  display: none; /* Hide the entry number */
+}
+
+.entry-type {
+  font-weight: 500;
+  color: #333;
+  position: relative;
+}
+
+.entry-type::before {
+  content: '•';
+  color: #8B3A2B;
+  margin-right: 8px;
+  font-size: 1.2em;
+  line-height: 1;
+}
+
+/* Empty State */
 .company-empty-state {
   text-align: center;
-  padding: 40px 20px;
+  padding: 60px 20px;
   color: #666;
 }
 
@@ -226,6 +426,7 @@
   font-size: 3em;
   color: #8B3A2B;
   margin-bottom: 15px;
+  opacity: 0.7;
 }
 
 .company-empty-state p {
@@ -238,504 +439,48 @@
   color: #888;
 }
 
-/* Responsive styles */
-@media (max-width: 768px) {
-  .company-list-header {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .company-header-controls {
-    flex-direction: column;
-    gap: 15px;
-  }
-
-  .company-search-box {
-    width: 100%;
-    min-width: unset;
-  }
-
-  .company-filter-controls {
-    width: 100%;
-    flex-direction: column;
-  }
-
-  .company-filter-select {
-    width: 100%;
-  }
-}
-
-/* Update scrollbar styles to be thinner */
-.company-table-container::-webkit-scrollbar {
-  width: 6px;  /* Reduced from 12px to 6px */
-  height: 6px; /* Also make horizontal scrollbar thinner */
-}
-
-.company-table-container::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 3px; /* Reduced from 10px to 3px */
-}
-
-.company-table-container::-webkit-scrollbar-thumb {
-  background: #8B3A2B;
-  border-radius: 3px; /* Reduced from 10px to 3px */
-}
-
-.company-table-container::-webkit-scrollbar-thumb:hover {
-  background: #7A3225;
-}
-
-/* For Firefox */
-.company-table-container {
-  scrollbar-width: thin; /* Changed from 'auto' to 'thin' */
-  scrollbar-color: #8B3A2B #f1f1f1;
-}
-
-/* Keep horizontal scrollbar visible */
-.company-table-container::-webkit-scrollbar:horizontal {
-  height: 6px;
-  display: block;
-}
-
-/* Add pagination styles */
-.company-pagination-container {
+/* Loading State */
+.company-loading {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
-  padding: 20px;
-  background: white;
-  border-top: 1px solid #eee;
-}
-
-.company-pagination {
-  display: flex;
-  gap: 8px;
-  align-items: center;
   justify-content: center;
-}
-
-.company-page-btn {
-  padding: 8px 12px;
-  border: 1px solid #ddd;
-  background: white;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.company-page-btn:hover {
-  border-color: #8B3A2B;
+  padding: 60px 20px;
   color: #8B3A2B;
 }
 
-.company-page-btn.active {
-  background: #8B3A2B;
-  color: white;
-  border-color: #8B3A2B;
-}
-
-.company-page-btn:disabled {
-  background: #f5f5f5;
-  cursor: not-allowed;
-  color: #999;
-}
-
-.company-page-info {
-  text-align: center;
-  color: #666;
-  font-size: 0.9em;
-}
-
-.company-page-ellipsis {
-  color: #666;
-  padding: 0 4px;
-}
-
-/* Update scrollbar styles */
-.company-table-container {
-  max-height: 70vh;
-  overflow-y: auto;
-  margin-top: 20px;
-  padding-right: 5px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  background: white;
-  position: relative;
-}
-
-/* Custom scrollbar styles */
-.company-table-container::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-.company-table-container::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 3px;
-}
-
-.company-table-container::-webkit-scrollbar-thumb {
-  background: #8B3A2B;
-  border-radius: 3px;
-}
-
-.company-table-container::-webkit-scrollbar-thumb:hover {
-  background: #7A3225;
-}
-
-/* For Firefox */
-.company-table-container {
-  scrollbar-width: thin;
-  scrollbar-color: #8B3A2B #f1f1f1;
-}
-
-/* Update pagination container to center content */
-.company-pagination-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  padding: 20px;
-  background: white;
-  border-top: 1px solid #eee;
-}
-
-.company-pagination {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  justify-content: center;
-}
-
-.company-page-info {
-  text-align: center;
-  color: #666;
-  font-size: 0.9em;
-}
-
-/* Add these new styles to your existing CSS */
-
-.list-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 30px;
-  flex-wrap: wrap;
-  gap: 20px;
-}
-
-.header-controls {
-  display: flex;
-  align-items: center;
-  gap: 60px;
-  flex-wrap: wrap;
-}
-
-.search-box {
-  position: relative;
-  min-width: 300px;
-}
-
-.search-box input {
-  width: 100%;
-  padding: 8px 8px 8px 35px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  font-size: 13px;
-  transition: all 0.3s ease;
-}
-
-.search-box input:focus {
-  border-color: #8B3A2B;
-  box-shadow: 0 0 0 2px rgba(139, 58, 43, 0.1);
-}
-
-.search-box i {
-  position: absolute;
-  left: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #666;
-  font-size: 14px;
-}
-
-.filter-group {
-  display: flex;
-  gap: 15px;
-  align-items: center;
-}
-
-.filter-group select {
-  padding: 8px 12px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  font-size: 13px;
-  min-width: 150px;
-  cursor: pointer;
-  background-color: white;
-}
-
-.filter-group select:hover {
-  border-color: #8B3A2B;
-}
-
-.filter-group select:focus {
-  border-color: #8B3A2B;
-  box-shadow: 0 0 0 2px rgba(139, 58, 43, 0.1);
-  outline: none;
-}
-
-@media (max-width: 768px) {
-  .list-header {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .header-controls {
-    flex-direction: column;
-    gap: 15px;
-  }
-
-  .search-box {
-    width: 100%;
-    min-width: unset;
-  }
-
-  .filter-group {
-    width: 100%;
-    flex-direction: column;
-  }
-
-  .filter-group select {
-    width: 100%;
-  }
-}
-
-/* Adjust table cell padding for better readability */
-.companies-table td {
-  padding: 12px 15px;
-}
-
-/* Add word-wrap for remarks column */
-.companies-table td:nth-child(10) {
-  white-space: normal;
-  word-wrap: break-word;
-}
-
-/* Add styling for coordinates */
-.companies-table td:nth-child(3),
-.companies-table td:nth-child(4) {
-  font-family: monospace;
-  font-size: 0.9em;
-  color: #666;
-}
-
-/* Add styling for expiration status */
-.companies-table td:nth-child(8) {
-  text-align: center;
-  font-weight: 500;
-}
-
-.companies-table td:nth-child(8)::before {
-  content: '';
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  margin-right: 6px;
-}
-
-.companies-table td:nth-child(8):contains('Yes')::before {
-  background-color: #2E7D32;
-}
-
-.companies-table td:nth-child(8):contains('No')::before {
-  background-color: #C62828;
-}
-
-/* Add this to your existing CSS */
-.company-table td:nth-child(9) {
-  color: #2E7D32;  /* Green color for 'Active' text */
-  font-weight: 500;
-}
-
-/* If you want to style specifically the 'Active' text for non-expiring MOAs */
-.company-table td:nth-child(9):not(:contains('years')) {
-  font-style: italic;
-}
-
-/* Delete Confirmation Modal Styles */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.delete-confirm {
-  background: white;
-  padding: 24px;
-  border-radius: 8px;
-  width: 90%;
-  max-width: 400px;
-  text-align: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.delete-confirm h3 {
-  color: #C62828;
+.loading-spinner {
+  font-size: 2em;
   margin-bottom: 16px;
-  font-size: 1.5em;
 }
 
-.warning-text {
-  color: #333;
-  font-weight: 600;
-  margin: 16px 0;
-}
-
-.delete-actions {
-  display: flex;
-  justify-content: center;
-  gap: 16px;
-  margin-top: 24px;
-}
-
-.cancel-btn {
-  padding: 8px 24px;
-  border: 2px solid #8B3A2B;
-  background: white;
-  color: #8B3A2B;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: all 0.2s ease;
-}
-
-.cancel-btn:hover {
-  background: #8B3A2B;
-  color: white;
-}
-
-.confirm-btn {
-  padding: 8px 24px;
-  border: none;
-  background: #C62828;
-  color: white;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: all 0.2s ease;
-}
-
-.confirm-btn:hover {
-  background: #B71C1C;
-}
-
-.company-list-table {
-  width: 100%;
-  min-width: 1500px;
-  border-collapse: collapse;
-  margin-bottom: 20px;
-}
-
-.company-list-table th,
-.company-list-table td {
-  border: none;
-  padding: 8px;
-  text-align: left;
-}
-
-.company-list-table th {
-  background-color: #f2f2f2;
-  color: #333;
-  font-weight: 600;
-  border-bottom: 2px solid #dee2e6;
-}
-
-.company-list-table tr:not(:last-child) td {
-  border-bottom: 1px solid #eee;
-}
-
-.company-list-table tr:hover {
-  background-color: #f1f1f1;
-}
-
-.table-container {
-  max-height: 70vh;
-  overflow-y: auto;
-  margin-top: 20px;
-  padding-right: 5px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  background: white;
-  position: relative;
-}
-
-/* Custom scrollbar styles */
-.table-container::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-.table-container::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 3px;
-}
-
-.table-container::-webkit-scrollbar-thumb {
-  background: #8B3A2B;
-  border-radius: 3px;
-}
-
-.table-container::-webkit-scrollbar-thumb:hover {
-  background: #7A3225;
-}
-
-/* For Firefox */
-.table-container {
-  scrollbar-width: thin;
-  scrollbar-color: #8B3A2B #f1f1f1;
-}
-
-/* Keep horizontal scrollbar visible */
-.table-container::-webkit-scrollbar:horizontal {
-  height: 6px;
-  display: block;
-}
-
-/* Add pagination styles */
+/* Pagination */
 .company-pagination-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
-  padding: 20px;
-  background: white;
-  border-top: 1px solid #eee;
+  gap: 12px;
+  padding: 16px 0;
 }
 
 .company-pagination {
   display: flex;
   gap: 8px;
   align-items: center;
-  justify-content: center;
 }
 
 .company-page-btn {
-  padding: 8px 12px;
+  min-width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border: 1px solid #ddd;
   background: white;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
+  font-size: 0.9rem;
 }
 
 .company-page-btn:hover {
@@ -753,6 +498,12 @@
   background: #f5f5f5;
   cursor: not-allowed;
   color: #999;
+  border-color: #eee;
+}
+
+.company-page-ellipsis {
+  color: #666;
+  padding: 0 4px;
 }
 
 .company-page-info {
@@ -761,97 +512,7 @@
   font-size: 0.9em;
 }
 
-.company-page-ellipsis {
-  color: #666;
-  padding: 0 4px;
-}
-
-.company-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px;
-  border-bottom: 1px solid #ddd;
-}
-
-.company-details p {
-  margin: 0;
-  font-size: 14px;
-}
-
-/* Update the filters section styles */
-.company-filters-section {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  gap: 20px;
-}
-
-.company-search-box {
-  position: relative;
-  flex: 1;
-}
-
-.company-search-input {
-  width: 100%;
-  padding: 8px 35px 8px 12px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 14px;
-  transition: border-color 0.3s ease;
-}
-
-.company-search-input:focus {
-  border-color: #8B3A2B;
-  outline: none;
-}
-
-.company-search-icon {
-  position: absolute;
-  right: 15px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #888;
-}
-
-.company-filter-controls {
-  display: flex;
-  gap: 15px;
-}
-
-.company-filter-select {
-  padding: 8px 12px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  background-color: white;
-  min-width: 160px;
-  transition: border-color 0.3s ease;
-  cursor: pointer;
-}
-
-.company-filter-select:focus {
-  border-color: #8B3A2B;
-  outline: none;
-}
-
-/* Responsive styles */
-@media (max-width: 768px) {
-  .company-filters-section {
-    flex-direction: column;
-    gap: 15px;
-  }
-
-  .company-filter-controls {
-    width: 100%;
-    flex-direction: column;
-  }
-
-  .company-filter-select {
-    width: 100%;
-  }
-}
-
+/* Notification */
 .notification {
   position: fixed;
   top: 20px;
@@ -905,6 +566,71 @@
   opacity: 1;
 }
 
+/* Delete Confirmation Modal */
+.delete-confirm {
+  background: white;
+  padding: 24px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.delete-confirm h3 {
+  color: #C62828;
+  margin-bottom: 16px;
+  font-size: 1.5em;
+}
+
+.warning-text {
+  color: #333;
+  font-weight: 600;
+  margin: 16px 0;
+  padding: 12px;
+  background-color: #FFEBEE;
+  border-radius: 6px;
+}
+
+.delete-actions {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.cancel-btn {
+  padding: 10px 24px;
+  border: 2px solid #8B3A2B;
+  background: white;
+  color: #8B3A2B;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.cancel-btn:hover {
+  background: #8B3A2B;
+  color: white;
+}
+
+.confirm-btn {
+  padding: 10px 24px;
+  border: none;
+  background: #C62828;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.confirm-btn:hover {
+  background: #B71C1C;
+}
+
+/* Animations */
 @keyframes slideIn {
   from {
     transform: translateX(100%);
@@ -916,48 +642,96 @@
   }
 }
 
-/* Update the address cell and tooltip styles */
-.company-list-table td.address-cell {
-  max-width: 300px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+/* Sticky first column adjustments */
+@media (max-width: 1024px) {
+  .company-name-col {
+    position: sticky;
+    left: 0;
+    background-color: #f8f9fa;
+    z-index: 2;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+  }
+  
+  .company-list-table tbody .company-name-cell {
+    position: sticky;
+    left: 0;
+    background-color: white;
+    z-index: 1;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.05); /* Add shadow to sticky column */
+  }
+  
+  .company-list-table tbody tr:hover .company-name-cell {
+    background-color: #f9f9f9;
+  }
+  
+  /* Add visual indicator for scrollable content */
+  .company-table-container {
   position: relative;
-  cursor: help;
 }
 
-.address-cell[data-tooltip] {
-  position: relative;
-}
-
-.address-cell[data-tooltip]:hover::after {
-  content: attr(data-tooltip);
+  .company-table-container::after {
+    content: '';
   position: absolute;
-  bottom: 120%;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(0, 0, 0, 0.9);
-  color: white;
-  padding: 8px 12px;
-  border-radius: 6px;
-  font-size: 13px;
-  white-space: normal;
-  max-width: 400px;
-  width: max-content;
-  z-index: 1000;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    width: 24px;
+    height: 24px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238B3A2B' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='9 18 15 12 9 6'%3E%3C/polyline%3E%3C/svg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+    opacity: 0.7;
   pointer-events: none;
+    animation: pulse 2s infinite;
+  }
 }
 
-/* Add arrow to tooltip */
-.address-cell[data-tooltip]:hover::before {
-  content: '';
-  position: absolute;
-  bottom: 110%;
-  left: 50%;
-  transform: translateX(-50%);
-  border-width: 6px;
-  border-style: solid;
-  border-color: rgba(0, 0, 0, 0.9) transparent transparent transparent;
-  pointer-events: none;
+/* Animation for scroll indicator */
+@keyframes pulse {
+  0% { opacity: 0.7; }
+  50% { opacity: 0.3; }
+  100% { opacity: 0.7; }
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .company-list-container {
+    padding: 16px;
+    margin: 0 -10px;
+  }
+  
+  .company-list-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .company-filters-section {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .company-search-box {
+    width: 100%;
+    min-width: unset;
+  }
+  
+  .company-filter-controls {
+    width: 100%;
+  }
+  
+  .company-filter-select {
+    width: 100%;
+  }
+  
+  /* Adjust table padding for mobile */
+  .company-list-table th,
+  .company-list-table td {
+    padding: 12px 10px;
+  }
+  
+  /* Make sure the company name column is visible */
+  .company-name-col { 
+    min-width: 150px; 
+  }
 } 

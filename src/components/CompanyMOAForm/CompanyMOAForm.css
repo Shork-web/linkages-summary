@@ -319,6 +319,9 @@ input:disabled,
   border: 1px solid #e0e0e0;
   margin-bottom: 1rem;
   position: relative;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
 }
 
 .college-entry-header {
@@ -374,4 +377,20 @@ input:disabled,
 
 .add-college-btn i {
   font-size: 0.8rem;
+}
+
+/* Add responsive grid layout for larger screens */
+@media (min-width: 768px) {
+  .college-entry {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .college-entry-header {
+    grid-column: 1 / -1; /* Span full width */
+  }
+  
+  /* Make the last form group (status) span the full width */
+  .college-entry .form-group:last-child {
+    grid-column: 1 / -1;
+  }
 } 

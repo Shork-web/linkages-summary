@@ -10,49 +10,45 @@
   align-items: center;
   z-index: 1000;
   backdrop-filter: blur(4px);
-  animation: fadeIn 0.2s ease-out;
+  animation: fadeIn 0.3s ease-out;
 }
 
 .edit-company-modal {
-  background: white;
+  background-color: white;
   border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   width: 90%;
   max-width: 800px;
   max-height: 90vh;
   overflow-y: auto;
-  position: relative;
-  padding: 28px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-  animation: slideIn 0.3s ease-out;
+  animation: slideUp 0.3s ease-out;
 }
 
 .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
-  padding-bottom: 16px;
+  padding: 24px 28px;
   border-bottom: 2px solid #8B3A2B;
 }
 
 .modal-header h2 {
-  color: #8B3A2B;
   margin: 0;
-  font-size: 1.8em;
+  color: #8B3A2B;
+  font-size: 1.8rem;
   font-weight: 600;
 }
 
 .close-button {
   background: none;
   border: none;
+  font-size: 1.4rem;
   color: #666;
-  font-size: 1.4em;
   cursor: pointer;
-  padding: 8px;
-  border-radius: 50%;
-  transition: all 0.2s ease;
+  transition: all 0.3s;
   width: 40px;
   height: 40px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -65,180 +61,210 @@
 }
 
 .edit-company-form {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
+  padding: 28px;
 }
 
 .form-row {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  display: flex;
   gap: 24px;
-  margin-bottom: 16px;
+  margin-bottom: 24px;
 }
 
 .form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-bottom: 15px;
+  flex: 1;
+  margin-bottom: 24px;
+}
+
+.form-group.full-width {
+  width: 100%;
 }
 
 .form-group label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: 500;
   color: #333;
   font-size: 0.95rem;
-  font-weight: 500;
 }
 
-.helper-text {
-  color: #666;
-  font-size: 0.85rem;
-  font-weight: normal;
-  margin-top: 0;
-}
-
-.form-group input {
-  width: 100%;
-  padding: 8px 12px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 0.95rem;
-  height: 38px;
-  background-color: #fff;
-}
-
-.form-group input[type="date"] {
-  color: #666;
-  font-family: inherit;
-}
-
-.readonly-input {
-  background-color: #f8f9fa !important;
-  cursor: not-allowed;
-}
-
-/* Disabled state */
-.form-group input:disabled {
-  background-color: #f8f9fa;
-  cursor: not-allowed;
-  color: #666;
-}
-
-/* Full width fields */
-.form-group.full-width {
-  grid-column: 1 / -1;
-}
-
-/* Specific field sizes */
-.form-group.address-field textarea {
-  min-height: 80px;
-}
-
-.form-group.remarks-field textarea {
-  min-height: 100px;
-}
-
-.form-group.coordinates-field {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-
-.form-group.coordinates-field input {
-  width: 100%;
-}
-
-/* Status field specific styling */
-.form-group.status-field select {
-  color: #333;
-  font-weight: 500;
-}
-
-.form-group.status-field select option {
-  padding: 8px;
-}
-
-/* Validation styling */
 .form-group.required label::after {
   content: '*';
   color: #C62828;
   margin-left: 4px;
 }
 
+.form-group input,
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  transition: all 0.3s;
+  background-color: #fff;
+}
+
 .form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
-  outline: none;
+.form-group textarea:focus,
+.form-group select:focus {
   border-color: #8B3A2B;
+  outline: none;
   box-shadow: 0 0 0 3px rgba(139, 58, 43, 0.1);
 }
 
-.required {
-  color: #C62828;
+.form-group textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.helper-text {
+  font-size: 0.85rem;
+  color: #666;
+  font-weight: normal;
   margin-left: 4px;
+}
+
+/* Remove company type styles */
+
+/* Remove college styles */
+
+/* Remove department styles */
+
+.address-field textarea {
+  min-height: 80px;
+}
+
+.coordinates-field {
+  display: flex;
+  gap: 20px;
+}
+
+.coordinates-field > div {
+  flex: 1;
+}
+
+.validity-input-group {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.validity-input-group input {
+  flex: 1;
+}
+
+.validity-input-group select {
+  width: 120px;
+  background-color: #f8f9fa;
+}
+
+.remarks-field textarea {
+  min-height: 100px;
+}
+
+.expiration-section {
+  margin-bottom: 28px;
+  padding: 20px;
+  background-color: #E3F2FD;
+  border-radius: 8px;
+  border-left: 4px solid #1976D2;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.expiration-checkbox {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.expiration-checkbox input {
+  margin-right: 12px;
+  width: 20px;
+  height: 20px;
+  accent-color: #8B3A2B;
+}
+
+.expiration-checkbox label {
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  color: #333;
+  cursor: pointer;
+  user-select: none;
+}
+
+.expiration-checkbox i {
+  margin-right: 10px;
+  color: #1976D2;
+  font-size: 1.1em;
+}
+
+.expiration-description {
+  font-size: 0.9rem;
+  color: #555;
+  margin-left: 32px;
 }
 
 .modal-actions {
   display: flex;
   justify-content: flex-end;
   gap: 16px;
-  margin-top: 24px;
-  padding-top: 16px;
-  border-top: 1px solid #ddd;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid #eee;
+}
+
+.cancel-button,
+.save-button {
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.95rem;
 }
 
 .cancel-button {
-  padding: 10px 24px;
+  background-color: transparent;
   border: 2px solid #8B3A2B;
-  background: white;
   color: #8B3A2B;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: all 0.2s ease;
 }
 
 .cancel-button:hover {
-  background: #8B3A2B;
+  background-color: #8B3A2B;
   color: white;
 }
 
 .save-button {
-  padding: 10px 24px;
+  background-color: #8B3A2B;
   border: none;
-  background: #8B3A2B;
   color: white;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: all 0.2s ease;
 }
 
 .save-button:hover {
-  background: #7A3225;
+  background-color: #7A3225;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(139, 58, 43, 0.2);
 }
 
 .save-button:disabled {
-  background: #ccc;
+  background-color: #cccccc;
   cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
-.delete-button {
-  padding: 10px 24px;
-  border: none;
-  background: #C62828;
-  color: white;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: all 0.2s ease;
+/* Styling for disabled inputs */
+.form-group input:disabled,
+.form-group textarea:disabled,
+.form-group select:disabled {
+  background-color: #f8f9fa;
+  cursor: not-allowed;
+  color: #666;
 }
 
-.delete-button:hover {
-  background: #B71C1C;
-}
-
-/* Scrollbar styling */
+/* Custom scrollbar */
 .edit-company-modal::-webkit-scrollbar {
   width: 8px;
 }
@@ -257,168 +283,145 @@
   background: #7A3225;
 }
 
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Responsive adjustments */
 @media (max-width: 768px) {
+  .edit-company-modal {
+    width: 95%;
+    max-height: 95vh;
+  }
+  
   .form-row {
-    grid-template-columns: 1fr;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  
+  .coordinates-field {
+    flex-direction: column;
     gap: 16px;
   }
   
-  .form-group.coordinates-field {
-    grid-template-columns: 1fr;
+  .modal-header {
+    padding: 20px;
+  }
+  
+  .edit-company-form {
+    padding: 20px;
   }
 }
 
-/* Add these styles for better field alignment */
-.expiration-section {
-  background-color: #E3F2FD;
-  border: 1px solid #90CAF9;
-  border-radius: 8px;
-  padding: 16px 20px;
-  margin-top: 8px;
-}
-
-.expiration-checkbox {
+/* New styles for the validity and expiration date fields */
+.expiration-fields-container {
   display: flex;
-  align-items: center;
-  gap: 12px;
+  gap: 24px;
+  margin-bottom: 24px;
 }
 
-.expiration-checkbox input[type="checkbox"] {
-  width: 20px;
-  height: 20px;
-  accent-color: #8B3A2B;
-  cursor: pointer;
+.expiration-field {
+  flex: 1;
 }
 
-.expiration-checkbox label {
+.expiration-field label {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-weight: 600;
+  margin-bottom: 12px;
+  font-weight: 500;
   color: #333;
-  cursor: pointer;
-  user-select: none;
+  font-size: 0.95rem;
 }
 
-.expiration-checkbox i {
-  color: #1976D2;
-  font-size: 1.1em;
+.expiration-field label i {
+  color: #8B3A2B;
 }
 
-.expiration-description {
-  margin-top: 8px;
-  font-size: 0.9em;
-  color: #666;
-  padding-left: 32px;
+.validity-input-container {
+  display: flex;
+  gap: 8px;
 }
 
-/* Adjust spacing for form rows */
-.form-row {
-  margin-bottom: 8px;
+.duration-input {
+  flex: 1;
+  padding: 12px 14px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  transition: all 0.3s;
+  background-color: #fff;
 }
 
-/* Ensure consistent heights for inputs */
-.form-group input,
-.form-group select {
-  height: 45px;
+.unit-select {
+  width: 120px;
+  padding: 12px 14px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  transition: all 0.3s;
+  background-color: #fff;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 16px;
+  padding-right: 30px;
 }
 
-/* Adjust textarea heights */
-.form-group.address-field textarea {
-  min-height: 80px;
-}
-
-.form-group.remarks-field textarea {
-  min-height: 100px;
-}
-
-/* Date input container and tooltip */
 .date-input-container {
   position: relative;
+}
+
+.date-input {
   width: 100%;
-}
-
-.form-group input.error {
-  border-color: #C62828;
-  background-color: #FFEBEE;
-}
-
-.date-error-tooltip {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  background-color: #C62828;
-  color: white;
-  padding: 6px 12px;
-  border-radius: 4px;
-  font-size: 0.8rem;
-  margin-top: 4px;
-  z-index: 1;
-  white-space: nowrap;
-  animation: fadeIn 0.2s ease-out;
-}
-
-.date-error-tooltip::before {
-  content: '';
-  position: absolute;
-  top: -4px;
-  left: 10px;
-  border-left: 4px solid transparent;
-  border-right: 4px solid transparent;
-  border-bottom: 4px solid #C62828;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-4px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.validity-input-group {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-
-.validity-input-group input {
-  flex: 2;
-  padding: 10px;
+  padding: 12px 14px;
   border: 1px solid #ddd;
   border-radius: 6px;
-  font-size: 14px;
-  transition: all 0.3s ease;
+  font-size: 0.95rem;
+  transition: all 0.3s;
+  background-color: #fff;
+  padding-right: 40px; /* Make room for the calendar icon */
 }
 
-.validity-input-group select {
-  flex: 0;
-  width: auto;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  font-size: 14px;
-  transition: all 0.3s ease;
-}
-
-.suggestions-list {
+.date-icon {
   position: absolute;
-  top: 100%; /* Position directly below the input */
-  left: 0;
-  right: 0;
-  width: 100%;
-  background-color: white;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  max-height: 150px;
-  overflow-y: auto;
-  z-index: 1000;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #8B3A2B;
+  pointer-events: none;
 }
 
-.suggestion-item {
-  padding: 10px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
+.duration-input:focus,
+.unit-select:focus,
+.date-input:focus {
+  border-color: #8B3A2B;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(139, 58, 43, 0.1);
 }
 
-.suggestion-item:hover {
-  background-color: #f0f0f0;
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .expiration-fields-container {
+    flex-direction: column;
+    gap: 16px;
+  }
 } 

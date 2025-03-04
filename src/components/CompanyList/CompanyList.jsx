@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { collection, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '../../firebase-config';
 import EditCompanyModal from './EditCompanyModal';
@@ -10,7 +10,6 @@ const CompanyList = () => {
   const [filters, setFilters] = useState({
     search: '',
     type: '',
-    status: ''
   });
   const [notification, setNotification] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState({
@@ -22,9 +21,12 @@ const CompanyList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(5);
   const [visiblePages, setVisiblePages] = useState([]);
+  const [expandedCompanies, setExpandedCompanies] = useState({});
+  const tableContainerRef = useRef(null);
 
   const companyTypes = [
     'N/A',
+    'SALES/MARKETING',
     'BPO',
     'INSURANCE',
     'ENGINEERING SERVICES',
@@ -71,11 +73,19 @@ const CompanyList = () => {
 
   const filteredCompanies = companies
     .filter(company => {
-      const matchesSearch = company.companyName.toLowerCase().includes(filters.search.toLowerCase());
-      const matchesType = filters.type ? company.companyType === filters.type : true;
-      const matchesStatus = filters.status ? company.moaStatus === filters.status : true;
+      // Search filter - check company name, address, and remarks
+      const searchTerm = filters.search.toLowerCase();
+      const matchesSearch = 
+        company.companyName.toLowerCase().includes(searchTerm) ||
+        (company.companyAddress && company.companyAddress.toLowerCase().includes(searchTerm)) ||
+        (company.moaRemarks && company.moaRemarks.toLowerCase().includes(searchTerm));
       
-      return matchesSearch && matchesType && matchesStatus;
+      // Type filter - check both main company type and all college entries
+      const matchesType = !filters.type || 
+        company.companyType === filters.type || 
+        (company.collegeEntries && company.collegeEntries.some(entry => entry.companyType === filters.type));
+      
+      return matchesSearch && matchesType;
     })
     .sort((a, b) => {
       const nameA = a.companyName.toLowerCase();
@@ -180,8 +190,65 @@ const CompanyList = () => {
     setTimeout(() => setNotification(null), 3000); // Hide notification after 3 seconds
   };
 
+  const toggleExpand = (companyId) => {
+    setExpandedCompanies(prev => ({
+      ...prev,
+      [companyId]: !prev[companyId]
+    }));
+  };
+
+  // Add scroll indicator logic
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!tableContainerRef.current) return;
+      
+      const container = tableContainerRef.current;
+      const hasHorizontalScroll = container.scrollWidth > container.clientWidth;
+      
+      if (hasHorizontalScroll) {
+        const isScrolledLeft = container.scrollLeft > 0;
+        const isScrolledRight = container.scrollLeft + container.clientWidth < container.scrollWidth - 5;
+        
+        if (isScrolledLeft) {
+          container.classList.add('scroll-left');
+        } else {
+          container.classList.remove('scroll-left');
+        }
+        
+        if (isScrolledRight) {
+          container.classList.add('scroll-right');
+        } else {
+          container.classList.remove('scroll-right');
+        }
+      }
+    };
+    
+    const container = tableContainerRef.current;
+    if (container) {
+      container.addEventListener('scroll', handleScroll);
+      // Initial check
+      handleScroll();
+      
+      // Check again after content might have changed
+      setTimeout(handleScroll, 500);
+    }
+    
+    return () => {
+      if (container) {
+        container.removeEventListener('scroll', handleScroll);
+      }
+    };
+  }, [currentCompanies]);
+
   if (loading) {
-    return <div className="company-loading">Loading companies...</div>;
+    return (
+      <div className="company-loading">
+        <div className="loading-spinner">
+          <i className="fas fa-spinner fa-spin"></i>
+        </div>
+        <p>Loading companies...</p>
+      </div>
+    );
   }
 
   return (
@@ -232,84 +299,143 @@ const CompanyList = () => {
         />
       )}
 
-      <h2 className="company-list-title">Company List</h2>
+      <div className="company-list-header">
+        <h2 className="company-list-title">Company List</h2>
+        
+        {/* Search and Filter Section */}
+        <div className="company-filters-section">
+          <div className="company-search-box">
+            <i className="fas fa-search company-search-icon"></i>
+            <input
+              type="text"
+              className="company-search-input"
+              placeholder="Search by name, address or remarks..."
+              name="search"
+              value={filters.search}
+              onChange={handleFilterChange}
+            />
+          </div>
 
-      {/* Search and Filter Section */}
-      <div className="company-filters-section">
-        <div className="company-search-box">
-          <input
-            type="text"
-            className="company-search-input"
-            placeholder="Search companies..."
-            name="search"
-            value={filters.search}
-            onChange={handleFilterChange}
-          />
-          <i className="fas fa-search company-search-icon"></i>
-        </div>
-
-        <div className="company-filter-controls">
-          <select
-            className="company-filter-select"
-            name="type"
-            value={filters.type}
-            onChange={handleFilterChange}
-          >
-            <option value="">All Types</option>
-            {companyTypes.map(type => (
-              <option key={type} value={type}>{type}</option>
-            ))}
-          </select>
-
-          <select
-            className="company-filter-select"
-            name="status"
-            value={filters.status}
-            onChange={handleFilterChange}
-          >
-            <option value="">All Status</option>
-            <option value="Active">Active</option>
-            <option value="For-Update">For Update</option>
-            <option value="Blacklisted">Blacklisted</option>
-          </select>
+          <div className="company-filter-controls">
+            <select
+              className="company-filter-select"
+              name="type"
+              value={filters.type}
+              onChange={handleFilterChange}
+            >
+              <option value="">All Types</option>
+              {companyTypes.map(type => (
+                <option key={type} value={type}>{type}</option>
+              ))}
+            </select>
+          </div>
         </div>
       </div>
 
-      <div className="company-table-container">
+      <div className="company-table-container" ref={tableContainerRef}>
         <table className="company-list-table">
           <thead>
             <tr>
-              <th>Company</th>
-              <th>Address</th>
-              <th>Longitude</th>
-              <th>Latitude</th>
-              <th>Year</th>
-              <th>Status</th>
-              <th>Type</th>
-              <th>With Expiration</th>
-              <th>Validity</th>
-              <th>Remarks</th>
-              <th>Actions</th>
+              <th className="company-name-col">
+                <div className="th-content">
+                  <i className="fas fa-building"></i> Company
+                </div>
+              </th>
+              <th className="address-col">
+                <div className="th-content">
+                  <i className="fas fa-map-marker-alt"></i> Address
+                </div>
+              </th>
+              <th className="coordinates-col">
+                <div className="th-content">
+                  <i className="fas fa-location-arrow"></i> Longitude
+                </div>
+              </th>
+              <th className="coordinates-col">
+                <div className="th-content">
+                  <i className="fas fa-location-arrow"></i> Latitude
+                </div>
+              </th>
+              <th className="year-col">
+                <div className="th-content">
+                  <i className="fas fa-calendar-alt"></i> Year
+                </div>
+              </th>
+              <th className="type-col">
+                <div className="th-content">
+                  <i className="fas fa-tag"></i> Type
+                </div>
+              </th>
+              <th className="expiration-col">
+                <div className="th-content">
+                  <i className="fas fa-clock"></i> With Expiration
+                </div>
+              </th>
+              <th className="validity-col">
+                <div className="th-content">
+                  <i className="fas fa-hourglass-half"></i> Validity
+                </div>
+              </th>
+              <th className="remarks-col">
+                <div className="th-content">
+                  <i className="fas fa-comment-alt"></i> Remarks
+                </div>
+              </th>
+              <th className="actions-col">
+                <div className="th-content">
+                  <i className="fas fa-cog"></i> Actions
+                </div>
+              </th>
             </tr>
           </thead>
           <tbody>
             {currentCompanies.length > 0 ? (
-              currentCompanies.map(company => (
-                <tr key={company.id}>
-                  <td>{company.companyName}</td>
-                  <td>{company.companyAddress}</td>
-                  <td>{company.companyLongitude}</td>
-                  <td>{company.companyLatitude}</td>
-                  <td>{company.moaYear}</td>
-                  <td>
-                    <span className={`company-status-badge status-${company.moaStatus.toLowerCase()}`}>
-                      {company.moaStatus}
+              currentCompanies.map(company => {
+                const hasMultipleEntries = company.collegeEntries && company.collegeEntries.length > 1;
+                const isExpanded = expandedCompanies[company.id] || false;
+                
+                const firstEntry = company.collegeEntries && company.collegeEntries.length > 0 
+                  ? company.collegeEntries[0] 
+                  : { companyType: company.companyType || 'N/A' };
+                
+                return (
+                  <React.Fragment key={company.id}>
+                    <tr className={hasMultipleEntries ? "has-multiple-entries" : ""}>
+                      <td className="company-name-cell">{company.companyName}</td>
+                      <td className="address-cell" title={company.companyAddress}>
+                        {company.companyAddress}
+                      </td>
+                      <td className="coordinates-cell">{company.companyLongitude}</td>
+                      <td className="coordinates-cell">{company.companyLatitude}</td>
+                      <td className="year-cell">{company.moaYear}</td>
+                      <td className="type-cell">
+                        <div className="company-type-cell">
+                          <span className="company-type-badge">{firstEntry.companyType || company.companyType}</span>
+                          {hasMultipleEntries && (
+                            <button 
+                              className="toggle-entries-btn"
+                              onClick={() => toggleExpand(company.id)}
+                              title={isExpanded ? "Collapse entries" : "Show all entries"}
+                            >
+                              <i className={`fas fa-chevron-${isExpanded ? 'up' : 'down'}`}></i>
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                      <td className="expiration-cell">
+                        <span className={`expiration-badge ${company.withExpiration ? 'yes' : 'no'}`}>
+                          {company.withExpiration ? 'Yes' : 'No'}
                     </span>
                   </td>
-                  <td>{company.companyType}</td>
-                  <td>{company.withExpiration ? 'Yes' : 'No'}</td>
-                  <td>{company.withExpiration ? `${company.moaValidity} ${company.validityUnit}` : 'Active'}</td>
-                  <td>{company.moaRemarks}</td>
+                      <td className="validity-cell">
+                        {company.withExpiration 
+                          ? `${company.moaValidity} ${company.validityUnit}` 
+                          : <span className="no-expiry">Active</span>
+                        }
+                      </td>
+                      <td className="remarks-cell" title={company.moaRemarks}>
+                        {company.moaRemarks}
+                      </td>
                   <td className="company-action-buttons">
                     <button 
                       className="company-action-btn company-edit-btn" 
@@ -327,15 +453,29 @@ const CompanyList = () => {
                     </button>
                   </td>
                 </tr>
-              ))
+                    
+                    {hasMultipleEntries && isExpanded && company.collegeEntries.slice(1).map((entry, index) => (
+                      <tr key={`${company.id}-entry-${index + 1}`} className="additional-entry-row">
+                        <td colSpan="5" className="additional-entry-spacer"></td>
+                        <td>
+                          <div className="additional-entry">
+                            <span className="entry-type">{entry.companyType || 'N/A'}</span>
+                          </div>
+                        </td>
+                        <td colSpan="4" className="additional-entry-spacer"></td>
+                      </tr>
+                    ))}
+                  </React.Fragment>
+                );
+              })
             ) : (
               <tr>
-                <td colSpan="11">
+                <td colSpan="10">
                   <div className="company-empty-state">
                     <i className="fas fa-building"></i>
                     <p>No companies found</p>
                     <p className="company-empty-subtitle">
-                      {(filters.search || filters.type || filters.status) 
+                      {(filters.search || filters.type) 
                         ? 'Try adjusting your filters'
                         : 'Add a new company to get started'}
                     </p>
@@ -384,7 +524,7 @@ const CompanyList = () => {
             </button>
           </div>
           <div className="company-page-info">
-            Page {currentPage} of {totalPages}
+            Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredCompanies.length)} of {filteredCompanies.length} companies
           </div>
         </div>
       )}
