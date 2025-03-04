@@ -421,16 +421,34 @@
   width: 80px;
 }
 
-.agreements-table td:nth-child(12) a {
-  color: #8B3A2B;
+.view-link-cell {
+  text-align: center;
+}
+
+.view-link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #1565C0;
   text-decoration: none;
   padding: 6px 12px;
   border-radius: 4px;
   transition: all 0.2s ease;
+  font-weight: 500;
 }
 
-.agreements-table td:nth-child(12) a:hover {
-  background-color: rgba(139, 58, 43, 0.1);
+.view-link-btn:hover {
+  background-color: rgba(21, 101, 192, 0.1);
+}
+
+.view-link-btn i {
+  font-size: 0.9em;
+}
+
+.no-link {
+  color: #999;
+  font-style: italic;
+  font-size: 0.9em;
 }
 
 /* Style for actions column */

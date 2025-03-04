@@ -334,6 +334,7 @@ const AllAgreements = () => {
                 <th>Date Signed</th>
                 <th>Date Expired</th>
                 <th>Description</th>
+                <th>View</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -386,6 +387,21 @@ const AllAgreements = () => {
                         </button>
                       )}
                     </td>
+                    <td className="view-link-cell">
+                      {agreement.links ? (
+                        <a 
+                          href={agreement.links} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="view-link-btn"
+                          title="View Agreement"
+                        >
+                          <i className="fas fa-external-link-alt"></i> View
+                        </a>
+                      ) : (
+                        <span className="no-link">No link</span>
+                      )}
+                    </td>
                     <td className="action-buttons">
                       <button 
                         className="action-btn edit-btn"
@@ -406,7 +422,7 @@ const AllAgreements = () => {
                 ))
               ) : (
                 <tr className="empty-table">
-                  <td colSpan="12">
+                  <td colSpan="13">
                     <div className="empty-state">
                       <i className="fas fa-file-contract"></i>
                       <p>No agreements found</p>

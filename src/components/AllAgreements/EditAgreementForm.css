@@ -422,4 +422,26 @@
   font-size: 0.9em;
   color: #666;
   padding-left: 32px;
+}
+
+/* Link field styling */
+.form-group input[type="text"]#links {
+  font-family: inherit;
+  padding: 12px 16px;
+  border: 1.5px solid #ddd;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  width: 100%;
+  transition: all 0.2s ease;
+}
+
+.form-group input[type="text"]#links:focus {
+  border-color: #8B3A2B;
+  box-shadow: 0 0 0 3px rgba(139, 58, 43, 0.1);
+  outline: none;
+}
+
+.form-group input[type="text"]#links::placeholder {
+  color: #aaa;
+  font-style: italic;
 } 

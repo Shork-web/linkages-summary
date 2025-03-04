@@ -253,6 +253,18 @@ const EditAgreementForm = ({ agreement, onClose, onUpdate }) => {
             />
           </div>
 
+          <div className="form-group">
+            <label htmlFor="links">Document Link:</label>
+            <input
+              type="text"
+              id="links"
+              name="links"
+              value={formData.links || ''}
+              onChange={handleChange}
+              placeholder="Enter document URL (e.g., SharePoint, Google Drive)"
+            />
+          </div>
+
           <div className="renewal-section">
             <div className="renewal-checkbox">
               <input
