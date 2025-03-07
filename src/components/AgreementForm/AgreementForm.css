@@ -492,4 +492,56 @@ select {
 .readonly-input {
   background-color: #f8f9fa;
   cursor: not-allowed;
+}
+
+/* Add these styles to your existing CSS */
+
+.input-error {
+  border-color: #C62828 !important;
+  background-color: #FFEBEE !important;
+}
+
+.error-message-inline {
+  color: #C62828;
+  font-size: 0.85rem;
+  margin-top: 5px;
+  animation: fadeIn 0.3s ease-in;
+}
+
+.validation-indicator {
+  color: #1976D2;
+  font-size: 0.85rem;
+  margin-top: 5px;
+  display: flex;
+  align-items: center;
+  animation: fadeIn 0.3s ease-in;
+}
+
+.validation-indicator::before {
+  content: '';
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border: 2px solid #1976D2;
+  border-top-color: transparent;
+  border-radius: 50%;
+  margin-right: 8px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Disable submit button when validation is in progress */
+.submit-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 } 

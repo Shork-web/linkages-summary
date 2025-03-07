@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../../firebase-config'; // Import Firestore
-import { collection, addDoc } from 'firebase/firestore'; // Import Firestore functions
+import { collection, addDoc, getDocs, query, where } from 'firebase/firestore'; // Add query and where imports
 import './AgreementForm.css';
 import { auth } from '../../firebase-config';
 import { useNavigate } from 'react-router-dom';
@@ -39,6 +39,10 @@ const AgreementForm = () => {
     links: ''
   });
 
+  // Add state for name validation
+  const [nameError, setNameError] = useState('');
+  const [isCheckingName, setIsCheckingName] = useState(false);
+  
   const navigate = useNavigate();
 
   // Add notification state
@@ -58,8 +62,52 @@ const AgreementForm = () => {
     return () => unsubscribe();
   }, [navigate]);
 
+  // Add a debounced name validation function
+  useEffect(() => {
+    const checkNameExists = async () => {
+      if (!formData.name || formData.name.trim().length < 3) {
+        setNameError('');
+        return;
+      }
+
+      setIsCheckingName(true);
+      try {
+        const agreementQuery = query(
+          collection(db, 'agreementform'),
+          where('name', '==', formData.name.trim())
+        );
+        
+        const querySnapshot = await getDocs(agreementQuery);
+        
+        if (!querySnapshot.empty) {
+          setNameError('This name already exists in the system');
+        } else {
+          setNameError('');
+        }
+      } catch (error) {
+        console.error('Error checking name:', error);
+      } finally {
+        setIsCheckingName(false);
+      }
+    };
+
+    // Set up debounce for name checking
+    const timeoutId = setTimeout(() => {
+      if (formData.name.trim()) {
+        checkNameExists();
+      }
+    }, 500); // 500ms debounce
+
+    return () => clearTimeout(timeoutId);
+  }, [formData.name]);
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
+    
+    // Clear name error when user starts typing again
+    if (name === 'name') {
+      setNameError('');
+    }
     
     setFormData(prevState => {
       const newState = {
@@ -90,6 +138,16 @@ const AgreementForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Check for name error before submitting
+    if (nameError) {
+      setNotification({
+        show: true,
+        type: 'error',
+        message: 'Please fix the name error before submitting'
+      });
+      return;
+    }
     
     if (!auth.currentUser) {
       setNotification({
@@ -126,7 +184,27 @@ const AgreementForm = () => {
       submissionData.dateExpired = calculateExpiryDate(formData.dateSigned, formData.validity);
     }
 
+    // Final name check before submission
+    setIsCheckingName(true);
     try {
+      const agreementQuery = query(
+        collection(db, 'agreementform'),
+        where('name', '==', formData.name.trim())
+      );
+      
+      const querySnapshot = await getDocs(agreementQuery);
+      
+      if (!querySnapshot.empty) {
+        setNameError('This name already exists in the system');
+        setNotification({
+          show: true,
+          type: 'error',
+          message: 'This name already exists in the system'
+        });
+        setIsCheckingName(false);
+        return;
+      }
+      
       const docRef = await addDoc(collection(db, 'agreementform'), {
         ...submissionData,
         createdBy: auth.currentUser.uid,
@@ -168,6 +246,8 @@ const AgreementForm = () => {
           message: 'Error submitting agreement. Please try again.'
         });
       }
+    } finally {
+      setIsCheckingName(false);
     }
   };
 
@@ -190,7 +270,10 @@ const AgreementForm = () => {
               value={formData.name}
               onChange={handleChange}
               required
+              className={nameError ? 'input-error' : ''}
             />
+            {isCheckingName && <div className="validation-indicator">Checking...</div>}
+            {nameError && <div className="error-message-inline">{nameError}</div>}
           </div>
           <div className="form-group">
             <label htmlFor="address">Address:</label>
@@ -364,8 +447,12 @@ const AgreementForm = () => {
           <button type="button" className="reset-button" onClick={() => window.location.reload()}>
             Reset Form
           </button>
-          <button type="submit" className="submit-button">
-            Submit Agreement
+          <button 
+            type="submit" 
+            className="submit-button"
+            disabled={isCheckingName || nameError}
+          >
+            {isCheckingName ? 'Checking...' : 'Submit Agreement'}
           </button>
         </div>
       </form>

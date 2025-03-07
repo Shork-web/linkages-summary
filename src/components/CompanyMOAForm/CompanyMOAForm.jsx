@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../../firebase-config';
-import { collection, addDoc } from 'firebase/firestore';
+import { collection, addDoc, getDocs, query, where } from 'firebase/firestore';
 import Notification from '../Notification/Notification';
 import './CompanyMOAForm.css';
 
@@ -81,6 +81,10 @@ const CompanyMOAForm = () => {
     validityUnit: 'years'
   });
 
+  // Add state for name validation
+  const [nameError, setNameError] = useState('');
+  const [isCheckingName, setIsCheckingName] = useState(false);
+  
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [notification, setNotification] = useState(null);
@@ -109,8 +113,52 @@ const CompanyMOAForm = () => {
     'BANK'
   ];
 
+  // Add a debounced name validation function
+  useEffect(() => {
+    const checkNameExists = async () => {
+      if (!formData.companyName || formData.companyName.trim().length < 3) {
+        setNameError('');
+        return;
+      }
+
+      setIsCheckingName(true);
+      try {
+        const companyQuery = query(
+          collection(db, 'companyMOA'),
+          where('companyName', '==', formData.companyName.trim())
+        );
+        
+        const querySnapshot = await getDocs(companyQuery);
+        
+        if (!querySnapshot.empty) {
+          setNameError('This company name already exists in the system');
+        } else {
+          setNameError('');
+        }
+      } catch (error) {
+        console.error('Error checking company name:', error);
+      } finally {
+        setIsCheckingName(false);
+      }
+    };
+
+    // Set up debounce for name checking
+    const timeoutId = setTimeout(() => {
+      if (formData.companyName.trim()) {
+        checkNameExists();
+      }
+    }, 500); // 500ms debounce
+
+    return () => clearTimeout(timeoutId);
+  }, [formData.companyName]);
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
+    
+    // Clear name error when user starts typing again
+    if (name === 'companyName') {
+      setNameError('');
+    }
     
     if (type === 'checkbox') {
       if (name === 'withExpiration') {
@@ -173,11 +221,41 @@ const CompanyMOAForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Check for name error before submitting
+    if (nameError) {
+      setNotification({
+        show: true,
+        type: 'error',
+        message: 'Please fix the company name error before submitting'
+      });
+      return;
+    }
+    
     setIsSubmitting(true);
     setError('');
     setNotification(null);
 
     try {
+      // Final name check before submission
+      const companyQuery = query(
+        collection(db, 'companyMOA'),
+        where('companyName', '==', formData.companyName.trim())
+      );
+      
+      const querySnapshot = await getDocs(companyQuery);
+      
+      if (!querySnapshot.empty) {
+        setNameError('This company name already exists in the system');
+        setNotification({
+          show: true,
+          type: 'error',
+          message: 'This company name already exists in the system'
+        });
+        setIsSubmitting(false);
+        return;
+      }
+      
       // Ensure all college entries have a company type
       const validatedEntries = formData.collegeEntries.map(entry => ({
         ...entry,
@@ -291,7 +369,10 @@ const CompanyMOAForm = () => {
             value={formData.companyName}
             onChange={handleChange}
             required
+            className={nameError ? 'input-error' : ''}
           />
+          {isCheckingName && <div className="validation-indicator">Checking...</div>}
+          {nameError && <div className="error-message-inline">{nameError}</div>}
         </div>
 
         <div className="form-group">
@@ -534,9 +615,9 @@ const CompanyMOAForm = () => {
           <button 
             type="submit" 
             className="submit-button"
-            disabled={isSubmitting}
+            disabled={isSubmitting || isCheckingName || nameError}
           >
-            {isSubmitting ? 'Submitting...' : 'Submit MOA'}
+            {isSubmitting ? 'Submitting...' : isCheckingName ? 'Checking...' : 'Submit MOA'}
           </button>
         </div>
       </form>
