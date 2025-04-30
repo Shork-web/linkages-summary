@@ -262,7 +262,7 @@ const EditDepartmentModal = ({ department, onClose, onUpdate }) => {
                     <option value="Active">Active</option>
                     <option value="For-Update">For Update</option>
                     <option value="Blacklisted">Blacklisted</option>
-                    <option value="On process">On process</option>
+                    <option value="On Process">On Process</option>
                   </select>
                 </div>
               </div>

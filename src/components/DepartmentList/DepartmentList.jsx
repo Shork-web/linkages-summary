@@ -223,6 +223,7 @@ const DepartmentList = () => {
             <option value="">All Status</option>
             <option value="Active">Active</option>
             <option value="For-Update">For Update</option>
+            <option value="On process">On process</option>
             <option value="Blacklisted">Blacklisted</option>
           </select>
 
