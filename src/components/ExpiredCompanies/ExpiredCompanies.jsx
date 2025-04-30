@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { collection, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '../../firebase-config';
-import EditCompanyModal from './EditCompanyModal';
-import './CompanyList.css';
+import EditCompanyModal from '../CompanyList/EditCompanyModal';
+import '../CompanyList/CompanyList.css';
+import './ExpiredCompanies.css';
 
-const CompanyList = () => {
+const ExpiredCompanies = () => {
   const [companies, setCompanies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
@@ -58,16 +59,12 @@ const CompanyList = () => {
       snapshot.forEach((doc) => {
         const companyData = { id: doc.id, ...doc.data() };
         
-        // Filter out expired companies
-        let isExpired = false;
+        // Check if the company has an expiration date and is expired
         if (companyData.withExpiration && companyData.moaExpirationDate) {
           const expirationDate = new Date(companyData.moaExpirationDate);
-          isExpired = expirationDate < currentDate;
-        }
-        
-        // Only add non-expired companies to the list
-        if (!isExpired) {
-          companiesData.push(companyData);
+          if (expirationDate < currentDate) {
+            companiesData.push(companyData);
+          }
         }
       });
       
@@ -84,6 +81,8 @@ const CompanyList = () => {
       ...prev,
       [name]: value
     }));
+    // Reset to first page when filters change
+    setCurrentPage(1);
   };
 
   const filteredCompanies = companies
@@ -103,6 +102,18 @@ const CompanyList = () => {
       return matchesSearch && matchesType;
     })
     .sort((a, b) => {
+      // First sort by days since expiration (descending)
+      const dateA = new Date(a.moaExpirationDate);
+      const dateB = new Date(b.moaExpirationDate);
+      const now = new Date();
+      const daysExpiredA = Math.floor((now - dateA) / (1000 * 60 * 60 * 24));
+      const daysExpiredB = Math.floor((now - dateB) / (1000 * 60 * 60 * 24));
+      
+      if (daysExpiredA !== daysExpiredB) {
+        return daysExpiredB - daysExpiredA; // Most recently expired first
+      }
+      
+      // If days since expiration are the same, sort by name
       const nameA = a.companyName.toLowerCase();
       const nameB = b.companyName.toLowerCase();
 
@@ -122,16 +133,22 @@ const CompanyList = () => {
     const maxVisiblePages = 5;
 
     if (totalPages <= maxVisiblePages) {
+      // If total pages is less than or equal to max visible, show all pages
       pages = Array.from({ length: totalPages }, (_, i) => i + 1);
     } else {
-      if (currentPage <= 3) {
-        pages = [1, 2, 3, 4, '...', totalPages];
-      } else if (currentPage >= totalPages - 2) {
-        pages = [1, '...', totalPages - 3, totalPages - 2, totalPages - 1, totalPages];
-      } else {
-        pages = [1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages];
+      // Always try to show 5 pages when possible
+      let startPage = Math.max(currentPage - 2, 1);
+      let endPage = Math.min(startPage + maxVisiblePages - 1, totalPages);
+      
+      // Adjust start page if we're near the end
+      if (endPage === totalPages) {
+        startPage = Math.max(endPage - maxVisiblePages + 1, 1);
       }
+      
+      // Generate the page numbers
+      pages = Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i);
     }
+    
     setVisiblePages(pages);
   };
 
@@ -208,9 +225,9 @@ const CompanyList = () => {
   const handleUpdate = (message) => {
     setNotification({
       type: 'success',
-      message: message || 'Company updated successfully' // Provide fallback message
+      message: message || 'Company updated successfully'
     });
-    setTimeout(() => setNotification(null), 3000); // Hide notification after 3 seconds
+    setTimeout(() => setNotification(null), 3000);
   };
 
   const toggleExpand = (companyId) => {
@@ -218,6 +235,15 @@ const CompanyList = () => {
       ...prev,
       [companyId]: !prev[companyId]
     }));
+  };
+
+  // Calculate days since expiration
+  const getDaysSinceExpiration = (expirationDate) => {
+    const expDate = new Date(expirationDate);
+    const currentDate = new Date();
+    const differenceInTime = currentDate.getTime() - expDate.getTime();
+    const differenceInDays = Math.ceil(differenceInTime / (1000 * 3600 * 24));
+    return differenceInDays;
   };
 
   // Add scroll indicator logic
@@ -269,13 +295,13 @@ const CompanyList = () => {
         <div className="loading-spinner">
           <i className="fas fa-spinner fa-spin"></i>
         </div>
-        <p>Loading companies...</p>
+        <p>Loading expired companies...</p>
       </div>
     );
   }
 
   return (
-    <div className="company-list-container">
+    <div className="expired-companies-container">
       {notification && (
         <div className={`notification ${notification.type}`}>
           <div className="notification-content">
@@ -323,7 +349,7 @@ const CompanyList = () => {
       )}
 
       <div className="company-list-header">
-        <h2 className="company-list-title">Company List</h2>
+        <h2 className="company-list-title">Expired Companies</h2>
         
         {/* Search and Filter Section */}
         <div className="company-filters-section">
@@ -356,7 +382,7 @@ const CompanyList = () => {
       </div>
 
       <div className="company-table-container" ref={tableContainerRef}>
-        <table className="company-list-table">
+        <table className="expired-table">
           <thead>
             <tr>
               <th className="company-name-col">
@@ -391,12 +417,12 @@ const CompanyList = () => {
               </th>
               <th className="expiration-col">
                 <div className="th-content">
-                  <i className="fas fa-clock"></i> With Expiration
+                  <i className="fas fa-exclamation-triangle"></i> Expired
                 </div>
               </th>
               <th className="validity-col">
                 <div className="th-content">
-                  <i className="fas fa-hourglass-half"></i> Validity
+                  <i className="fas fa-hourglass-end"></i> Validity
                 </div>
               </th>
               <th className="remarks-col">
@@ -416,6 +442,7 @@ const CompanyList = () => {
               currentCompanies.map(company => {
                 const hasMultipleEntries = company.collegeEntries && company.collegeEntries.length > 1;
                 const isExpanded = expandedCompanies[company.id] || false;
+                const daysSinceExpiration = getDaysSinceExpiration(company.moaExpirationDate);
                 
                 const firstEntry = company.collegeEntries && company.collegeEntries.length > 0 
                   ? company.collegeEntries[0] 
@@ -448,27 +475,23 @@ const CompanyList = () => {
                         </span>
                       </td>
                       <td>
-                        <span className={`status-badge ${company.withExpiration ? 'status-true' : 'status-false'}`}>
-                          {company.withExpiration ? 'Yes' : 'No'}
+                        <span className="expired-days-badge">
+                          {daysSinceExpiration} days
                         </span>
                       </td>
                       <td>
-                        {company.withExpiration && company.moaValidity ? (
-                          <div className="validity-info">
-                            <span>{company.moaValidity} {company.validityUnit || 'years'}</span>
-                            {company.moaExpirationDate && (
-                              <div className="expiration-date">
-                                Expires: {new Date(company.moaExpirationDate).toLocaleDateString('en-US', {
-                                  year: 'numeric',
-                                  month: 'short',
-                                  day: 'numeric'
-                                })}
-                              </div>
-                            )}
-                          </div>
-                        ) : (
-                          'N/A'
-                        )}
+                        <div className="validity-info">
+                          <span>{company.moaValidity} {company.validityUnit || 'years'}</span>
+                          {company.moaExpirationDate && (
+                            <div className="expiration-date">
+                              Expired: {new Date(company.moaExpirationDate).toLocaleDateString('en-US', {
+                                year: 'numeric',
+                                month: 'short',
+                                day: 'numeric'
+                              })}
+                            </div>
+                          )}
+                        </div>
                       </td>
                       <td>
                         <div className="remarks-cell">
@@ -537,7 +560,7 @@ const CompanyList = () => {
                 <td colSpan="10" className="no-companies-message">
                   <div className="no-companies-content">
                     <i className="fas fa-info-circle"></i>
-                    <p>No companies found matching your filters.</p>
+                    <p>No expired companies found matching your filters.</p>
                   </div>
                 </td>
               </tr>
@@ -571,15 +594,26 @@ const CompanyList = () => {
               {visiblePages.map((page, index) => (
                 <button
                   key={index}
-                  className={`pagination-page-btn ${page === currentPage ? 'active' : ''} ${page === '...' ? 'ellipsis' : ''}`}
-                  onClick={() => page !== '...' && setCurrentPage(page)}
-                  disabled={page === '...'}
-                  aria-label={page === '...' ? 'More pages' : `Go to page ${page}`}
+                  className={`pagination-page-btn ${page === currentPage ? 'active' : ''}`}
+                  onClick={() => setCurrentPage(page)}
+                  aria-label={`Go to page ${page}`}
                   aria-current={page === currentPage ? 'page' : null}
                 >
                   {page}
                 </button>
               ))}
+              {totalPages > Math.max(...visiblePages) && (
+                <>
+                  <span className="pagination-page-btn ellipsis">...</span>
+                  <button
+                    className="pagination-page-btn"
+                    onClick={() => setCurrentPage(totalPages)}
+                    aria-label={`Go to page ${totalPages}`}
+                  >
+                    {totalPages}
+                  </button>
+                </>
+              )}
             </div>
             
             <button 
@@ -610,4 +644,4 @@ const CompanyList = () => {
   );
 };
 
-export default CompanyList; 
+export default ExpiredCompanies; 

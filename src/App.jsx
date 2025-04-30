@@ -12,34 +12,42 @@ import RenewalAgreements from './components/RenewalAgreements/RenewalAgreements'
 import ExpiredAgreements from './components/ExpiredAgreements/ExpiredAgreements';
 import Partners from './components/Partners/Partners';
 import CompanyList from './components/CompanyList/CompanyList';
+import ExpiredCompanies from './components/ExpiredCompanies/ExpiredCompanies';
 import DepartmentList from './components/DepartmentList/DepartmentList';
+import FloatingNotificationBell from './components/NotificationBell/FloatingNotificationBell';
 import './App.css';
 
 function App() {
   return (
-    <Routes>
-      {/* Public Routes */}
-      <Route path="/login" element={<Login />} />
-      <Route path="/signup" element={<Signup />} />
+    <>
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
 
-      {/* Protected Routes */}
-      <Route element={<MainLayout />}>
-        <Route path="/" element={<Navigate to="/agreements" replace />} />
-        <Route path="/new-agreement" element={<AgreementForm />} />
-        <Route path="/company-moa" element={<CompanyMOAForm />} />
-        <Route path="/company-list" element={<CompanyList />} />
-        <Route path="/departments" element={<DepartmentList />} />
-        <Route path="/agreements" element={<AllAgreements />} />
-        <Route path="/active" element={<ActiveAgreements />} />
-        <Route path="/pending" element={<PendingAgreements />} />
-        <Route path="/renewal" element={<RenewalAgreements />} />
-        <Route path="/expired" element={<ExpiredAgreements />} />
-        <Route path="/partners" element={<Partners />} />
-      </Route>
+        {/* Protected Routes */}
+        <Route element={<MainLayout />}>
+          <Route path="/" element={<Navigate to="/agreements" replace />} />
+          <Route path="/new-agreement" element={<AgreementForm />} />
+          <Route path="/company-moa" element={<CompanyMOAForm />} />
+          <Route path="/company-list" element={<CompanyList />} />
+          <Route path="/expired-companies" element={<ExpiredCompanies />} />
+          <Route path="/departments" element={<DepartmentList />} />
+          <Route path="/agreements" element={<AllAgreements />} />
+          <Route path="/active" element={<ActiveAgreements />} />
+          <Route path="/pending" element={<PendingAgreements />} />
+          <Route path="/renewal" element={<RenewalAgreements />} />
+          <Route path="/expired" element={<ExpiredAgreements />} />
+          <Route path="/partners" element={<Partners />} />
+        </Route>
 
-      {/* Catch all route */}
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+        {/* Catch all route */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+      
+      {/* The FloatingNotificationBell handles its own visibility based on authentication */}
+      <FloatingNotificationBell />
+    </>
   );
 }
 

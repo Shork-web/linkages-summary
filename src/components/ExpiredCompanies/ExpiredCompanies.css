@@ -1,0 +1,411 @@
+/* ExpiredCompanies.css */
+/* Base styling inherits from CompanyList.css */
+
+.expired-companies-container {
+  padding: 24px;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  margin: 0 -20px;
+  max-width: 95vw;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Header and Title - with red theming */
+.expired-companies-container .company-list-title {
+  color: #e74c3c;
+  margin: 0;
+  font-size: 1.8em;
+  font-weight: 600;
+  position: relative;
+}
+
+.expired-companies-container .company-list-title::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 60px;
+  height: 3px;
+  background-color: #e74c3c;
+  border-radius: 2px;
+}
+
+/* Table container styling */
+.expired-companies-container .company-table-container {
+  overflow-x: auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  margin-bottom: 24px;
+  background-color: white;
+  border: 1px solid #eee;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: #e74c3c #f0f0f0;
+  position: relative;
+}
+
+/* Custom scrollbar for Webkit browsers */
+.expired-companies-container .company-table-container::-webkit-scrollbar {
+  height: 8px;
+}
+
+.expired-companies-container .company-table-container::-webkit-scrollbar-track {
+  background: #f0f0f0;
+  border-radius: 4px;
+}
+
+.expired-companies-container .company-table-container::-webkit-scrollbar-thumb {
+  background-color: #e74c3c;
+  border-radius: 4px;
+}
+
+/* Scroll indicators */
+.expired-companies-container .company-table-container::before,
+.expired-companies-container .company-table-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 15px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 5;
+}
+
+.expired-companies-container .company-table-container::before {
+  left: 0;
+  background: linear-gradient(to right, rgba(255,255,255,0.9), rgba(255,255,255,0));
+}
+
+.expired-companies-container .company-table-container::after {
+  right: 0;
+  background: linear-gradient(to left, rgba(255,255,255,0.9), rgba(255,255,255,0));
+}
+
+.expired-companies-container .company-table-container.scroll-left::before {
+  opacity: 1;
+}
+
+.expired-companies-container .company-table-container.scroll-right::after {
+  opacity: 1;
+}
+
+/* Expired table theming */
+.expired-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  min-width: 1200px;
+}
+
+.expired-table th,
+.expired-table td {
+  padding: 14px 16px;
+  text-align: left;
+  border-bottom: 1px solid transparent;
+}
+
+.expired-table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  color: #333;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  border-bottom: 2px solid #e74c3c;
+}
+
+.expired-table th .th-content i {
+  color: #e74c3c;
+  font-size: 0.9rem;
+}
+
+.expired-table tbody tr {
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 0 0 rgba(0,0,0,0.05);
+}
+
+.expired-table tbody tr:hover {
+  background-color: #fff8f8;
+  box-shadow: 0 0 0 1px #f0f0f0;
+}
+
+/* Search and filter in expired companies */
+.expired-companies-container .company-search-input:focus {
+  border-color: #e74c3c;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+  background-color: white;
+}
+
+.expired-companies-container .company-search-icon {
+  color: #e74c3c;
+}
+
+.expired-companies-container .company-filter-select:focus {
+  border-color: #e74c3c;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+  background-color: white;
+}
+
+/* Days since expiration badge */
+.expired-days-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background-color: #e74c3c;
+  color: white;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.expiration-date {
+  color: #e74c3c;
+  font-weight: 500;
+  font-size: 0.85rem;
+}
+
+/* Pagination styling - redesigned to match the image */
+.expired-companies-container .pagination-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+  background: transparent;
+}
+
+.expired-companies-container .pagination-pages {
+  display: flex;
+  gap: 4px;
+}
+
+.expired-companies-container .pagination-btn {
+  background-color: #ffeae6; /* Lighter pink */
+  color: #8b3a2b;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  box-shadow: none;
+  font-size: 14px;
+}
+
+.expired-companies-container .pagination-btn:hover:not(:disabled) {
+  background-color: #e74c3c;
+  color: white;
+  transform: none;
+  box-shadow: none;
+}
+
+.expired-companies-container .pagination-btn:disabled {
+  background-color: #f2dcd9;
+  color: #c5a197;
+  cursor: not-allowed;
+}
+
+.expired-companies-container .pagination-btn.first-btn,
+.expired-companies-container .pagination-btn.last-btn {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.expired-companies-container .pagination-page-btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background-color: white;
+  color: #555;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid #ddd;
+  font-size: 14px;
+}
+
+.expired-companies-container .pagination-page-btn:hover:not(:disabled):not(.active) {
+  background-color: #f9f0ee;
+  transform: none;
+  border-color: #e74c3c;
+}
+
+.expired-companies-container .pagination-page-btn.active {
+  background-color: #8b3a2b;
+  color: white;
+  border: none;
+}
+
+.expired-companies-container .pagination-page-btn.ellipsis {
+  border: none;
+  background-color: transparent;
+  width: auto;
+  cursor: default;
+}
+
+/* Pagination info */
+.expired-companies-container .pagination-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  color: #666;
+  background-color: #f8f8f8;
+  padding: 8px 12px;
+  border-radius: 4px;
+  border: 1px solid #eee;
+  box-shadow: none;
+  margin-top: 10px;
+  width: auto;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.expired-companies-container .pagination-info strong {
+  color: #e74c3c;
+  margin: 0 5px;
+  font-weight: 600;
+}
+
+/* Notification */
+.expired-companies-container .notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  min-width: 300px;
+  max-width: 450px;
+  animation: slideIn 0.3s ease-out forwards;
+}
+
+.expired-companies-container .notification.success {
+  background-color: #d4edda;
+  border-left: 4px solid #28a745;
+  color: #155724;
+}
+
+.expired-companies-container .notification.error {
+  background-color: #f8d7da;
+  border-left: 4px solid #e74c3c;
+  color: #721c24;
+}
+
+/* Empty state and loading */
+.expired-companies-container .no-companies-message {
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.expired-companies-container .no-companies-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+}
+
+.expired-companies-container .no-companies-content i {
+  font-size: 2rem;
+  color: #e74c3c;
+  margin-bottom: 15px;
+}
+
+.expired-companies-container .company-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 100px 0;
+  color: #e74c3c;
+}
+
+.expired-companies-container .loading-spinner {
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .expired-companies-container {
+    padding: 16px;
+  }
+  
+  .expired-companies-container .company-list-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .expired-companies-container .company-filters-section {
+    width: 100%;
+    flex-direction: column;
+  }
+  
+  .expired-companies-container .company-search-box {
+    width: 100%;
+  }
+  
+  .expired-companies-container .company-filter-controls {
+    width: 100%;
+  }
+  
+  .expired-companies-container .company-filter-select {
+    width: 100%;
+  }
+  
+  .expired-days-badge {
+    padding: 3px 6px;
+    font-size: 0.7rem;
+  }
+  
+  .expiration-date {
+    font-size: 0.75rem;
+  }
+  
+  .expired-companies-container .pagination-container {
+    flex-wrap: wrap;
+    padding: 10px;
+  }
+  
+  .expired-companies-container .pagination-btn {
+    padding: 6px 10px;
+    font-size: 0.85rem;
+  }
+  
+  .expired-companies-container .pagination-page-btn {
+    width: 30px;
+    height: 30px;
+    font-size: 0.85rem;
+  }
+  
+  .expired-companies-container .pagination-info {
+    font-size: 0.8rem;
+    padding: 6px 10px;
+  }
+  
+  .expired-companies-container .pagination-btn.first-btn,
+  .expired-companies-container .pagination-btn.last-btn {
+    width: 34px;
+  }
+} 

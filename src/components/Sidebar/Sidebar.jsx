@@ -207,6 +207,21 @@ const Sidebar = ({ isCollapsed, toggleSidebar }) => {
             </NavLink>
             
             <NavLink 
+              to="/expired-companies" 
+              className={({ isActive }) => 
+                `nav-item ${isActive ? 'active' : ''} ${!isAllowed('item', 'Expired Companies') ? 'disabled' : ''}`
+              } 
+              title="Expired Companies"
+              onClick={(e) => !isAllowed('item', 'Expired Companies') && e.preventDefault()}
+            >
+              <i className="fas fa-calendar-times"></i>
+              <span className={!isAllowed('item', 'Expired Companies') ? 'disabled-text' : ''}>
+                Expired Companies
+                {isAuthenticated && !isAllowed('item', 'Expired Companies') && <span className="locked-icon">🔒</span>}
+              </span>
+            </NavLink>
+            
+            <NavLink 
               to="/departments" 
               className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} 
               title="Department List"
