@@ -181,7 +181,7 @@ const Sidebar = ({ isCollapsed, toggleSidebar }) => {
 
           {/* MOA LIST Section - This section should remain accessible for all roles */}
           <div className="nav-section">
-            <div className="section-title">MOA LIST</div>
+            <div className="section-title">OJT MOA LIST</div>
             <NavLink 
               to="/company-moa" 
               className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} 

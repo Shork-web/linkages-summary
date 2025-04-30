@@ -8,6 +8,8 @@ import './ExpiredCompanies.css';
 const ExpiredCompanies = () => {
   const [companies, setCompanies] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deletingCompanyId, setDeletingCompanyId] = useState(null);
   const [filters, setFilters] = useState({
     search: '',
     type: '',
@@ -52,9 +54,11 @@ const ExpiredCompanies = () => {
   useEffect(() => {
     const companiesRef = collection(db, 'companyMOA');
     
+    // Get current date for filtering expired companies
+    const currentDate = new Date();
+    
     const unsubscribe = onSnapshot(companiesRef, (snapshot) => {
       const companiesData = [];
-      const currentDate = new Date();
       
       snapshot.forEach((doc) => {
         const companyData = { id: doc.id, ...doc.data() };
@@ -184,19 +188,56 @@ const ExpiredCompanies = () => {
 
   const handleDelete = async () => {
     try {
+      setDeleteLoading(true);
+      setDeletingCompanyId(deleteConfirm.companyId);
+      
+      // Optimistic update - remove from local state immediately
+      setCompanies(prevCompanies => 
+        prevCompanies.filter(company => company.id !== deleteConfirm.companyId)
+      );
+      
+      // Close confirmation modal
+      setDeleteConfirm({ show: false, companyId: null, companyName: '' });
+      
+      // Perform actual delete operation
       await deleteDoc(doc(db, 'companyMOA', deleteConfirm.companyId));
+      
       setNotification({
         message: `Successfully deleted ${deleteConfirm.companyName}`,
         type: 'success'
       });
-      setDeleteConfirm({ show: false, companyId: null, companyName: '' });
     } catch (error) {
+      console.error("Delete error:", error);
+      
+      // Restore the company in case of error
+      const companiesRef = collection(db, 'companyMOA');
+      const unsubscribe = onSnapshot(companiesRef, (snapshot) => {
+        const companiesData = [];
+        const currentDate = new Date();
+        
+        snapshot.forEach((doc) => {
+          const companyData = { id: doc.id, ...doc.data() };
+          if (companyData.withExpiration && companyData.moaExpirationDate) {
+            const expirationDate = new Date(companyData.moaExpirationDate);
+            if (expirationDate < currentDate) {
+              companiesData.push(companyData);
+            }
+          }
+        });
+        
+        setCompanies(companiesData);
+        unsubscribe();
+      });
+      
       setNotification({
         message: `Error deleting company: ${error.message}`,
         type: 'error'
       });
+    } finally {
+      setDeleteLoading(false);
+      setDeletingCompanyId(null);
+      setTimeout(() => setNotification(null), 3000);
     }
-    setTimeout(() => setNotification(null), 3000);
   };
 
   const confirmDelete = (id, name) => {
@@ -329,10 +370,15 @@ const ExpiredCompanies = () => {
                 Cancel
               </button>
               <button
-                className="confirm-btn"
+                className={`confirm-btn ${deleteLoading ? 'loading' : ''}`}
                 onClick={handleDelete}
+                disabled={deleteLoading}
               >
-                Delete
+                {deleteLoading ? (
+                  <>
+                    <i className="fas fa-spinner fa-spin"></i> Deleting...
+                  </>
+                ) : 'Delete'}
               </button>
             </div>
           </div>
@@ -504,15 +550,26 @@ const ExpiredCompanies = () => {
                             className="edit-btn" 
                             onClick={() => handleEditCompany(company)}
                             aria-label="Edit company"
+                            title="Edit company"
                           >
                             <i className="fas fa-edit"></i>
+                            <span className="action-label">Edit</span>
                           </button>
                           <button 
-                            className="delete-btn" 
+                            className={`delete-btn ${deletingCompanyId === company.id ? 'loading' : ''}`}
                             onClick={() => confirmDelete(company.id, company.companyName)}
+                            disabled={deleteLoading && deletingCompanyId === company.id}
                             aria-label="Delete company"
+                            title="Delete company"
                           >
-                            <i className="fas fa-trash-alt"></i>
+                            {deleteLoading && deletingCompanyId === company.id ? (
+                              <i className="fas fa-spinner fa-spin"></i>
+                            ) : (
+                              <>
+                                <i className="fas fa-trash-alt"></i>
+                                <span className="action-label">Delete</span>
+                              </>
+                            )}
                           </button>
                         </div>
                       </td>
